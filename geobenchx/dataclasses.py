@@ -1,5 +1,6 @@
 import json
 import os
+from pathlib import Path
 from collections import Counter
 from pprint import pformat, pprint
 from typing import Any, Dict, List, Optional, Union
@@ -143,7 +144,7 @@ class TaskSet(BaseModel):
         self.tasks.extend(tasks)
 
     @classmethod
-    def read_from_file(cls, filename: str, folder:str = DATA_FOLDER) -> "TaskSet":
+    def read_from_file(cls, filename: str, folder: str = DATA_FOLDER) -> "TaskSet":
         """
         Reads tasks and metadata from a JSON file.
 
@@ -155,8 +156,8 @@ class TaskSet(BaseModel):
             TaskSet object
         """    
 
-        file_path = os.path.join(folder, filename)
-        
+        file_path = Path(folder) / filename
+
         with open(file_path, 'r', encoding='utf-8') as f:
             data = json.load(f)
 
@@ -172,11 +173,12 @@ class TaskSet(BaseModel):
             folder: Directory path for output file
 
         """
+        folder_path = Path(folder)
         # Create the folder if it doesn't exist
-        os.makedirs(folder, exist_ok=True)
-        
+        os.makedirs(folder_path, exist_ok=True)
+
         # Full path to the output file
-        file_path = os.path.join(folder, filename)
+        file_path = folder_path / filename
         
         # Convert the taskset to a dictionary
         data = self.model_dump()

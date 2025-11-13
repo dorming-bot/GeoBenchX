@@ -1,4 +1,4 @@
-overpy 
+overpy
 contextily
 google-generativeai
 geopandas
@@ -19,22 +19,18 @@ langchain_core
 langgraph
 numpy
 pandas
-pathlib
 langchain_google_genai
 langchain_anthropic
 langchain_openai
 nbformat
 plotly
-shapely
 networkx
-typing_extensions
-gdal
-contextily
-zipfile
+# gdal  # 注释掉，使用下面的替代方案
+# 使用预编译的 GDAL 包，在 Windows 上更容易安装
+# 可以通过 conda 安装：conda install -c conda-forge gdal
+# 或者使用：pip install GDAL==3.8.4  # 指定版本
 pydantic
 streamlit
 statsmodels
 scikit-learn
 kaleido
-html
-gc

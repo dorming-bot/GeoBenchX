@@ -197,10 +197,18 @@ You provide concise reasoning before making decisions on whether the candidate s
 
 TOOLS_DESCRIPTION = ''
 for tool in tools:
-    tool_args_str = '\n'.join([f"{name}({v.get('type', '')}): {v['description']}" for name, v in tool.args.items() if name != 'state'])
-    tool_args_str = tool_args_str.replace("{", "{{").replace("}", "}}")
-    tool_description = tool.description.replace("{", "{{").replace("}", "}}")
-    TOOLS_DESCRIPTION = TOOLS_DESCRIPTION + f"""<TOOL>Tool name: {tool.name}\n Tool arguments:\n {tool_args_str} \n Tool description: {tool_description}</TOOL>\n\n""" 
+    try:
+        tool_args_str = '\n'.join([
+            f"{name}({v.get('type', '')}): {v.get('description', 'No description available')}" 
+            for name, v in tool.args.items() 
+            if name != 'state'
+        ])
+        tool_args_str = tool_args_str.replace("{", "{{").replace("}", "}}")
+        tool_description = getattr(tool, 'description', 'No description available').replace("{", "{{").replace("}", "}}")
+        TOOLS_DESCRIPTION = TOOLS_DESCRIPTION + f"""<TOOL>Tool name: {tool.name}\n Tool arguments:\n {tool_args_str} \n Tool description: {tool_description}</TOOL>\n\n"""
+    except Exception as e:
+        print(f"Warning: Error processing tool {tool.name}: {str(e)}")
+        continue
 
 EXAMPLES = ''
 for example in examples_list:
