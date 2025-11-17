@@ -11,7 +11,9 @@ from geobenchx.dataclasses import TaskSet
 from geobenchx.save_chats import save_conversation_to_html
 
 
-wait_time = 61
+wait_time = 120
+REQUEST_DELAY_SECONDS = 10.0  # 控制连续调用之间的最小间隔
+POST_TASK_DELAY_SECONDS = 30.0  # 每个任务结束后额外等待
 
 def generate_solutions(tasks: TaskSet, model: str, temperature: float, output_filename: str = None, max_steps: int =25, skip_solved = True, capture_history = False) -> tuple[TaskSet, int]:
     """
@@ -43,6 +45,7 @@ def generate_solutions(tasks: TaskSet, model: str, temperature: float, output_fi
     tasks.metadata['temperature'] = temperature
     total_input = 0
     total_output = 0
+    last_request_ts = 0.0
     for task in tqdm(tasks):
         print(f"Task ID: {task.task_ID}")
         print(f"Task text: {task.task_text}")
@@ -53,6 +56,10 @@ def generate_solutions(tasks: TaskSet, model: str, temperature: float, output_fi
         try_count = 0
         while(not success):
             try:
+                elapsed = time.time() - last_request_ts
+                if elapsed < REQUEST_DELAY_SECONDS:
+                    time.sleep(REQUEST_DELAY_SECONDS - elapsed)
+                last_request_ts = time.time()
                 solution, input_tokens, output_tokens, conversation_history = execute_task(task.task_text, temperature = temperature, model=model, max_steps=max_steps, capture_history=capture_history)
                 print('='*30)
                 print(get_solution_code(solution))
@@ -70,6 +77,8 @@ def generate_solutions(tasks: TaskSet, model: str, temperature: float, output_fi
 
                 save_conversation_to_html(task, conversation_history, run_folder)
                 del conversation_history
+
+                time.sleep(POST_TASK_DELAY_SECONDS)
 
             except Exception as e:
                 try_count += 1

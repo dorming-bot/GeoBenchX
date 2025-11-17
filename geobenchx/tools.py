@@ -85,6 +85,12 @@ GEO_CATALOG = {
     "Municipalities of Brazil": "bra_admbnda_adm2_ibge_2020.shp",
     "Regions of Peru":"per_admbnda_adm1_ign_20200714.shp",
     "Provinces of Peru": "per_admbnda_adm2_ign_20200714.shp",
+    "2014 China POI": "2014_China_POI.shp",
+    "Chengdu Surface": "Chengdu_Surface.shp",
+    "Jiuzhaigou earthquake zone": "Jiuzhai.shp",
+    "Forest Water Conservation China": "ForestWaterRetentionChina.shp",
+    "Wuhan Urban Parks": "park_in_wuhan.shp",
+    "Beijing-Tianjin-Hebei boundary": "2020jjj.shp",
     }
 
 RASTER_CATALOG = {

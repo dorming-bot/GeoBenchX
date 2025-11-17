@@ -1,0 +1,268 @@
+{
+    "metadata": {
+        "author": "zsx",
+        "notes": "Custom tasks derived from GeoBenchX base format"
+    },
+    "tasks": [
+        {
+            "task_ID": "TASK_251113_142843_001001",
+            "task_text": "Count the total number of POI points in the 2014 China POI data that fall within Chengdu City.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": "Load the Chengdu municipal polygon and the 2014 POI point shapefile from data/Data/GeoData, select the POIs located within the Chengdu boundary, and tally the resulting features to report the total count.",
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "load_geodata",
+                            "arguments": {
+                                "geodataset": "2014 China POI",
+                                "output_geodataframe_name": "china_poi_2014"
+                            },
+                            "comment": "Register '2014 China POI': 'data/Data/GeoData/2014_China_POI.shp' in GEO_CATALOG so this call loads all POI points into GeoDataFrame 'china_poi_2014'."
+                        },
+                        {
+                            "function_name": "load_geodata",
+                            "arguments": {
+                                "geodataset": "Chengdu Surface",
+                                "output_geodataframe_name": "chengdu_boundary"
+                            },
+                            "comment": "Register 'Chengdu Surface': 'data/Data/GeoData/Chengdu_Surface.shp' in GEO_CATALOG to bring the Chengdu city polygon into GeoDataFrame 'chengdu_boundary'."
+                        },
+                        {
+                            "function_name": "select_features_by_spatial_relationship",
+                            "arguments": {
+                                "features_geodataframe_name": "china_poi_2014",
+                                "reference_geodataframe_name": "chengdu_boundary",
+                                "spatial_predicates": [
+                                    "within"
+                                ],
+                                "output_geodataframe_name": "poi_within_chengdu",
+                                "plot_result": false
+                            },
+                            "comment": "Filter POI points that fall inside Chengdu's polygon; the returned message reports how many features satisfy the 'within' predicate and stores them in 'poi_within_chengdu'."
+                        },
+                        {
+                            "function_name": "calculate_column_statistics",
+                            "arguments": {
+                                "dataframe_name": "poi_within_chengdu",
+                                "column_name": "OBJECTID",
+                                "output_variable_name": "poi_within_chengdu_stats",
+                                "include_quantiles": false,
+                                "additional_quantiles": null
+                            },
+                            "comment": "Use any stable numeric identifier column (e.g., OBJECTID or FID) to get the exact record count for POIs inside Chengdu; adjust column_name if the shapefile uses a different field."
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_251113_170215_002002",
+            "task_text": "Select the areas located within the Jiuzhaigou earthquake zone and classified as forest water conservation zones to be designated as ecological core restoration areas.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize"
+            ],
+            "reference_solution_description": "Use the national forest water retention layer and the Jiuzhaigou earthquake zone polygon to isolate the conservation areas that fall inside the seismic boundary, then output/visualize the candidate ecological core restoration areas.",
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "load_geodata",
+                            "arguments": {
+                                "geodataset": "Forest Water Conservation China",
+                                "output_geodataframe_name": "forest_water_retention"
+                            },
+                            "comment": "Register 'Forest Water Conservation China': 'data/Data/GeoData/ForestWaterRetentionChina.shp' in GEO_CATALOG so this call loads the forest water conservation polygons."
+                        },
+                        {
+                            "function_name": "load_geodata",
+                            "arguments": {
+                                "geodataset": "Jiuzhaigou Earthquake Zone",
+                                "output_geodataframe_name": "jiuzhai_quake_zone"
+                            },
+                            "comment": "Register 'Jiuzhaigou Earthquake Zone': 'data/Data/GeoData/jiuzhai.shp' in GEO_CATALOG to bring the earthquake-affected boundary into memory."
+                        },
+                        {
+                            "function_name": "select_features_by_spatial_relationship",
+                            "arguments": {
+                                "features_geodataframe_name": "forest_water_retention",
+                                "reference_geodataframe_name": "jiuzhai_quake_zone",
+                                "spatial_predicates": [
+                                    "within",
+                                    "intersects"
+                                ],
+                                "output_geodataframe_name": "core_restoration_candidates",
+                                "plot_result": false
+                            },
+                            "comment": "Clip the forest water retention polygons to the earthquake zone; using both 'within' and 'intersects' ensures partial overlaps are retained for restoration design."
+                        },
+                        {
+                            "function_name": "visualize_geographies",
+                            "arguments": {
+                                "geodataframe_names": [
+                                    "jiuzhai_quake_zone",
+                                    "core_restoration_candidates"
+                                ],
+                                "layer_styles": [
+                                    {
+                                        "color": "#8c510a",
+                                        "alpha": 0.4,
+                                        "linewidth": 0.8,
+                                        "label": "Jiuzhaigou earthquake zone"
+                                    },
+                                    {
+                                        "color": "#01665e",
+                                        "alpha": 0.7,
+                                        "linewidth": 0.5,
+                                        "label": "Forest water conservation areas inside zone"
+                                    }
+                                ],
+                                "basemap_style": "OpenStreetMap",
+                                "title": "Ecological Core Restoration Candidates in Jiuzhaigou"
+                            },
+                            "comment": "Map the resulting candidate polygons against the earthquake footprint to communicate where ecological core restoration should occur."
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_251113_173012_003003",
+            "task_text": "Calculate the total area of all urban parks in Wuhan.",
+            "task_labels": [
+                "Spatial operations",
+                "Process, Merge, Visualize",
+                "Task Set 03"
+            ],
+            "reference_solution_description": "Load the Wuhan urban park polygons, keep the provided square-metre area attribute, and summarize that column directly to report the total park area in square metres.",
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "load_geodata",
+                            "arguments": {
+                                "geodataset": "Wuhan Urban Parks",
+                                "output_geodataframe_name": "wuhan_parks"
+                            },
+                            "comment": "Register 'Wuhan Urban Parks': 'data/Data/GeoData/park_in_wuhan.shp' in GEO_CATALOG so the shapefile with every park polygon can be loaded."
+                        },
+                        {
+                            "function_name": "get_unique_values",
+                            "arguments": {
+                                "dataframe_name": "wuhan_parks",
+                                "column": "Area_sqm"
+                            },
+                            "comment": "Any inspection tool works; alternatively call get_dataframe_info. The key is to confirm that the attribute table already contains the 'Area_sqm' numeric field with each park's area in square metres so we can sum it without recomputing geometry."
+                        },
+                        {
+                            "function_name": "calculate_column_statistics",
+                            "arguments": {
+                                "dataframe_name": "wuhan_parks",
+                                "column_name": "Area_sqm",
+                                "output_variable_name": "wuhan_parks_area_stats",
+                                "include_quantiles": false,
+                                "additional_quantiles": null
+                            },
+                            "comment": "Use the stored summary dict to read 'valid_count' and 'mean' for Area_sqm; multiplying these two numbers gives the total park area in square metres (since Area_sqm is already the per-park value)."
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_251113_181735_004004",
+            "task_text": "Count the total number of POI points in the 2014 China POI data that are located within the Beijing-Tianjin-Hebei region.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": "Load the 2014 national POI point dataset and the Beijing-Tianjin-Hebei boundary, select POIs that lie within that region, and use a statistics call to report the total count of qualifying POIs.",
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "load_geodata",
+                            "arguments": {
+                                "geodataset": "2014 China POI",
+                                "output_geodataframe_name": "china_poi_2014"
+                            },
+                            "comment": "Same dataset as Task 1; keep '2014 China POI': 'data/Data/GeoData/2014_China_POI.shp' registered so all national POI points are available."
+                        },
+                        {
+                            "function_name": "load_geodata",
+                            "arguments": {
+                                "geodataset": "Beijing Tianjin Hebei Region",
+                                "output_geodataframe_name": "bth_region"
+                            },
+                            "comment": "Add 'Beijing Tianjin Hebei Region': 'data/Data/GeoData/2020jjj.shp' to GEO_CATALOG so the Jing-Jin-Ji polygon is accessible."
+                        },
+                        {
+                            "function_name": "select_features_by_spatial_relationship",
+                            "arguments": {
+                                "features_geodataframe_name": "china_poi_2014",
+                                "reference_geodataframe_name": "bth_region",
+                                "spatial_predicates": [
+                                    "within"
+                                ],
+                                "output_geodataframe_name": "poi_within_bth",
+                                "plot_result": false
+                            },
+                            "comment": "Filter the POIs to those inside the Beijing-Tianjin-Hebei boundary and store them in 'poi_within_bth' for counting or visualization."
+                        },
+                        {
+                            "function_name": "calculate_column_statistics",
+                            "arguments": {
+                                "dataframe_name": "poi_within_bth",
+                                "column_name": "OBJECTID",
+                                "output_variable_name": "poi_within_bth_stats",
+                                "include_quantiles": false,
+                                "additional_quantiles": null
+                            },
+                            "comment": "Use a stable numeric identifier column (OBJECTID/FID) so the 'valid_count' in the statistics output equals the total number of POIs inside Jing-Jin-Ji."
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        }
+    ]
+}
