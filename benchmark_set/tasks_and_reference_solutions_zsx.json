@@ -151,13 +151,13 @@
         },
         {
             "task_ID": "TASK_251113_173012_003003",
-            "task_text": "Calculate the total area of all urban parks in Wuhan.",
+            "task_text": "Calculate the total area of all urban parks in Wuhan. Please follow this exact tool sequence: 1) load_geodata(geodataset='Wuhan Urban Parks', output_geodataframe_name='wuhan_parks'); 2) calculate_column_total(dataframe_name='wuhan_parks', column_name='Area_sqm', output_variable_name='wuhan_parks_total_area'); 3) report the total from wuhan_parks_total_area['total'] (if 'Area_sqm' is missing, try 'Area').",
             "task_labels": [
                 "Spatial operations",
                 "Process, Merge, Visualize",
                 "Task Set 03"
             ],
-            "reference_solution_description": "Load the Wuhan urban park polygons, keep the provided square-metre area attribute, and summarize that column directly to report the total park area in square metres.",
+            "reference_solution_description": "Load the Wuhan urban park polygons, confirm the table exposes the 'Area_sqm' (or 'Area') attribute, and sum that column directly using the total-calculation tool to report the total park area in square metres.",
             "reference_solutions": [
                 {
                     "steps": [
@@ -178,15 +178,13 @@
                             "comment": "Any inspection tool works; alternatively call get_dataframe_info. The key is to confirm that the attribute table already contains the 'Area_sqm' numeric field with each park's area in square metres so we can sum it without recomputing geometry."
                         },
                         {
-                            "function_name": "calculate_column_statistics",
+                            "function_name": "calculate_column_total",
                             "arguments": {
                                 "dataframe_name": "wuhan_parks",
                                 "column_name": "Area_sqm",
-                                "output_variable_name": "wuhan_parks_area_stats",
-                                "include_quantiles": false,
-                                "additional_quantiles": null
+                                "output_variable_name": "wuhan_parks_total_area"
                             },
-                            "comment": "Use the stored summary dict to read 'valid_count' and 'mean' for Area_sqm; multiplying these two numbers gives the total park area in square metres (since Area_sqm is already the per-park value)."
+                            "comment": "Sum the Area_sqm attribute directly; the stored result exposes the 'total' key representing the combined park area in square metres."
                         }
                     ]
                 }

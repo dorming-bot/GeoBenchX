@@ -972,6 +972,61 @@ def calculate_column_statistics(
     except Exception as e:
         return f"Error calculating statistics: {type(e).__name__} : {str(e)}"    
 
+# Create tool function to calculate total value of a numeric column
+def calculate_column_total(
+    dataframe_name: Annotated[str, "Name of DataFrame/GeoDataFrame in data_store"],
+    column_name: Annotated[str, "Name of numeric column to sum"],
+    output_variable_name: Annotated[str, "Name for storing the calculated totals"],
+    state: Annotated[dict, InjectedState]
+) -> str:
+    """
+    Calculate the total value of a numeric column in a DataFrame or GeoDataFrame.
+
+    Args:
+        dataframe_name: Name of DataFrame/GeoDataFrame in data store
+        column_name: Column containing numeric values to sum
+        output_variable_name: Name for storing the results
+        state: Current graph state containing dataframes
+
+    Returns:
+        str: Summary of the calculated total with counts of valid/missing rows
+    """
+    try:
+        if "data_store" not in state:
+            state["data_store"] = {}
+
+        df = state["data_store"].get(dataframe_name)
+        if df is None:
+            return f"Error: DataFrame '{dataframe_name}' not found in data store"
+
+        if column_name not in df.columns:
+            return f"Error: Column '{column_name}' not found in DataFrame"
+
+        column_series = pd.to_numeric(df[column_name], errors="coerce")
+        valid_mask = column_series.notna()
+        valid_count = int(valid_mask.sum())
+        missing_count = int(len(column_series) - valid_count)
+        total_value = float(column_series[valid_mask].sum()) if valid_count > 0 else 0.0
+
+        result = {
+            "total": total_value,
+            "valid_count": valid_count,
+            "missing_count": missing_count
+        }
+
+        state["data_store"][output_variable_name] = result
+
+        return (
+            f"Calculated total for column '{column_name}' in {dataframe_name}.\n"
+            f"- Total value: {total_value:,.2f}\n"
+            f"- Valid rows summed: {valid_count}\n"
+            f"- Rows ignored due to missing/non-numeric values: {missing_count}\n"
+            f"Results stored in '{output_variable_name}'."
+        )
+
+    except Exception as e:
+        return f"Error calculating column total: {type(e).__name__} : {str(e)}"
+
 # Create tool funtion to make buffers arounf geometries in a GeoDataFrame
 def create_buffer(
     geodataframe_name: Annotated[str, "Name of GeoDataFrame containing spatial data"],
@@ -2490,6 +2545,12 @@ calculate_column_statistics_tool = StructuredTool.from_function(
     description='Calculate summary statistics (count (total, valid, and missing values), min/max range, mean, standard deviation) for a numerical column in a DataFrame/GeoDataFrame.\
         Optionally calculates quantiles (25th, 50th/median, 75th percentiles). Can calculate additional custom quantiles if specified. \
         Returns a formatted summary of the statistics. The tool can be used before applying numerical filters to calculate the optimal filtering thresholds.'
+)
+
+calculate_column_total_tool = StructuredTool.from_function(
+    func=calculate_column_total,
+    name='calculate_column_total',
+    description='Calculate the total (sum) of numeric values stored in a DataFrame/GeoDataFrame column and report how many rows contributed to the sum versus missing/non-numeric values.'
 )
 
 create_buffer_tool = StructuredTool.from_function(
