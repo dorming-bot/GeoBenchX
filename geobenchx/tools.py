@@ -33,6 +33,7 @@ import contextily as ctx
 from osgeo import gdal, gdal_array, ogr, osr
 from osgeo.gdalconst import *
 from shapely.geometry import LineString
+from pyproj import CRS, exceptions as pyproj_exceptions
 
 from geobenchx.utils import get_dataframe_info
 
@@ -88,9 +89,12 @@ GEO_CATALOG = {
     "2014 China POI": "2014_China_POI.shp",
     "Chengdu Surface": "Chengdu_Surface.shp",
     "Jiuzhaigou earthquake zone": "Jiuzhai.shp",
+    "Loess Plateau Region": "LoessPlateauRegion.shp",
+    "Wuhan POIs (3 locations)": "3_places_in_wuhan.shp",
     "Forest Water Conservation China": "ForestWaterRetentionChina.shp",
     "Wuhan Urban Parks": "park_in_wuhan.shp",
     "Beijing-Tianjin-Hebei boundary": "2020jjj.shp",
+    "Traditional Villages of China": "VillagesChina.shp",
     }
 
 RASTER_CATALOG = {
@@ -1445,6 +1449,154 @@ def calculate_line_lengths(
     except Exception as e:
         return f"Error: {type(e).__name__} : {str(e)}"   
 
+# Tool function to calculate polygon areas
+def calculate_polygon_areas(
+    geodataframe_name: Annotated[str, "Name of GeoDataFrame with polygon features"],
+    output_variable_name: Annotated[str, "Name for storing calculated areas"],
+    state: Annotated[dict, InjectedState],
+    area_column_name: Annotated[str, "Column to store per-feature area in square kilometers"] = "area_sq_km"
+) -> str:
+    """
+    Calculate polygon areas in square kilometers using an appropriate UTM projection.
+
+    Args:
+        geodataframe_name: Name of the GeoDataFrame with polygon geometries stored in data_store
+        output_variable_name: Name for storing the projected GeoDataFrame and summary statistics
+        state: Current graph state containing geodataframes and results
+        area_column_name: Column name for storing per-feature areas in square kilometers
+
+    Returns:
+        str: Status message summarizing UTM zone, total area, and where results are stored
+    """
+    try:
+        gdf = state["data_store"].get(geodataframe_name)
+        if gdf is None:
+            return f"Error: GeoDataFrame '{geodataframe_name}' not found"
+
+        if gdf.empty:
+            return f"Error: GeoDataFrame '{geodataframe_name}' has no features"
+
+        if gdf.geometry.is_empty.all():
+            return f"Error: GeoDataFrame '{geodataframe_name}' contains empty geometries"
+
+        centroid = gdf.geometry.union_all().centroid
+        utm_zone = int(np.floor((centroid.x + 180) / 6) + 1)
+        hemisphere = 'N' if centroid.y >= 0 else 'S'
+        epsg = 32600 + utm_zone if hemisphere == 'N' else 32700 + utm_zone
+
+        fallback_crs = "ESRI:102025"  # Asia North Albers Equal Area Conic
+        projection_label = f"UTM zone {utm_zone}{hemisphere} (EPSG:{epsg})"
+
+        try:
+            gdf_projected = gdf.to_crs(f'EPSG:{epsg}')
+        except Exception:
+            gdf_projected = gdf.to_crs(fallback_crs)
+            projection_label = f"Fallback CRS {fallback_crs}"
+
+        gdf_projected[area_column_name] = gdf_projected.geometry.area / 1_000_000
+        total_area_sq_km = gdf_projected[area_column_name].sum()
+
+        result = {
+            'gdf_with_areas': gdf_projected,
+            'total_area_sq_km': total_area_sq_km,
+            'area_column': area_column_name,
+            'utm_zone': utm_zone,
+            'epsg': epsg,
+            'projection_used': projection_label
+        }
+        state["data_store"][output_variable_name] = result
+
+        return (f"Calculated polygon areas in {geodataframe_name} using {projection_label}.\n"
+                f"Total area: {total_area_sq_km:,.2f} square kilometers\n"
+                f"Results stored in '{output_variable_name}' with per-feature areas in column '{area_column_name}'")
+
+    except Exception as e:
+        return f"Error: {type(e).__name__} : {str(e)}"
+
+def calculate_nearest_distances(
+    source_geodataframe_name: Annotated[str, "Name of GeoDataFrame containing source point features"],
+    target_geodataframe_name: Annotated[str, "Name of GeoDataFrame containing destination geometries (parks, facilities, etc.)"],
+    output_geodataframe_name: Annotated[str, "Name for storing the enriched GeoDataFrame with distance results"],
+    output_variable_name: Annotated[str, "Name for storing summary information about the calculation"],
+    state: Annotated[dict, InjectedState],
+    distance_column_name: Annotated[str, "Column name to store nearest-feature distance in kilometers"] = "nearest_distance_km",
+    nearest_id_column_name: Annotated[str, "Column to store identifier of the nearest target feature"] = "nearest_target_id"
+) -> str:
+    """
+    Calculate the distance from each point in a GeoDataFrame to its nearest feature in another GeoDataFrame.
+
+    Args:
+        source_geodataframe_name: Points requiring distance measurements
+        target_geodataframe_name: Reference GeoDataFrame containing candidate destination geometries
+        output_geodataframe_name: Name for storing the GeoDataFrame with distance columns
+        output_variable_name: Name for storing calculation metadata and summary
+        state: Graph state with cached GeoDataFrames
+        distance_column_name: Column name for distances (in km)
+        nearest_id_column_name: Column name capturing the index of the nearest target feature
+
+    Returns:
+        str: Status message summarizing CRS used and key statistics
+    """
+    try:
+        points_gdf = state["data_store"].get(source_geodataframe_name)
+        targets_gdf = state["data_store"].get(target_geodataframe_name)
+
+        if points_gdf is None:
+            return f"Error: GeoDataFrame '{source_geodataframe_name}' not found"
+        if targets_gdf is None:
+            return f"Error: GeoDataFrame '{target_geodataframe_name}' not found"
+        if points_gdf.empty or targets_gdf.empty:
+            return "Error: Source or target GeoDataFrame is empty"
+
+        centroid = points_gdf.geometry.union_all().centroid
+        utm_zone = int(np.floor((centroid.x + 180) / 6) + 1)
+        hemisphere = 'N' if centroid.y >= 0 else 'S'
+        epsg = 32600 + utm_zone if hemisphere == 'N' else 32700 + utm_zone
+        fallback_crs = "ESRI:102025"
+        projection_label = f"UTM zone {utm_zone}{hemisphere} (EPSG:{epsg})"
+
+        try:
+            points_proj = points_gdf.to_crs(f'EPSG:{epsg}')
+            targets_proj = targets_gdf.to_crs(f'EPSG:{epsg}')
+        except Exception:
+            points_proj = points_gdf.to_crs(fallback_crs)
+            targets_proj = targets_gdf.to_crs(fallback_crs)
+            projection_label = f"Fallback CRS {fallback_crs}"
+
+        nearest_distances = []
+        nearest_ids = []
+
+        target_geoms = targets_proj.geometry
+
+        for point in points_proj.geometry:
+            distances = target_geoms.distance(point)
+            min_index = distances.idxmin()
+            nearest_ids.append(min_index)
+            nearest_distances.append(distances.loc[min_index])
+
+        enriched_gdf = points_gdf.copy()
+        enriched_gdf[distance_column_name] = np.array(nearest_distances) / 1000  # convert to km
+        enriched_gdf[nearest_id_column_name] = nearest_ids
+
+        state["data_store"][output_geodataframe_name] = enriched_gdf
+        state["data_store"][output_variable_name] = {
+            "result_geodataframe": enriched_gdf,
+            "distance_column": distance_column_name,
+            "nearest_id_column": nearest_id_column_name,
+            "projection_used": projection_label,
+            "number_of_sources": len(enriched_gdf)
+        }
+
+        min_dist = enriched_gdf[distance_column_name].min()
+        max_dist = enriched_gdf[distance_column_name].max()
+
+        return (f"Calculated nearest distances from '{source_geodataframe_name}' to '{target_geodataframe_name}' using {projection_label}.\n"
+                f"Distance column '{distance_column_name}' added to '{output_geodataframe_name}'.\n"
+                f"Min distance: {min_dist:,.3f} km, Max distance: {max_dist:,.3f} km")
+
+    except Exception as e:
+        return f"Error: {type(e).__name__} : {str(e)}"
+
 # Tool function for operations between 2 columns in a (Geo)DataFrame    
 def calculate_columns(
    dataframe1_name: Annotated[str, "Name of first DataFrame in data_store"],
@@ -2589,6 +2741,19 @@ calculate_line_lengths_tool = StructuredTool.from_function(
     name='calculate_line_lengths',
     description='Calculates the lengths of line features in a GeoDataFrame in kilometers, using appropriate UTM projections for accurate distance measurements. \
         Returns total lengh of line features in km, GeoDataFrame in UTM projection with column storing features length in m, and a descritive message of the results.'
+)
+
+calculate_polygon_areas_tool = StructuredTool.from_function(
+    func=calculate_polygon_areas,
+    name='calculate_polygon_areas',
+    description='Calculates areas of polygon features in a GeoDataFrame in square kilometers using an appropriate UTM projection. \
+        Returns total area, projected GeoDataFrame with a per-feature area column, and UTM metadata.'
+)
+
+calculate_nearest_distances_tool = StructuredTool.from_function(
+    func=calculate_nearest_distances,
+    name='calculate_nearest_distances',
+    description='Calculates the distance from each point feature to the nearest geometry in another GeoDataFrame, storing the results in kilometers and reporting the projection used.'
 )
 
 calculate_columns_tool = StructuredTool.from_function(

@@ -1,0 +1,174 @@
+{
+    "metadata": {
+        "author": "zsx",
+        "notes": "Token-lean tasks focusing on new tools"
+    },
+    "tasks": [
+        {
+            "task_ID": "TASK_251118_120501_005005",
+            "task_text": "Load the Loess Plateau Region shapefile and use the calculate_polygon_areas tool to report the total area in square kilometers.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": "This task validates the polygon-area tool: load the Loess Plateau Region boundary, run calculate_polygon_areas to project into the correct UTM zone, and read the total_area_sq_km result.",
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "load_geodata",
+                            "arguments": {
+                                "geodataset": "Loess Plateau Region",
+                                "output_geodataframe_name": "loess_plateau_region"
+                            },
+                            "comment": "Bring the Loess Plateau boundary (data/Data/GeoData/LoessPlateauRegion.shp) into memory for analysis."
+                        },
+                        {
+                            "function_name": "calculate_polygon_areas",
+                            "arguments": {
+                                "geodataframe_name": "loess_plateau_region",
+                                "output_variable_name": "loess_plateau_region_area",
+                                "area_column_name": "area_sq_km"
+                            },
+                            "comment": "Explicitly invoke the new polygon-area tool so the total area is available in loess_plateau_region_area['total_area_sq_km']."
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_251118_153200_006006",
+            "task_text": "Identify and count the number of traditional villages within the Loess Plateau region, and calculate their spatial density in the area (villages per 10,000 square kilometers).",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 04",
+                "Process, Merge, Visualize",
+                "Merge, Visualize"
+            ],
+            "reference_solution_description": "Load the Loess Plateau boundary and the national traditional village point layer, select the villages that fall inside the plateau, count them, and measure the plateau area with calculate_polygon_areas so density (villages per 10,000 sq km) can be derived.",
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "load_geodata",
+                            "arguments": {
+                                "geodataset": "Loess Plateau Region",
+                                "output_geodataframe_name": "loess_plateau_region"
+                            },
+                            "comment": "Load the Loess Plateau boundary (data/Data/GeoData/LoessPlateauRegion.shp) so it can be used as the spatial constraint for filtering."
+                        },
+                        {
+                            "function_name": "load_geodata",
+                            "arguments": {
+                                "geodataset": "Traditional Villages of China",
+                                "output_geodataframe_name": "villages_china"
+                            },
+                            "comment": "Load the nationwide traditional village points (data/Data/GeoData/VillagesChina.shp) to prepare for filtering."
+                        },
+                        {
+                            "function_name": "select_features_by_spatial_relationship",
+                            "arguments": {
+                                "features_geodataframe_name": "villages_china",
+                                "reference_geodataframe_name": "loess_plateau_region",
+                                "spatial_predicates": [
+                                    "within"
+                                ],
+                                "output_geodataframe_name": "villages_in_loess",
+                                "plot_result": false
+                            },
+                            "comment": "Select the traditional villages that fall within the Loess Plateau boundary and store them in 'villages_in_loess' for counting."
+                        },
+                        {
+                            "function_name": "calculate_column_statistics",
+                            "arguments": {
+                                "dataframe_name": "villages_in_loess",
+                                "column_name": "OBJECTID",
+                                "output_variable_name": "villages_in_loess_stats",
+                                "include_quantiles": false,
+                                "additional_quantiles": null
+                            },
+                            "comment": "Use the statistics tool to obtain 'valid_count', which equals the number of traditional villages within the plateau."
+                        },
+                        {
+                            "function_name": "calculate_polygon_areas",
+                            "arguments": {
+                                "geodataframe_name": "loess_plateau_region",
+                                "output_variable_name": "loess_plateau_area",
+                                "area_column_name": "area_sq_km"
+                            },
+                            "comment": "Run calculate_polygon_areas to obtain the total Loess Plateau area (loess_plateau_area['total_area_sq_km']) and document the projection used."
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_251118_174500_007007",
+            "task_text": "Calculate the distances from the three points of interest in Wuhan to their nearest parks using the 3_places_in_wuhan.shp dataset for the POIs.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 04",
+                "Process, Merge, Visualize"
+            ],
+            "reference_solution_description": "Load the Wuhan POI sample and park polygons, then use the nearest-distance tool to compute how far each POI is from the closest park, reporting the distances in kilometers.",
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "load_geodata",
+                            "arguments": {
+                                "geodataset": "Wuhan POIs (3 locations)",
+                                "output_geodataframe_name": "wuhan_pois"
+                            },
+                            "comment": "Load the three POIs from data/Data/GeoData/3_places_in_wuhan.shp so their coordinates are in memory."
+                        },
+                        {
+                            "function_name": "load_geodata",
+                            "arguments": {
+                                "geodataset": "Wuhan Urban Parks",
+                                "output_geodataframe_name": "wuhan_parks"
+                            },
+                            "comment": "Load the Wuhan park polygons (data/Data/GeoData/park_in_wuhan.shp) that will serve as candidate destinations."
+                        },
+                        {
+                            "function_name": "calculate_nearest_distances",
+                            "arguments": {
+                                "source_geodataframe_name": "wuhan_pois",
+                                "target_geodataframe_name": "wuhan_parks",
+                                "output_geodataframe_name": "wuhan_pois_with_distances",
+                                "output_variable_name": "wuhan_poi_distance_summary",
+                                "distance_column_name": "nearest_park_distance_km",
+                                "nearest_id_column_name": "nearest_park_index"
+                            },
+                            "comment": "Compute the distance from each POI to the nearest park; the resulting GeoDataFrame 'wuhan_pois_with_distances' stores the kilometers in 'nearest_park_distance_km'."
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        }
+    ]
+}
