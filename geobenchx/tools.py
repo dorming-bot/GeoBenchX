@@ -7,11 +7,12 @@ from pathlib import Path
 import ast
 import io
 import base64
+from datetime import datetime
 
 import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.ticker import FuncFormatter
-from matplotlib.colors import LinearSegmentedColormap
+from matplotlib.colors import LinearSegmentedColormap, ListedColormap
 from matplotlib.patches import Rectangle
 import numpy as np
 import pandas as pd
@@ -28,6 +29,7 @@ import geopandas as gpd
 import rasterio
 from rasterio.warp import reproject, Resampling
 from rasterio.mask import mask
+from rasterio.transform import array_bounds
 import plotly.express as px
 import contextily as ctx
 from osgeo import gdal, gdal_array, ogr, osr
@@ -703,6 +705,219 @@ def get_values_from_raster_with_geometries(
         return f"Error opening raster file: {type(e).__name__} : {str(e)}"
     except Exception as e:
         return f"Unexpected error: {type(e).__name__} : {str(e)}"
+
+# Tool function to classify/reclassify raster values by table ranges
+def classify_raster_zones(
+    raster_path: Annotated[str, "Path to the raster file to reclassify"],
+    reclassification_table: Annotated[str | List[Dict[str, Any]], "JSON string or list of dictionaries defining ranges: {'min_value': float, 'max_value': float, 'new_value': float, 'label': str (optional), 'color': str (optional)}"],
+    output_variable_name: Annotated[str, "Name for storing info about the reclassified raster"],
+    state: Annotated[dict, InjectedState],
+    band_number: Annotated[int, "1-based raster band number"] = 1,
+    nodata_value: Annotated[float, "Output nodata value for unmatched pixels"] = -9999.0,
+    output_raster_path: Annotated[str | None, "Optional path to save the reclassified raster (defaults to SCRATCHPATH/classified_<rastername>.tif)"] = None,
+    overwrite_existing: Annotated[bool, "If True, overwrite an existing output raster at the same path"] = True,
+    output_dtype: Annotated[Literal["float32", "float64", "int32", "int16", "uint8"], "Data type for the output raster"] = "float32",
+    plot_title: Annotated[str, "Title for the visualization"] = "Reclassified Raster",
+    legend_location: Annotated[str, "Matplotlib legend location string"] = "upper right"
+) -> str:
+    """
+    Classify a raster using a table of value ranges, similar to QGIS "Reclassify by table".
+    Generates a GeoTIFF with the new classes, stores metadata, and plots the classes with user-provided colors.
+    """
+    try:
+        if "data_store" not in state:
+            state["data_store"] = {}
+        if "image_store" not in state:
+            state["image_store"] = []
+
+        if isinstance(reclassification_table, str):
+            reclassification_table = ast.literal_eval(reclassification_table)
+
+        if not isinstance(reclassification_table, list) or not reclassification_table:
+            return "Error: reclassification_table must be a non-empty list."
+        if not output_variable_name:
+            return "Error: output_variable_name must be provided."
+
+        dtype_map = {
+            "float32": np.float32,
+            "float64": np.float64,
+            "int32": np.int32,
+            "int16": np.int16,
+            "uint8": np.uint8
+        }
+        if output_dtype not in dtype_map:
+            return f"Error: Unsupported output_dtype '{output_dtype}'."
+
+        if not os.path.exists(raster_path):
+            return f"Error: Raster file '{raster_path}' not found."
+
+        with rasterio.open(raster_path) as src:
+            if band_number < 1 or band_number > src.count:
+                return f"Error: band_number {band_number} is outside available bands (1-{src.count})."
+
+            raster_data = src.read(band_number)
+            transform = src.transform
+            bounds = array_bounds(src.height, src.width, transform)
+            profile = src.profile
+            source_nodata = src.nodata
+            pixel_area_sq_km = abs(transform.a * transform.e) / 1_000_000
+
+        valid_mask = np.isfinite(raster_data)
+        if source_nodata is not None:
+            valid_mask &= raster_data != source_nodata
+
+        dtype_cls = dtype_map[output_dtype]
+        if np.issubdtype(dtype_cls, np.integer):
+            dtype_info = np.iinfo(dtype_cls)
+        else:
+            dtype_info = np.finfo(dtype_cls)
+
+        nodata_used = nodata_value
+        if not (dtype_info.min <= nodata_value <= dtype_info.max):
+            nodata_used = dtype_info.min
+
+        reclass_data = np.full(raster_data.shape, nodata_used, dtype=dtype_cls)
+        class_index = np.full(raster_data.shape, -1, dtype=np.int16)
+
+        default_colors = ["#2ca25f", "#feb24c", "#de2d26", "#756bb1", "#3182bd", "#bdbdbd", "#636363"]
+        class_info: List[Dict[str, Any]] = []
+
+        sorted_table = sorted(
+            reclassification_table,
+            key=lambda row: (
+                float(row.get("min_value", row.get("min", 0))),
+                float(row.get("max_value", row.get("max", 0)))
+            )
+        )
+
+        for idx, row in enumerate(sorted_table):
+            min_val_raw = row.get("min_value", row.get("min"))
+            max_val_raw = row.get("max_value", row.get("max"))
+            new_val_raw = row.get("new_value", row.get("value"))
+
+            missing_keys = []
+            if min_val_raw is None:
+                missing_keys.append("min_value")
+            if max_val_raw is None:
+                missing_keys.append("max_value")
+            if new_val_raw is None:
+                missing_keys.append("new_value")
+            if missing_keys:
+                return f"Error: Missing keys {missing_keys} in table entry {row}"
+
+            min_value = float(min_val_raw)
+            max_value = float(max_val_raw)
+            if max_value < min_value:
+                return f"Error: max_value < min_value in table entry {row}"
+            new_value = float(new_val_raw)
+            label = row.get("label") or f"Class {new_value}"
+            color = row.get("color") or default_colors[idx % len(default_colors)]
+
+            mask = (raster_data >= min_value) & (raster_data <= max_value) & valid_mask
+            pixel_count = int(mask.sum())
+
+            if pixel_count > 0:
+                if np.issubdtype(dtype_cls, np.integer):
+                    new_value_cast = dtype_cls(int(round(new_value)))
+                else:
+                    new_value_cast = dtype_cls(new_value)
+                reclass_data[mask] = new_value_cast
+                class_index[mask] = idx
+
+            class_info.append({
+                "label": label,
+                "color": color,
+                "min_value": min_value,
+                "max_value": max_value,
+                "new_value": new_value,
+                "pixel_count": pixel_count,
+                "area_sq_km": pixel_count * pixel_area_sq_km
+            })
+
+        del raster_data
+
+        if output_raster_path is None:
+            Path(SCRATCH_PATH).mkdir(parents=True, exist_ok=True)
+            default_name = f"classified_{Path(raster_path).stem}.tif"
+            output_raster_path = os.path.join(SCRATCH_PATH, default_name)
+
+        output_path_obj = Path(output_raster_path)
+        output_path_obj.parent.mkdir(parents=True, exist_ok=True)
+        if output_path_obj.exists():
+            if overwrite_existing:
+                output_path_obj.unlink()
+                aux_file = output_path_obj.with_suffix(output_path_obj.suffix + ".aux.xml")
+                if aux_file.exists():
+                    aux_file.unlink()
+            else:
+                return f"Error: Output raster '{output_raster_path}' already exists. Set overwrite_existing=True to replace it or provide a different path."
+
+        output_array = reclass_data.astype(dtype_cls)
+        profile.update(dtype=output_dtype, count=1, nodata=nodata_used)
+
+        with rasterio.open(output_path_obj.as_posix(), "w", **profile) as dst:
+            dst.write(output_array, 1)
+        output_raster_path = output_path_obj.as_posix()
+
+        masked_display = np.ma.masked_where(class_index < 0, class_index)
+        cmap = ListedColormap([info["color"] for info in class_info]) if class_info else ListedColormap(["#cccccc"])
+
+        fig, ax = plt.subplots(1, 1, figsize=(10, 8))
+        ax.imshow(
+            masked_display,
+            cmap=cmap,
+            extent=(bounds[0], bounds[2], bounds[1], bounds[3]),
+            origin="upper"
+        )
+        ax.set_title(plot_title)
+        ax.set_axis_off()
+
+        legend_handles = [
+            Rectangle((0, 0), 1, 1, facecolor=info["color"], edgecolor="none", label=info["label"])
+            for info in class_info
+        ]
+        if legend_handles:
+            ax.legend(handles=legend_handles, loc=legend_location, bbox_to_anchor=(1.02, 1), frameon=False)
+
+        buf = io.BytesIO()
+        fig.savefig(buf, format="png", bbox_inches="tight", dpi=150)
+        buf.seek(0)
+        img_base64 = base64.b64encode(buf.read()).decode("utf-8")
+        buf.close()
+        plt.close(fig)
+
+        state["image_store"].append({
+            "type": "map",
+            "description": f"Reclassified raster visualization ({plot_title})",
+            "base64": img_base64
+        })
+
+        state["data_store"][output_variable_name] = {
+            "reclassified_raster_path": output_raster_path,
+            "class_info": class_info,
+            "nodata_value": nodata_used,
+            "band_number": band_number,
+            "table": sorted_table
+        }
+
+        summary_lines = [
+            f"- {info['label']}: {info['pixel_count']:,} pixels (~{info['area_sq_km']:.2f} sq km)"
+            for info in class_info
+        ]
+
+        summary = (
+            f"Classified raster '{Path(raster_path).name}' into {len(class_info)} classes.\n"
+            f"Output saved to '{output_raster_path}'.\n" +
+            "\n".join(summary_lines)
+        )
+        if nodata_used != nodata_value:
+            summary += f"\n(Note: nodata value adjusted to {nodata_used} to match dtype {output_dtype}.)"
+        if overwrite_existing:
+            summary += "\n(Existing output at this path is overwritten each run to avoid duplicate .tif files.)"
+        return summary
+
+    except Exception as e:
+        return f"Error classifying raster: {type(e).__name__} : {str(e)}"
 
 # Create tool function to merge 2 dataframes, or a dataframe and a geodataframe
 def merge_dataframes(
@@ -3038,6 +3253,13 @@ get_values_from_raster_with_geometries_tool = StructuredTool.from_function(
     description='Mask a raster using vector geometries from a GeoDataFrame and calculate statistics for the masked area of the raster.\
     The tool returns statistics (total value in masked areas, min, max, mean, standard deviation, count) and stores the cropped raster data in the specified variable. \
     Optionally displays a visualization of masked areas. ' 
+)
+
+classify_raster_zones_tool = StructuredTool.from_function(
+    func=classify_raster_zones,
+    name='classify_raster_zones',
+    description='Classify or reclassify raster values based on range definitions (min <= value <= max), similar to QGIS Reclassify by Table. \
+        Produces a new raster with specified dtype, stores class statistics, and visualizes the resulting zones with optional custom colors/labels.'
 )
 
 merge_dataframes_tool = StructuredTool.from_function(

@@ -56,7 +56,7 @@
                 "Process, Merge, Visualize",
                 "Heatmaps, Contour Lines"
             ],
-            "reference_solution_description": "Derive the GeoTIFF path, convert the raster slope icons into a GeoDataFrame, split the features into the three requested icon ranges, and visualize the reclassified levels together.",
+            "reference_solution_description": "Resolve the GeoTIFF path and use the classify_raster_zones tool to bin icon values into gentle/moderate/steep classes while producing a ready-made visualization of the three slope levels.",
             "reference_solutions": [
                 {
                     "steps": [
@@ -68,80 +68,36 @@
                             "comment": "Resolve the catalog path for data/Data/GeoData/WeiheBasin.tif before downstream processing."
                         },
                         {
-                            "function_name": "generate_contours_display",
+                            "function_name": "classify_raster_zones",
                             "arguments": {
                                 "raster_path": "data/Data/GeoData/WeiheBasin.tif",
-                                "output_filename": "weihe_slope_icons",
-                                "contour_interval": 1,
-                                "column_title": "iconvalue",
-                                "nodataval": -9999,
-                                "output_geodataframe_name": "weihe_slope_icons",
-                                "min_value": 1,
-                                "max_value": 7,
-                                "cleanup_files": true,
-                                "plot_result": false
-                            },
-                            "comment": "Convert the raster icon classifications into a GeoDataFrame so each isoline keeps its original icon value for subsequent grouping."
-                        },
-                        {
-                            "function_name": "filter_numerical",
-                            "arguments": {
-                                "dataframe_name": "weihe_slope_icons",
-                                "conditions": "iconvalue >= 6 and iconvalue <= 7",
-                                "output_dataframe_name": "weihe_gentle_slopes"
-                            },
-                            "comment": "Group the icon classes 6\u20137 labeled as gentle slopes."
-                        },
-                        {
-                            "function_name": "filter_numerical",
-                            "arguments": {
-                                "dataframe_name": "weihe_slope_icons",
-                                "conditions": "iconvalue >= 4 and iconvalue <= 5",
-                                "output_dataframe_name": "weihe_moderate_slopes"
-                            },
-                            "comment": "Group icon classes 4\u20135 representing moderate slopes."
-                        },
-                        {
-                            "function_name": "filter_numerical",
-                            "arguments": {
-                                "dataframe_name": "weihe_slope_icons",
-                                "conditions": "iconvalue >= 1 and iconvalue <= 3",
-                                "output_dataframe_name": "weihe_steep_slopes"
-                            },
-                            "comment": "Group icon classes 1\u20133 representing steep slopes."
-                        },
-                        {
-                            "function_name": "visualize_geographies",
-                            "arguments": {
-                                "geodataframe_names": [
-                                    "weihe_gentle_slopes",
-                                    "weihe_moderate_slopes",
-                                    "weihe_steep_slopes"
-                                ],
-                                "layer_styles": [
+                                "reclassification_table": [
                                     {
-                                        "color": "#2ca25f",
-                                        "alpha": 0.6,
-                                        "linewidth": 0.8,
-                                        "label": "Gentle (icons 6\u20137)"
+                                        "min_value": 6,
+                                        "max_value": 7,
+                                        "new_value": 3,
+                                        "label": "Gentle (icons 6\u20137)",
+                                        "color": "#2ca25f"
                                     },
                                     {
-                                        "color": "#feb24c",
-                                        "alpha": 0.6,
-                                        "linewidth": 0.8,
-                                        "label": "Moderate (icons 4\u20135)"
+                                        "min_value": 4,
+                                        "max_value": 5,
+                                        "new_value": 2,
+                                        "label": "Moderate (icons 4\u20135)",
+                                        "color": "#feb24c"
                                     },
                                     {
-                                        "color": "#de2d26",
-                                        "alpha": 0.6,
-                                        "linewidth": 0.8,
-                                        "label": "Steep (icons 1\u20133)"
+                                        "min_value": 1,
+                                        "max_value": 3,
+                                        "new_value": 1,
+                                        "label": "Steep (icons 1\u20133)",
+                                        "color": "#de2d26"
                                     }
                                 ],
-                                "title": "Wei River Basin Slope Classes",
-                                "basemap_style": "Carto Positron"
+                                "output_variable_name": "weihe_slope_reclass",
+                                "plot_title": "Wei River Basin Slope Classes"
                             },
-                            "comment": "Produce a layered graph (map) that visualizes the three reclassified slope categories together."
+                            "comment": "Use the classify_raster_zones tool to group icon ranges into the three requested slope levels and visualize the resulting raster."
                         }
                     ]
                 }
