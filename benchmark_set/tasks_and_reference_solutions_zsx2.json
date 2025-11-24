@@ -169,6 +169,48 @@
             "match_score_LLM": null,
             "match_reasoning_Human": null,
             "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_251118_191500_008008",
+            "task_text": "Analyze the spatial distribution of villages in China and identify their primary geographic extension directions.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 04",
+                "Process, Merge, Visualize"
+            ],
+            "reference_solution_description": "Load the national traditional village points and apply the Standard Deviational Ellipse tool to summarize their overall dispersion, reporting the dominant orientation and ellipse geometry.",
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "load_geodata",
+                            "arguments": {
+                                "geodataset": "Traditional Villages of China",
+                                "output_geodataframe_name": "villages_china"
+                            },
+                            "comment": "Load all traditional village points from data/Data/GeoData/VillagesChina.shp for analysis."
+                        },
+                        {
+                            "function_name": "calculate_standard_directional_ellipse",
+                            "arguments": {
+                                "geodataframe_name": "villages_china",
+                                "output_geodataframe_name": "villages_china_directional_ellipse",
+                                "output_variable_name": "villages_china_directional_summary",
+                                "num_standard_deviations": 1.5,
+                                "ellipse_points": 120
+                            },
+                            "comment": "Generate the Standard Deviational Ellipse, capturing semi-major/minor axes, orientation, and a visualization summarizing the primary extension direction of the villages."
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
         }
     ]
 }

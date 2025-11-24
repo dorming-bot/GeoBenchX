@@ -32,7 +32,9 @@ import plotly.express as px
 import contextily as ctx
 from osgeo import gdal, gdal_array, ogr, osr
 from osgeo.gdalconst import *
-from shapely.geometry import LineString
+from shapely.geometry import LineString, Point
+from shapely import affinity
+from shapely.ops import nearest_points
 from pyproj import CRS, exceptions as pyproj_exceptions
 
 from geobenchx.utils import get_dataframe_info
@@ -91,6 +93,7 @@ GEO_CATALOG = {
     "Jiuzhaigou earthquake zone": "Jiuzhai.shp",
     "Loess Plateau Region": "LoessPlateauRegion.shp",
     "Wuhan POIs (3 locations)": "3_places_in_wuhan.shp",
+    "Inner Mongolia roads": "road_in_neimenggu.shp",
     "Forest Water Conservation China": "ForestWaterRetentionChina.shp",
     "Wuhan Urban Parks": "park_in_wuhan.shp",
     "Beijing-Tianjin-Hebei boundary": "2020jjj.shp",
@@ -108,7 +111,8 @@ RASTER_CATALOG = {
     "Peru, Bolivia, Argentina, Chile flood, February 2018": "DFO_4569_From_20180201_to_20180221.tif",
     "Peru population, 2018, 1 km resolution": "per_ppp_2018_1km_Aggregated_UNadj.tif",
     "Brazil population, 2018, 1 km resolution": "bra_ppp_2018_1km_Aggregated_UNadj.tif",
-    "Algeria population density per 1 km 2020, 1 km resolution": "dza_pd_2020_1km_UNadj.tif"    
+    "Algeria population density per 1 km 2020, 1 km resolution": "dza_pd_2020_1km_UNadj.tif",
+    "Wei River Basin Topographic Slope Classification Dataset": "WeiheBasin.tif"
 }
 
 COLORMAPS = {
@@ -1548,6 +1552,9 @@ def calculate_nearest_distances(
         if points_gdf.empty or targets_gdf.empty:
             return "Error: Source or target GeoDataFrame is empty"
 
+        if "image_store" not in state:
+            state["image_store"] = []
+
         centroid = points_gdf.geometry.union_all().centroid
         utm_zone = int(np.floor((centroid.x + 180) / 6) + 1)
         hemisphere = 'N' if centroid.y >= 0 else 'S'
@@ -1565,34 +1572,410 @@ def calculate_nearest_distances(
 
         nearest_distances = []
         nearest_ids = []
+        distance_details = []
+        connection_lines = []
 
         target_geoms = targets_proj.geometry
 
-        for point in points_proj.geometry:
+        for point_idx, point in points_proj.geometry.items():
             distances = target_geoms.distance(point)
             min_index = distances.idxmin()
             nearest_ids.append(min_index)
-            nearest_distances.append(distances.loc[min_index])
+            nearest_distance_m = distances.loc[min_index]
+            nearest_distances.append(nearest_distance_m)
+
+            target_geom = targets_proj.loc[min_index].geometry
+            try:
+                source_point, target_point = nearest_points(point, target_geom)
+            except Exception:
+                source_point = point
+                target_point = target_geom.representative_point()
+
+            connection_lines.append(LineString([source_point, target_point]))
+            distance_details.append(
+                f"Source index {point_idx} -> target {min_index}: {nearest_distance_m / 1000:.3f} km"
+            )
 
         enriched_gdf = points_gdf.copy()
         enriched_gdf[distance_column_name] = np.array(nearest_distances) / 1000  # convert to km
         enriched_gdf[nearest_id_column_name] = nearest_ids
 
         state["data_store"][output_geodataframe_name] = enriched_gdf
+
+        lines_gdf = gpd.GeoDataFrame(
+            {
+                "source_index": list(points_gdf.index),
+                "nearest_target_index": nearest_ids,
+                distance_column_name: enriched_gdf[distance_column_name],
+            },
+            geometry=connection_lines,
+            crs=points_proj.crs,
+        )
+
+        lines_store_name = f"{output_geodataframe_name}_connections"
+        state["data_store"][lines_store_name] = lines_gdf
+
         state["data_store"][output_variable_name] = {
             "result_geodataframe": enriched_gdf,
+            "lines_geodataframe": lines_gdf,
             "distance_column": distance_column_name,
             "nearest_id_column": nearest_id_column_name,
             "projection_used": projection_label,
-            "number_of_sources": len(enriched_gdf)
+            "number_of_sources": len(enriched_gdf),
+            "distance_details": distance_details,
         }
+
+        try:
+            display_points = points_proj.to_crs(epsg=3857)
+            display_targets = targets_proj.to_crs(epsg=3857)
+            display_lines = lines_gdf.to_crs(epsg=3857)
+
+            fig, ax = plt.subplots(1, 1, figsize=(8, 8))
+            display_targets.plot(ax=ax, color="#7ec97e", alpha=0.4, edgecolor="#317531", linewidth=0.5, label="Targets")
+            display_lines.plot(ax=ax, color="#ff6f69", linewidth=2, label="Nearest line")
+            display_points.plot(ax=ax, color="#005f99", markersize=60, label="Source POIs")
+
+            ax.set_title("Nearest Park Connections")
+            ax.legend(loc="upper right")
+            ax.set_axis_off()
+
+            buf = io.BytesIO()
+            fig.savefig(buf, format="png", bbox_inches="tight", dpi=150)
+            buf.seek(0)
+            img_base64 = base64.b64encode(buf.read()).decode("utf-8")
+            buf.close()
+            plt.close(fig)
+
+            state["image_store"].append(
+                {
+                    "type": "map",
+                    "description": f"Nearest connections from {source_geodataframe_name} to {target_geodataframe_name}",
+                    "base64": img_base64,
+                }
+            )
+        except Exception:
+            pass
 
         min_dist = enriched_gdf[distance_column_name].min()
         max_dist = enriched_gdf[distance_column_name].max()
+        details_text = "\n".join(distance_details)
 
-        return (f"Calculated nearest distances from '{source_geodataframe_name}' to '{target_geodataframe_name}' using {projection_label}.\n"
-                f"Distance column '{distance_column_name}' added to '{output_geodataframe_name}'.\n"
-                f"Min distance: {min_dist:,.3f} km, Max distance: {max_dist:,.3f} km")
+        return (
+            f"Calculated nearest distances from '{source_geodataframe_name}' to '{target_geodataframe_name}' using {projection_label}.\n"
+            f"Distance column '{distance_column_name}' added to '{output_geodataframe_name}' (lines stored as '{lines_store_name}').\n"
+            f"Min distance: {min_dist:,.3f} km, Max distance: {max_dist:,.3f} km.\n"
+            f"All distances:\n{details_text}"
+        )
+
+    except Exception as e:
+        return f"Error: {type(e).__name__} : {str(e)}"
+
+def calculate_standard_directional_ellipse(
+    geodataframe_name: Annotated[str, "Name of GeoDataFrame containing point features to analyze"],
+    output_geodataframe_name: Annotated[str, "Name for storing the ellipse GeoDataFrame"],
+    output_variable_name: Annotated[str, "Name for storing summary statistics"],
+    state: Annotated[dict, InjectedState],
+    num_standard_deviations: Annotated[float, "Multiplier for the ellipse axes (1=1σ, 2=2σ, etc.)"] = 1.0,
+    ellipse_points: Annotated[int, "Number of vertices used to draw the ellipse boundary"] = 90
+) -> str:
+    """
+    Analyze point dispersion using a Standard Deviational Ellipse (directional distribution) and return the ellipse geometry and statistics.
+    """
+    try:
+        gdf = state["data_store"].get(geodataframe_name)
+        if gdf is None:
+            return f"Error: GeoDataFrame '{geodataframe_name}' not found"
+        if gdf.empty:
+            return f"Error: GeoDataFrame '{geodataframe_name}' has no features"
+
+        if "image_store" not in state:
+            state["image_store"] = []
+
+        centroid = gdf.geometry.union_all().centroid
+        utm_zone = int(np.floor((centroid.x + 180) / 6) + 1)
+        hemisphere = 'N' if centroid.y >= 0 else 'S'
+        epsg = 32600 + utm_zone if hemisphere == 'N' else 32700 + utm_zone
+        fallback_crs = "ESRI:102025"
+        projection_label = f"UTM zone {utm_zone}{hemisphere} (EPSG:{epsg})"
+
+        try:
+            points_proj = gdf.to_crs(f'EPSG:{epsg}')
+        except Exception:
+            points_proj = gdf.to_crs(fallback_crs)
+            projection_label = f"Fallback CRS {fallback_crs}"
+
+        coords = []
+        for geom in points_proj.geometry:
+            if geom is None or geom.is_empty:
+                continue
+            if geom.geom_type != "Point":
+                centroid_geom = geom.centroid
+                coords.append((centroid_geom.x, centroid_geom.y))
+            else:
+                coords.append((geom.x, geom.y))
+
+        if not coords:
+            return "Error: No valid geometries to analyze"
+
+        coords = np.array(coords)
+        mean_x = coords[:, 0].mean()
+        mean_y = coords[:, 1].mean()
+        diff_x = coords[:, 0] - mean_x
+        diff_y = coords[:, 1] - mean_y
+
+        sum_x2 = np.sum(diff_x ** 2)
+        sum_y2 = np.sum(diff_y ** 2)
+        sum_xy = np.sum(diff_x * diff_y)
+
+        theta = 0.5 * np.arctan2(2 * sum_xy, (sum_x2 - sum_y2))
+
+        major_component = (diff_x * np.cos(theta) + diff_y * np.sin(theta)) ** 2
+        minor_component = (diff_x * np.sin(theta) - diff_y * np.cos(theta)) ** 2
+
+        std_major = np.sqrt(major_component.sum() / len(coords))
+        std_minor = np.sqrt(minor_component.sum() / len(coords))
+
+        if std_major < std_minor:
+            std_major, std_minor = std_minor, std_major
+            theta += np.pi / 2
+
+        semi_major = std_major * num_standard_deviations
+        semi_minor = std_minor * num_standard_deviations
+
+        center = Point(mean_x, mean_y)
+        base_circle = center.buffer(1, resolution=ellipse_points)
+        ellipse_projected = affinity.scale(base_circle, semi_major, semi_minor)
+        ellipse_projected = affinity.rotate(ellipse_projected, np.degrees(theta), origin=center)
+
+        ellipse_gdf = gpd.GeoDataFrame(
+            {
+                "center_x": [mean_x],
+                "center_y": [mean_y],
+                "semi_major_km": [semi_major / 1000],
+                "semi_minor_km": [semi_minor / 1000],
+                "orientation_degrees_from_east": [(np.degrees(theta) % 180)],
+                "num_points": [len(coords)],
+                "projection_used": [projection_label],
+                "num_standard_deviations": [num_standard_deviations],
+            },
+            geometry=[ellipse_projected],
+            crs=points_proj.crs,
+        )
+
+        ellipse_original = ellipse_gdf.to_crs(gdf.crs)
+        state["data_store"][output_geodataframe_name] = ellipse_original
+
+        orientation_deg = float(ellipse_gdf["orientation_degrees_from_east"].iloc[0])
+
+        def describe_orientation(angle: float) -> str:
+            angle = angle % 180
+            if angle < 22.5 or angle >= 157.5:
+                return "East-West"
+            if angle < 67.5:
+                return "Northeast-Southwest"
+            if angle < 112.5:
+                return "North-South"
+            return "Northwest-Southeast"
+
+        summary = {
+            "semi_major_km": semi_major / 1000,
+            "semi_minor_km": semi_minor / 1000,
+            "orientation_degrees_from_east": orientation_deg,
+            "primary_direction": describe_orientation(orientation_deg),
+            "center_coordinates": (ellipse_original.geometry.centroid.x.iloc[0], ellipse_original.geometry.centroid.y.iloc[0]),
+            "num_points": len(coords),
+            "num_standard_deviations": num_standard_deviations,
+            "projection_used": projection_label,
+            "ellipse_geodataframe_name": output_geodataframe_name,
+        }
+        state["data_store"][output_variable_name] = summary
+
+        try:
+            display_points = points_proj.to_crs(epsg=3857)
+            display_ellipse = ellipse_gdf.to_crs(epsg=3857)
+
+            fig, ax = plt.subplots(1, 1, figsize=(8, 8))
+            display_ellipse.boundary.plot(ax=ax, color="#ff7f0e", linewidth=2, label="Directional ellipse")
+            display_points.plot(ax=ax, color="#1f77b4", markersize=8, alpha=0.7, label="Villages")
+            ax.set_title("Standard Deviational Ellipse")
+            ax.set_axis_off()
+            ax.legend(loc="upper right")
+
+            buf = io.BytesIO()
+            fig.savefig(buf, format="png", bbox_inches="tight", dpi=150)
+            buf.seek(0)
+            img_base64 = base64.b64encode(buf.read()).decode("utf-8")
+            buf.close()
+            plt.close(fig)
+
+            state["image_store"].append(
+                {
+                    "type": "map",
+                    "description": f"Directional ellipse for {geodataframe_name}",
+                    "base64": img_base64,
+                }
+            )
+        except Exception:
+            pass
+
+        return (
+            f"Calculated a {num_standard_deviations}σ directional ellipse for '{geodataframe_name}' using {projection_label}.\n"
+            f"Semi-major axis: {semi_major / 1000:,.2f} km, Semi-minor axis: {semi_minor / 1000:,.2f} km.\n"
+            f"Primary extension direction: {summary['primary_direction']} (orientation {orientation_deg:.2f}° from east).\n"
+            f"Ellipse stored as '{output_geodataframe_name}', stats stored in '{output_variable_name}'."
+        )
+
+    except Exception as e:
+        return f"Error: {type(e).__name__} : {str(e)}"
+
+def calculate_line_direction_rose(
+    geodataframe_name: Annotated[str, "Name of GeoDataFrame containing line features (roads, rivers, etc.)"],
+    output_table_name: Annotated[str, "Name for storing the orientation frequency table (DataFrame)"],
+    output_variable_name: Annotated[str, "Name for storing summary statistics"],
+    state: Annotated[dict, InjectedState],
+    number_of_bins: Annotated[int, "Number of directional bins for the rose diagram"] = 18
+) -> str:
+    """
+    Analyze orientations of line features and create a rose diagram summarizing their prevailing directions.
+    """
+    try:
+        gdf = state["data_store"].get(geodataframe_name)
+        if gdf is None:
+            return f"Error: GeoDataFrame '{geodataframe_name}' not found"
+        if gdf.empty:
+            return f"Error: GeoDataFrame '{geodataframe_name}' has no features"
+
+        if "image_store" not in state:
+            state["image_store"] = []
+
+        if number_of_bins < 4:
+            return "Error: number_of_bins must be at least 4"
+
+        centroid = gdf.geometry.union_all().centroid
+        utm_zone = int(np.floor((centroid.x + 180) / 6) + 1)
+        hemisphere = 'N' if centroid.y >= 0 else 'S'
+        epsg = 32600 + utm_zone if hemisphere == 'N' else 32700 + utm_zone
+        fallback_crs = "ESRI:102025"
+        projection_label = f"UTM zone {utm_zone}{hemisphere} (EPSG:{epsg})"
+
+        try:
+            lines_proj = gdf.to_crs(f'EPSG:{epsg}')
+        except Exception:
+            lines_proj = gdf.to_crs(fallback_crs)
+            projection_label = f"Fallback CRS {fallback_crs}"
+
+        def extract_lines(geom):
+            if geom is None or geom.is_empty:
+                return []
+            if geom.geom_type == "LineString":
+                return [geom]
+            if geom.geom_type == "MultiLineString":
+                return list(geom.geoms)
+            if geom.geom_type == "GeometryCollection":
+                lines = []
+                for g in geom.geoms:
+                    lines.extend(extract_lines(g))
+                return lines
+            return []
+
+        angles = []
+        lengths = []
+
+        for geom in lines_proj.geometry:
+            for line in extract_lines(geom):
+                coords = list(line.coords)
+                if len(coords) < 2:
+                    continue
+                for (x1, y1), (x2, y2) in zip(coords[:-1], coords[1:]):
+                    dx = x2 - x1
+                    dy = y2 - y1
+                    segment_length = np.hypot(dx, dy)
+                    if segment_length == 0:
+                        continue
+                    # Angle clockwise from north
+                    angle = (np.degrees(np.arctan2(dx, dy)) + 360) % 360
+                    angles.append(angle)
+                    lengths.append(segment_length)
+
+        if not lengths:
+            return "Error: Unable to derive segment orientations from the provided geometries"
+
+        bin_edges = np.linspace(0, 360, number_of_bins + 1)
+        bin_indices = np.digitize(angles, bin_edges) - 1
+        bin_indices[bin_indices == number_of_bins] = 0
+
+        totals = np.zeros(number_of_bins)
+        for idx, length in zip(bin_indices, lengths):
+            totals[idx] += length
+
+        totals_km = totals / 1000
+        bin_centers = (bin_edges[:-1] + bin_edges[1:]) / 2
+
+        orientation_table = pd.DataFrame({
+            "bin_start_deg": bin_edges[:-1],
+            "bin_end_deg": bin_edges[1:],
+            "bin_center_deg": bin_centers,
+            "total_length_km": totals_km
+        })
+        state["data_store"][output_table_name] = orientation_table
+
+        dominant_idx = int(np.argmax(totals))
+        dominant_direction = bin_centers[dominant_idx]
+        dominant_length = totals_km[dominant_idx]
+
+        def describe_orientation(angle: float) -> str:
+            angle = angle % 180
+            if angle < 22.5 or angle >= 157.5:
+                return "East-West"
+            if angle < 67.5:
+                return "Northeast-Southwest"
+            if angle < 112.5:
+                return "North-South"
+            return "Northwest-Southeast"
+
+        summary = {
+            "projection_used": projection_label,
+            "number_of_bins": number_of_bins,
+            "dominant_orientation_deg": float(dominant_direction),
+            "dominant_orientation_label": describe_orientation(dominant_direction),
+            "dominant_total_length_km": float(dominant_length),
+            "total_line_length_km": float(totals_km.sum()),
+            "orientation_table_name": output_table_name
+        }
+        state["data_store"][output_variable_name] = summary
+
+        try:
+            theta = np.deg2rad(bin_centers)
+            radii = totals_km
+            width = 2 * np.pi / number_of_bins
+
+            fig, ax = plt.subplots(subplot_kw={'projection': 'polar'}, figsize=(8, 8))
+            bars = ax.bar(theta, radii, width=width, bottom=0, color="#1f77b4", edgecolor="black", alpha=0.8)
+            ax.set_theta_zero_location("N")
+            ax.set_theta_direction(-1)
+            ax.set_title(f"Line Direction Rose: {geodataframe_name}")
+
+            buf = io.BytesIO()
+            fig.savefig(buf, format="png", bbox_inches="tight", dpi=150)
+            buf.seek(0)
+            img_base64 = base64.b64encode(buf.read()).decode("utf-8")
+            buf.close()
+            plt.close(fig)
+
+            state["image_store"].append({
+                "type": "plot",
+                "description": f"Line direction rose for {geodataframe_name}",
+                "base64": img_base64
+            })
+        except Exception:
+            pass
+
+        return (
+            f"Computed a {number_of_bins}-bin line direction rose for '{geodataframe_name}' using {projection_label}.\n"
+            f"Dominant direction: {dominant_direction:.1f}° ({summary['dominant_orientation_label']}) "
+            f"with {dominant_length:,.2f} km of road length.\n"
+            f"Orientation table stored as '{output_table_name}', summary stored in '{output_variable_name}'."
+        )
 
     except Exception as e:
         return f"Error: {type(e).__name__} : {str(e)}"
@@ -2754,6 +3137,18 @@ calculate_nearest_distances_tool = StructuredTool.from_function(
     func=calculate_nearest_distances,
     name='calculate_nearest_distances',
     description='Calculates the distance from each point feature to the nearest geometry in another GeoDataFrame, storing the results in kilometers and reporting the projection used.'
+)
+
+calculate_directional_ellipse_tool = StructuredTool.from_function(
+    func=calculate_standard_directional_ellipse,
+    name='calculate_standard_directional_ellipse',
+    description='Computes the Standard Deviational Ellipse (directional distribution) for a set of points, summarizing major/minor axes, orientation, and providing an ellipse GeoDataFrame plus visualization.'
+)
+
+calculate_line_direction_rose_tool = StructuredTool.from_function(
+    func=calculate_line_direction_rose,
+    name='calculate_line_direction_rose',
+    description='Analyzes the orientations of line features (roads, rivers, etc.) by computing a rose diagram with length-weighted bins, returning a summary table, metadata, and an illustrative plot.'
 )
 
 calculate_columns_tool = StructuredTool.from_function(

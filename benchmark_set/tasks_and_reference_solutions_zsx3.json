@@ -1,0 +1,158 @@
+{
+    "metadata": {
+        "author": "zsx",
+        "notes": "Directional line network tasks using custom rose tool"
+    },
+    "tasks": [
+        {
+            "task_ID": "TASK_251118_210000_001001",
+            "task_text": "Please conduct a directional analysis of the road network in the Inner Mongolia Autonomous Region.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": "Load the Inner Mongolia road polylines and run the line-direction rose tool to summarize their dominant orientations and visualize the rose diagram.",
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "load_geodata",
+                            "arguments": {
+                                "geodataset": "Inner Mongolia roads",
+                                "output_geodataframe_name": "inner_mongolia_roads"
+                            },
+                            "comment": "Load the road_in_neimenggu.shp dataset (data/Data/GeoData/road_in_neimenggu.shp) containing the region's road network."
+                        },
+                        {
+                            "function_name": "calculate_line_direction_rose",
+                            "arguments": {
+                                "geodataframe_name": "inner_mongolia_roads",
+                                "output_table_name": "inner_mongolia_road_direction_bins",
+                                "output_variable_name": "inner_mongolia_road_direction_summary",
+                                "number_of_bins": 24
+                            },
+                            "comment": "Use the custom rose-diagram tool to measure segment orientations, store the bin table, and capture the dominant directional trend for the road network."
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_251119_160500_002002",
+            "task_text": "Using the \"Wei River Basin Topographic Slope Classification Dataset,\" reclassify the slope into three levels: gentle (icons 6\u20137), moderate (icons 4\u20135), and steep (icons 1\u20133), and create a graph to visualize the results.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 04",
+                "Process, Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": "Derive the GeoTIFF path, convert the raster slope icons into a GeoDataFrame, split the features into the three requested icon ranges, and visualize the reclassified levels together.",
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "get_raster_path",
+                            "arguments": {
+                                "rasterdataset": "Wei River Basin Topographic Slope Classification Dataset"
+                            },
+                            "comment": "Resolve the catalog path for data/Data/GeoData/WeiheBasin.tif before downstream processing."
+                        },
+                        {
+                            "function_name": "generate_contours_display",
+                            "arguments": {
+                                "raster_path": "data/Data/GeoData/WeiheBasin.tif",
+                                "output_filename": "weihe_slope_icons",
+                                "contour_interval": 1,
+                                "column_title": "iconvalue",
+                                "nodataval": -9999,
+                                "output_geodataframe_name": "weihe_slope_icons",
+                                "min_value": 1,
+                                "max_value": 7,
+                                "cleanup_files": true,
+                                "plot_result": false
+                            },
+                            "comment": "Convert the raster icon classifications into a GeoDataFrame so each isoline keeps its original icon value for subsequent grouping."
+                        },
+                        {
+                            "function_name": "filter_numerical",
+                            "arguments": {
+                                "dataframe_name": "weihe_slope_icons",
+                                "conditions": "iconvalue >= 6 and iconvalue <= 7",
+                                "output_dataframe_name": "weihe_gentle_slopes"
+                            },
+                            "comment": "Group the icon classes 6\u20137 labeled as gentle slopes."
+                        },
+                        {
+                            "function_name": "filter_numerical",
+                            "arguments": {
+                                "dataframe_name": "weihe_slope_icons",
+                                "conditions": "iconvalue >= 4 and iconvalue <= 5",
+                                "output_dataframe_name": "weihe_moderate_slopes"
+                            },
+                            "comment": "Group icon classes 4\u20135 representing moderate slopes."
+                        },
+                        {
+                            "function_name": "filter_numerical",
+                            "arguments": {
+                                "dataframe_name": "weihe_slope_icons",
+                                "conditions": "iconvalue >= 1 and iconvalue <= 3",
+                                "output_dataframe_name": "weihe_steep_slopes"
+                            },
+                            "comment": "Group icon classes 1\u20133 representing steep slopes."
+                        },
+                        {
+                            "function_name": "visualize_geographies",
+                            "arguments": {
+                                "geodataframe_names": [
+                                    "weihe_gentle_slopes",
+                                    "weihe_moderate_slopes",
+                                    "weihe_steep_slopes"
+                                ],
+                                "layer_styles": [
+                                    {
+                                        "color": "#2ca25f",
+                                        "alpha": 0.6,
+                                        "linewidth": 0.8,
+                                        "label": "Gentle (icons 6\u20137)"
+                                    },
+                                    {
+                                        "color": "#feb24c",
+                                        "alpha": 0.6,
+                                        "linewidth": 0.8,
+                                        "label": "Moderate (icons 4\u20135)"
+                                    },
+                                    {
+                                        "color": "#de2d26",
+                                        "alpha": 0.6,
+                                        "linewidth": 0.8,
+                                        "label": "Steep (icons 1\u20133)"
+                                    }
+                                ],
+                                "title": "Wei River Basin Slope Classes",
+                                "basemap_style": "Carto Positron"
+                            },
+                            "comment": "Produce a layered graph (map) that visualizes the three reclassified slope categories together."
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        }
+    ]
+}
