@@ -49,14 +49,14 @@
         },
         {
             "task_ID": "TASK_251119_160500_002002",
-            "task_text": "Using the \"Wei River Basin Topographic Slope Classification Dataset,\" reclassify the slope into three levels: gentle (icons 6\u20137), moderate (icons 4\u20135), and steep (icons 1\u20133), and create a graph to visualize the results.",
+            "task_text": "Using the \"Wei River Basin Topographic Slope Classification Dataset,\" reclassify the slope into three levels: gentle (icons 6-7), moderate (icons 4-5), and steep (icons 1-3), and create a graph to visualize the results.",
             "task_labels": [
                 "Spatial operations",
                 "Task Set 04",
                 "Process, Merge, Visualize",
                 "Heatmaps, Contour Lines"
             ],
-            "reference_solution_description": "Resolve the GeoTIFF path and use the classify_raster_zones tool to bin icon values into gentle/moderate/steep classes while producing a ready-made visualization of the three slope levels.",
+            "reference_solution_description": "Resolve the GeoTIFF path and use the dedicated reclassify_raster_by_table tool to bin icon values into gentle/moderate/steep classes while producing a ready-made visualization of the three slope levels.",
             "reference_solutions": [
                 {
                     "steps": [
@@ -68,7 +68,7 @@
                             "comment": "Resolve the catalog path for data/Data/GeoData/WeiheBasin.tif before downstream processing."
                         },
                         {
-                            "function_name": "classify_raster_zones",
+                            "function_name": "reclassify_raster_by_table",
                             "arguments": {
                                 "raster_path": "data/Data/GeoData/WeiheBasin.tif",
                                 "reclassification_table": [
@@ -97,7 +97,7 @@
                                 "output_variable_name": "weihe_slope_reclass",
                                 "plot_title": "Wei River Basin Slope Classes"
                             },
-                            "comment": "Use the classify_raster_zones tool to group icon ranges into the three requested slope levels and visualize the resulting raster."
+                            "comment": "Use the reclassify_raster_by_table tool to group icon ranges into the three requested slope levels and visualize the resulting raster."
                         }
                     ]
                 }

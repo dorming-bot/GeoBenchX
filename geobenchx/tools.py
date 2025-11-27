@@ -1297,6 +1297,175 @@ def create_buffer(
 
     return result
 
+def create_dissolved_buffer(
+    geodataframe_name: Annotated[str, "Name of GeoDataFrame containing features to buffer"],
+    buffer_size_meters: Annotated[float, "Size of the buffer distance in meters"],
+    output_geodataframe_name: Annotated[str, "Name used to store the dissolved buffer GeoDataFrame"],
+    state: Annotated[dict, InjectedState],
+    dissolve_by_attribute: Annotated[Optional[str], "Column whose categories should be dissolved independently. Leave blank to merge into a single buffer."] = None,
+    output_file_path: Annotated[Optional[str], "Optional path (e.g., .shp, .gpkg, .geojson) to save the dissolved buffer"] = None,
+    overwrite_existing: Annotated[bool, "Whether to overwrite an existing file at output_file_path"] = True,
+    basemap_style: Annotated[Literal["OpenStreetMap", "Carto Positron", "Carto Dark"], "Basemap provider used for the preview figure"] = "Carto Positron",
+    plot_title: Annotated[Optional[str], "Title shown on the preview map"] = None
+) -> str:
+    """
+    Create buffer zones around geometries in a GeoDataFrame using a metric projection and
+    dissolve overlapping results either globally or by an attribute column.
+
+    Args:
+        geodataframe_name: Name of the source GeoDataFrame stored in the data store
+        buffer_size_meters: Numeric buffer distance expressed in meters
+        output_geodataframe_name: Name used to store the dissolved buffer GeoDataFrame
+        state: Current graph state containing datasets and metadata
+        dissolve_by_attribute: Optional column name for grouped dissolves; defaults to full merge
+        output_file_path: Optional filepath to store the dissolved buffer (defaults to SCRATCHPATH/<output_geodataframe_name>.shp)
+        overwrite_existing: Whether to overwrite an existing vector file
+        basemap_style: Tile provider for visualization
+        plot_title: Custom title for the generated preview map
+
+    Returns:
+        str: Status message summarizing processing details and output GeoDataFrame info
+    """
+    try:
+        if "data_store" not in state:
+            state["data_store"] = {}
+        if "image_store" not in state:
+            state["image_store"] = []
+
+        geodataframe = state["data_store"].get(geodataframe_name)
+        if geodataframe is None:
+            return f"Error: GeoDataFrame '{geodataframe_name}' not found in data store"
+        if geodataframe.empty:
+            return "Error: Source GeoDataFrame is empty"
+        if geodataframe.crs is None:
+            return "Error: Source GeoDataFrame has no CRS. Please assign one before buffering."
+
+        try:
+            metric_crs = geodataframe.estimate_utm_crs()
+        except pyproj_exceptions.CRSError:
+            metric_crs = None
+
+        if metric_crs is None:
+            metric_crs_code = "EPSG:3857"
+        else:
+            metric_crs_code = metric_crs.to_string()
+
+        geodataframe_metric = geodataframe.to_crs(metric_crs_code)
+        buffered = geodataframe_metric.copy()
+        buffered.geometry = buffered.geometry.buffer(buffer_size_meters)
+
+        if dissolve_by_attribute:
+            if dissolve_by_attribute not in buffered.columns:
+                return f"Error: Column '{dissolve_by_attribute}' not found in GeoDataFrame"
+            dissolved = buffered.dissolve(by=dissolve_by_attribute).reset_index()
+        else:
+            dissolved = gpd.GeoDataFrame(
+                {"buffer_id": ["merged_buffer"], "geometry": [buffered.geometry.unary_union]},
+                crs=buffered.crs
+            )
+
+        dissolved_original_crs = dissolved.to_crs(geodataframe.crs)
+        state["data_store"][output_geodataframe_name] = dissolved_original_crs
+
+        # Store vector output if requested
+        saved_file_path = None
+        if output_file_path is None:
+            Path(SCRATCH_PATH).mkdir(parents=True, exist_ok=True)
+            default_name = f"{output_geodataframe_name}.shp"
+            output_file_path = os.path.join(SCRATCH_PATH, default_name)
+
+        vector_path = Path(output_file_path)
+        vector_path.parent.mkdir(parents=True, exist_ok=True)
+        driver_lookup = {
+            ".shp": "ESRI Shapefile",
+            ".gpkg": "GPKG",
+            ".geojson": "GeoJSON",
+            ".json": "GeoJSON"
+        }
+        ext = vector_path.suffix.lower()
+        if ext not in driver_lookup:
+            return f"Error: Unsupported output file extension '{ext}'. Use .shp, .gpkg, or .geojson."
+
+        if vector_path.exists():
+            if not overwrite_existing:
+                return f"Error: Output file '{vector_path.as_posix()}' exists. Enable overwrite_existing to replace it."
+            if ext == ".shp":
+                for shp_ext in [".shp", ".shx", ".dbf", ".cpg", ".prj", ".sbx", ".sbn"]:
+                    candidate = vector_path.with_suffix(shp_ext)
+                    if candidate.exists():
+                        candidate.unlink()
+            else:
+                vector_path.unlink()
+
+        dissolved_original_crs.to_file(vector_path.as_posix(), driver=driver_lookup[ext])
+        saved_file_path = vector_path.as_posix()
+
+        # Visualization
+        providers = {
+            "OpenStreetMap": ctx.providers.OpenStreetMap.Mapnik,
+            "Carto Positron": ctx.providers.CartoDB.Positron,
+            "Carto Dark": ctx.providers.CartoDB.DarkMatter,
+        }
+        provider = providers.get(basemap_style, ctx.providers.CartoDB.Positron)
+
+        buffer_plot = dissolved_original_crs.to_crs("EPSG:3857")
+        source_plot = geodataframe.to_crs("EPSG:3857")
+
+        fig, ax = plt.subplots(1, 1, figsize=(10, 8))
+        buffer_plot.plot(
+            ax=ax,
+            color="#2ca25f",
+            edgecolor="#1b7837",
+            linewidth=1.2,
+            alpha=0.5,
+            label=f"{buffer_size_meters:.0f} m Buffer"
+        )
+        source_plot.plot(
+            ax=ax,
+            color="#045a8d",
+            linewidth=0.8,
+            alpha=0.8,
+            label="Original features"
+        )
+
+        ctx.add_basemap(ax, source=provider, crs="EPSG:3857")
+        ax.set_axis_off()
+        map_title = plot_title or f"{buffer_size_meters:.0f} m Dissolved Buffer"
+        ax.set_title(map_title)
+        ax.legend(loc="upper right")
+
+        buf = io.BytesIO()
+        fig.savefig(buf, format="png", bbox_inches="tight", dpi=150)
+        buf.seek(0)
+        img_base64 = base64.b64encode(buf.read()).decode("utf-8")
+        buf.close()
+        plt.close(fig)
+
+        state["image_store"].append({
+            "type": "map",
+            "description": f"{map_title} for {geodataframe_name}",
+            "base64": img_base64
+        })
+
+        info_string, _ = get_dataframe_info(dissolved_original_crs)
+        dissolve_note = (
+            f"Dissolved by column '{dissolve_by_attribute}'."
+            if dissolve_by_attribute
+            else "All buffered features merged into a single geometry."
+        )
+
+        return (
+            f"Created {buffer_size_meters:.0f}m buffer from '{geodataframe_name}' "
+            f"and stored dissolved result as '{output_geodataframe_name}'.\n"
+            f"{dissolve_note}\n"
+            f"Input features: {len(geodataframe)}, output features: {len(dissolved_original_crs)}.\n"
+            f"GeoDataFrame details:\n{info_string}\n"
+            f"Vector file saved to: {saved_file_path}"
+        )
+
+    except Exception as e:
+        return f"Error creating dissolved buffer: {type(e).__name__} : {str(e)}"
+
 # Create make_choropleth_map tool function to plot a geodataframe
 def make_choropleth_map(
     dataframe_name: Annotated[str, "Name of GeoDataFrame containing map data"],
@@ -2428,8 +2597,7 @@ def make_heatmap(
         return f"Error: Required package not found - {type(e).__name__} : {str(e)}"
     except Exception as e:
         return f"Error creating heatmap: {type(e).__name__} : {str(e)}"
-    
-# Tool function to visualize one or more GeoDataFrames on one map
+
 def visualize_geographies(
     geodataframe_names: Annotated[list[str] | str , '''List of GeoDataFrame names to visualize or JSON-string representation of this list, example ["geodataframe_name_1", "geodataframe_name_2"]'''],
     state: Annotated[dict, InjectedState],
@@ -3311,11 +3479,15 @@ calculate_column_total_tool = StructuredTool.from_function(
 )
 
 create_buffer_tool = StructuredTool.from_function(
-    func=create_buffer, 
+    func=create_buffer,
     name='create_buffer',
-    description='Create buffer zones around geometries in a GeoDataFrame using specified buffer size.\
-        Stores the result in a new GeoDataFrame with the specified name. Returns the DataFrame and its description, inlcuding \
-        DataFrame name, number of entries, columns names, number of non-null cells, data types, share of non-empty cells in columns.'
+    description='Create fixed-distance buffers around vector features and store the buffered GeoDataFrame for downstream analysis.'
+)
+
+create_dissolved_buffer_tool = StructuredTool.from_function(
+    func=create_dissolved_buffer,
+    name='create_dissolved_buffer',
+    description='Create metric buffers around vector features, dissolve overlaps globally or by attribute, save the result to a vector file, and capture a preview map for quick review.'
 )
 
 make_choropleth_map_tool = StructuredTool.from_function(

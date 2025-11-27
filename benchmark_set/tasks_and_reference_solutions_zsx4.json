@@ -1,0 +1,51 @@
+{
+    "metadata": {
+        "author": "zsx",
+        "notes": "Buffer creation tasks featuring the dedicated dissolved buffer tool"
+    },
+    "tasks": [
+        {
+            "task_ID": "TASK_251126_160950_004001",
+            "task_text": "Create a 1000-meter merged buffer zone for all major urban parks in Wuhan.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": "Load the Wuhan Urban Parks dataset and use the dissolved buffer tool to generate a single 1000-meter protection zone that merges overlapping park buffers.",
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "load_geodata",
+                            "arguments": {
+                                "geodataset": "Wuhan Urban Parks",
+                                "output_geodataframe_name": "wuhan_urban_parks"
+                            },
+                            "comment": "Load the park_in_wuhan.shp file to access the major park polygons within the city."
+                        },
+                        {
+                            "function_name": "create_dissolved_buffer",
+                            "arguments": {
+                                "geodataframe_name": "wuhan_urban_parks",
+                                "buffer_size_meters": 1000,
+                                "output_geodataframe_name": "wuhan_parks_1000m_merged_buffer",
+                                "dissolve_by_attribute": null
+                            },
+                            "comment": "Generate a metric 1000-meter buffer around every park and dissolve overlaps into one merged impact zone suitable for further planning analysis."
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        }
+    ]
+}
