@@ -1,0 +1,53 @@
+{
+    "metadata": {
+        "author": "zsx",
+        "notes": "Token-lean task demonstrating the raster erosion tool"
+    },
+    "tasks": [
+        {
+            "task_ID": "TASK_251128_101650_001001",
+            "task_text": "Based on the Xinxiang City Rainstorm and Flooding Dataset, use the erosion operation to simulate an inward contraction of 1000 meters and review the generated outputs.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": "Retrieve the Xinxiang flood raster path and call the erode_raster_regions tool with a 1000-meter erosion distance so the contracted GeoTIFF, HTML preview, and summary statistics are recorded for review.",
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "get_raster_path",
+                            "arguments": {
+                                "rasterdataset": "XinxiangCity Rainstorm and Flooding Dataset"
+                            },
+                            "comment": "Confirm the on-disk path to the Xinxiang flood raster before running any processing tools."
+                        },
+                        {
+                            "function_name": "erode_raster_regions",
+                            "arguments": {
+                                "raster_path": "d:/code/GeoBenchX/GeoBenchX/data/Data/GeoData/Xinxiang City Rainstorm and Flooding Dataset.tif",
+                                "output_variable_name": "xinxiang_flood_erosion_summary",
+                                "erosion_distance_meters": 1000,
+                                "presence_threshold": 0.0,
+                                "output_raster_path": "d:/code/GeoBenchX/GeoBenchX/scratch/xinxiang_flood_erosion.tif",
+                                "append_timestamp_to_output": true,
+                                "preview_title": "Xinxiang flood extent eroded inward by 1000 m"
+                            },
+                            "comment": "Apply the dedicated erosion tool to shrink the flooded zones by 1000 meters, saving a timestamped GeoTIFF plus the HTML preview for QA."
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        }
+    ]
+}

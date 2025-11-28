@@ -38,6 +38,8 @@ from shapely.geometry import LineString, Point
 from shapely import affinity
 from shapely.ops import nearest_points
 from pyproj import CRS, exceptions as pyproj_exceptions
+from scipy.ndimage import distance_transform_edt
+
 
 from geobenchx.utils import get_dataframe_info
 
@@ -114,7 +116,8 @@ RASTER_CATALOG = {
     "Peru population, 2018, 1 km resolution": "per_ppp_2018_1km_Aggregated_UNadj.tif",
     "Brazil population, 2018, 1 km resolution": "bra_ppp_2018_1km_Aggregated_UNadj.tif",
     "Algeria population density per 1 km 2020, 1 km resolution": "dza_pd_2020_1km_UNadj.tif",
-    "Wei River Basin Topographic Slope Classification Dataset": "WeiheBasin.tif"
+    "Wei River Basin Topographic Slope Classification Dataset": "WeiheBasin.tif",
+    "XinxiangCity Rainstorm and Flooding Dataset": "Xinxiang City Rainstorm and Flooding Dataset.tif",
 }
 
 COLORMAPS = {
@@ -918,6 +921,226 @@ def classify_raster_zones(
 
     except Exception as e:
         return f"Error classifying raster: {type(e).__name__} : {str(e)}"
+
+def erode_raster_regions(
+    raster_path: Annotated[str, "Path to the raster file that contains the inundation or mask values to erode"],
+    output_variable_name: Annotated[str, "Name for storing metadata about the erosion results"],
+    state: Annotated[dict, InjectedState],
+    erosion_distance_meters: Annotated[float, "Metric distance (meters) to shrink the raster mask inward"] = 1000.0,
+    presence_threshold: Annotated[float, "Minimum raster value (inclusive) to consider part of the mask prior to erosion"] = 0.0,
+    band_number: Annotated[int, "1-based raster band index to process"] = 1,
+    output_raster_path: Annotated[str | None, "Optional custom path for saving the eroded raster"] = None,
+    nodata_value: Annotated[float, "Fallback nodata value to use if the source lacks one"] = -9999.0,
+    append_timestamp_to_output: Annotated[bool, "Append a UTC timestamp to the saved GeoTIFF name for bookkeeping"] = True,
+    output_dtype: Annotated[
+        Literal["float32", "float64", "int16", "int32"],
+        "Data type used for storing the eroded raster"
+    ] = "float32",
+    preview_title: Annotated[str, "Title displayed above the preview figure embedded in HTML"] = "Raster erosion preview",
+    preview_figsize: Annotated[str, "Matplotlib figsize as JSON array, e.g. '[12, 5]'"] = "[12, 5]"
+) -> str:
+    """
+    Apply a morphological erosion to a raster mask to simulate an inward contraction expressed in meters.
+    Generates a GeoTIFF with the eroded pixels retained, stores summary statistics,
+    and embeds a compact before/after preview in the HTML store for quick inspection.
+    """
+    try:
+        if "data_store" not in state:
+            state["data_store"] = {}
+        if "image_store" not in state:
+            state["image_store"] = []
+        if "html_store" not in state:
+            state["html_store"] = []
+
+        if not raster_path:
+            return "Error: raster_path must be provided."
+
+        try:
+            erosion_distance = float(erosion_distance_meters)
+        except (TypeError, ValueError):
+            return "Error: erosion_distance_meters must be a numeric value."
+        if erosion_distance <= 0:
+            return "Error: erosion_distance_meters must be greater than zero."
+
+        try:
+            threshold = float(presence_threshold)
+        except (TypeError, ValueError):
+            return "Error: presence_threshold must be a numeric value."
+
+        if isinstance(preview_figsize, str):
+            try:
+                parsed_figsize = ast.literal_eval(preview_figsize)
+            except (ValueError, SyntaxError):
+                parsed_figsize = [12, 5]
+        else:
+            parsed_figsize = preview_figsize
+
+        if not (isinstance(parsed_figsize, (list, tuple)) and len(parsed_figsize) == 2):
+            parsed_figsize = [12, 5]
+        fig_width, fig_height = map(float, parsed_figsize)
+
+        dtype_map = {
+            "float32": np.float32,
+            "float64": np.float64,
+            "int32": np.int32,
+            "int16": np.int16,
+        }
+        if output_dtype not in dtype_map:
+            return f"Error: Unsupported output_dtype '{output_dtype}'."
+        dtype_cls = dtype_map[output_dtype]
+
+        if not raster_path.startswith("zip://") and not os.path.exists(raster_path):
+            return f"Error: Raster file '{raster_path}' not found."
+
+        with rasterio.open(raster_path) as src:
+            if band_number < 1 or band_number > src.count:
+                return f"Error: band_number {band_number} is outside available bands (1-{src.count})."
+            if src.crs is None:
+                return "Error: Raster has no CRS information; cannot perform meter-based erosion."
+            if not src.crs.is_projected:
+                return "Error: Raster CRS must be projected (meters) to apply meter-based erosion."
+
+            raster_data = src.read(band_number).astype(np.float64, copy=False)
+            transform = src.transform
+            bounds = src.bounds
+            source_nodata = src.nodata
+            profile = src.profile
+            pixel_width_m = abs(transform.a)
+            pixel_height_m = abs(transform.e)
+
+            if pixel_width_m == 0 or pixel_height_m == 0:
+                return "Error: Unable to derive pixel size from raster transform."
+
+            pixel_area_sq_km = (pixel_width_m * pixel_height_m) / 1_000_000.0
+
+            valid_mask = np.isfinite(raster_data)
+            if source_nodata is not None:
+                valid_mask &= raster_data != source_nodata
+
+            presence_mask = valid_mask & (raster_data >= threshold)
+            if not presence_mask.any():
+                return "Error: No pixels met the presence_threshold; nothing to erode."
+
+            distances = distance_transform_edt(
+                presence_mask,
+                sampling=(pixel_height_m, pixel_width_m)
+            )
+            eroded_mask = (distances >= erosion_distance) & presence_mask
+
+            original_pixels = int(presence_mask.sum())
+            eroded_pixels = int(eroded_mask.sum())
+
+            dtype_info = np.iinfo(dtype_cls) if np.issubdtype(dtype_cls, np.integer) else np.finfo(dtype_cls)
+            nodata_to_use = source_nodata if source_nodata is not None else nodata_value
+            if nodata_to_use < dtype_info.min or nodata_to_use > dtype_info.max:
+                nodata_to_use = dtype_info.min
+            nodata_cast = dtype_cls(nodata_to_use)
+
+            eroded_data = np.where(eroded_mask, raster_data, nodata_cast).astype(dtype_cls)
+
+            timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
+            if output_raster_path:
+                output_path_obj = Path(output_raster_path)
+                if output_path_obj.suffix.lower() not in {".tif", ".tiff"}:
+                    output_path_obj = output_path_obj.with_suffix(".tif")
+                if append_timestamp_to_output:
+                    output_path_obj = output_path_obj.with_name(
+                        f"{output_path_obj.stem}_{timestamp}{output_path_obj.suffix}"
+                    )
+            else:
+                scratch_dir = Path(SCRATCH_PATH or ".")
+                scratch_dir.mkdir(parents=True, exist_ok=True)
+                base_name = f"eroded_{Path(raster_path).stem}"
+                file_name = f"{base_name}_{timestamp}.tif" if append_timestamp_to_output else f"{base_name}.tif"
+                output_path_obj = scratch_dir / file_name
+
+            output_path_obj.parent.mkdir(parents=True, exist_ok=True)
+
+            profile.update(dtype=output_dtype, count=1, nodata=nodata_cast.item())
+            with rasterio.open(output_path_obj.as_posix(), "w", **profile) as dst:
+                dst.write(eroded_data, 1)
+
+        original_area_sq_km = original_pixels * pixel_area_sq_km
+        eroded_area_sq_km = eroded_pixels * pixel_area_sq_km
+        removed_area_sq_km = max(original_area_sq_km - eroded_area_sq_km, 0.0)
+        retention_pct = (eroded_area_sq_km / original_area_sq_km * 100) if original_area_sq_km > 0 else 0.0
+
+        extent = (bounds.left, bounds.right, bounds.bottom, bounds.top)
+        fig, axes = plt.subplots(1, 2, figsize=(fig_width, fig_height))
+        original_display = np.where(presence_mask, 1, np.nan)
+        eroded_display = np.where(eroded_mask, 1, np.nan)
+
+        axes[0].imshow(original_display, cmap="Blues", extent=extent, origin="upper")
+        axes[0].set_title("Original mask")
+        axes[1].imshow(eroded_display, cmap="Purples", extent=extent, origin="upper")
+        axes[1].set_title("After erosion")
+        for ax in axes:
+            ax.set_axis_off()
+        plt.tight_layout()
+
+        buf = io.BytesIO()
+        fig.savefig(buf, format="png", dpi=150, bbox_inches="tight")
+        buf.seek(0)
+        img_base64 = base64.b64encode(buf.read()).decode("utf-8")
+        buf.close()
+        plt.close(fig)
+
+        state["image_store"].append({
+            "type": "map",
+            "description": f"Erosion preview for '{Path(raster_path).name}'",
+            "base64": img_base64
+        })
+
+        html_preview = (
+            f"<div class='raster-erosion-preview'>"
+            f"<h3>{preview_title}</h3>"
+            f"<p>Erosion distance: {erosion_distance:,.0f} m | Threshold ≥ {threshold}</p>"
+            f"<img src='data:image/png;base64,{img_base64}' "
+            f"alt='Raster erosion preview' style='max-width:100%;height:auto;border:1px solid #ddd;'/>"
+            f"<p>Original area: {original_area_sq_km:.2f} sq km<br>"
+            f"Eroded area: {eroded_area_sq_km:.2f} sq km ({retention_pct:.1f}% retained)<br>"
+            f"Area removed: {removed_area_sq_km:.2f} sq km</p>"
+            f"</div>"
+        )
+        state["html_store"].append({
+            "type": "map",
+            "description": f"Raster erosion preview for {Path(raster_path).name}",
+            "html": html_preview
+        })
+
+        state["data_store"][output_variable_name] = {
+            "source_raster": raster_path,
+            "output_raster_path": output_path_obj.as_posix(),
+            "timestamp_utc": timestamp,
+            "erosion_distance_meters": erosion_distance,
+            "presence_threshold": threshold,
+            "original_pixels": original_pixels,
+            "eroded_pixels": eroded_pixels,
+            "original_area_sq_km": original_area_sq_km,
+            "eroded_area_sq_km": eroded_area_sq_km,
+            "area_removed_sq_km": removed_area_sq_km,
+            "retained_area_percent": retention_pct,
+            "pixel_width_m": pixel_width_m,
+            "pixel_height_m": pixel_height_m,
+            "preview_base64": img_base64,
+            "preview_title": preview_title
+        }
+
+        summary = (
+            f"Eroded raster '{Path(raster_path).name}' by {erosion_distance:,.0f} meters.\n"
+            f"- Pixels retained: {eroded_pixels:,} of {original_pixels:,}\n"
+            f"- Area retained: {eroded_area_sq_km:.2f} sq km ({retention_pct:.1f}% of original)\n"
+            f"- Output saved to '{output_path_obj.as_posix()}' with timestamp '{timestamp}'.\n"
+            f"A preview image has been stored in both the image and HTML stores."
+        )
+
+        if eroded_pixels == 0:
+            summary += "\nWarning: All pixels were removed by the requested erosion distance. Try a smaller value."
+
+        return summary
+
+    except Exception as e:
+        return f"Error eroding raster: {type(e).__name__} : {str(e)}"
 
 # Create tool function to merge 2 dataframes, or a dataframe and a geodataframe
 def merge_dataframes(
@@ -3428,6 +3651,12 @@ classify_raster_zones_tool = StructuredTool.from_function(
     name='classify_raster_zones',
     description='Classify or reclassify raster values based on range definitions (min <= value <= max), similar to QGIS Reclassify by Table. \
         Produces a new raster with specified dtype, stores class statistics, and visualizes the resulting zones with optional custom colors/labels.'
+)
+
+erode_raster_regions_tool = StructuredTool.from_function(
+    func=erode_raster_regions,
+    name='erode_raster_regions',
+    description='Apply morphological erosion to a raster mask using a metric distance, produce a timestamped GeoTIFF, and store a before/after preview in the HTML store.'
 )
 
 merge_dataframes_tool = StructuredTool.from_function(
