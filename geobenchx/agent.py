@@ -1,6 +1,7 @@
 import os
 import sys
 from pathlib import Path
+from typing import List, Optional
 
 sys.path.append(str(Path(__file__).parent.parent))
 
@@ -25,7 +26,9 @@ from geobenchx.constants import (
     MODEL_CLAUDE,
     MODEL_CLAUDE_mini,
     MODEL_CLAUDE_ADV3,
-    MODEL_CLAUDE_ADV4
+    MODEL_CLAUDE_ADV4,
+    MODEL_SHER_LOCKER,
+    MODEL_SHER_LOCKER_4o
     
 )
 from geobenchx.tools import (
@@ -71,6 +74,8 @@ openai.api_key  = os.getenv('OPENAI_API_KEY')
 
 google_api_key = os.getenv("GOOGLE_API_KEY")
 anthropic_api_key = os.getenv("ANTHROPIC_API_KEY")
+_sher_locker_api_key = os.getenv("SHER_LOCKER_API_KEY")
+_sher_locker_base_url = os.getenv("SHER_LOCKER_BASE_URL", "https://sher.locker/v1/")
 
 tools = [
     load_data_tool, 
@@ -125,6 +130,15 @@ def execute_task(task_text: str, temperature: float = 0, model: str = MODEL_GPT_
         llm = ChatOpenAI(model=model, temperature=None)
     elif model in [MODEL_GEMINI, MODEL_GEMINI_ADV]:
         llm = ChatGoogleGenerativeAI(model=model, temperature=temperature)
+    elif model in [MODEL_SHER_LOCKER,MODEL_SHER_LOCKER_4o]:
+        if not _sher_locker_api_key:
+            raise ValueError("SHER_LOCKER_API_KEY is not set in the environment.")
+        llm = ChatOpenAI(
+            model=model,
+            temperature=temperature,
+            api_key=_sher_locker_api_key,
+            base_url=_sher_locker_base_url,
+        )
     else:
         raise ValueError("Model is outside the predetermined list")
 

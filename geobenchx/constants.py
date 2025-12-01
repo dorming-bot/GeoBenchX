@@ -25,6 +25,8 @@ MODEL_CLAUDE = 'claude-3-5-sonnet-20241022'
 MODEL_CLAUDE_mini = 'claude-3-5-haiku-20241022'
 MODEL_CLAUDE_ADV3 = 'claude-3-7-sonnet-20250219'
 MODEL_CLAUDE_ADV4 = 'claude-sonnet-4-20250514'
+MODEL_SHER_LOCKER = 'gpt-4.1-nano'
+MODEL_SHER_LOCKER_4o = 'gpt-4o'
 
 
 class ScoreValues(IntEnum):
