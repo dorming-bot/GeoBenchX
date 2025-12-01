@@ -1,12 +1,12 @@
 {
     "metadata": {
-        "author": "zsx",
-        "notes": "Wei River Basin raster tasks plus Loess Plateau point analysis"
+        "author": "zsx6",
+        "notes": "Custom kernel density hotspot task for zsx6"
     },
     "tasks": [
         {
-            "task_ID": "TASK_251128_120000_001001",
-            "task_text": "Calculate the basic statistics (mean and standard deviation) of the Wei River Basin topographic slope raster dataset.",
+            "task_ID": "TASK_251201_154945_004004",
+            "task_text": "Using the 2014 China POI data, generate a heatmap of the 2014 China POI data to identify hotspot areas of point-of-interest distribution in China.",
             "task_labels": [
                 "Spatial operations",
                 "Task Set 03",
@@ -14,136 +14,29 @@
                 "Merge, Visualize",
                 "Heatmaps, Contour Lines"
             ],
-            "reference_solution_description": "Retrieve the raster path for the Wei River Basin slope dataset and use the raster-description tool to list the mean and standard deviation for the slope band.",
-            "reference_solutions": [
-                {
-                    "steps": [
-                        {
-                            "function_name": "get_raster_path",
-                            "arguments": {
-                                "rasterdataset": "Wei River Basin Topographic Slope Classification Dataset"
-                            },
-                            "comment": "Confirm the on-disk path to WeiheBasin.tif before computing statistics."
-                        },
-                        {
-                            "function_name": "get_raster_description",
-                            "arguments": {
-                                "raster_path": "d:/code/GeoBenchX/GeoBenchX/data/Data/GeoData/WeiheBasin.tif",
-                                "output_variable_name": "weihe_slope_stats"
-                            },
-                            "comment": "Read the slope raster metadata and record mean/stddev for the band in weiher_slope_stats."
-                        }
-                    ]
-                }
-            ],
-            "generated_solution": null,
-            "generated_solution_input_tokens": null,
-            "generated_solution_output_tokens": null,
-            "match_reasoning_LLM": null,
-            "match_score_LLM": null,
-            "match_reasoning_Human": null,
-            "match_score_Human": null
-        },
-        {
-            "task_ID": "TASK_251128_120000_002002",
-            "task_text": "Determine the mean center of the spatial distribution of all Chinese traditional villages that fall within the Loess Plateau Region.",
-            "task_labels": [
-                "Spatial operations",
-                "Task Set 03",
-                "Process, Merge, Visualize",
-                "Merge, Visualize",
-                "Heatmaps, Contour Lines"
-            ],
-            "reference_solution_description": "Load the Loess Plateau boundary and the national traditional village points, select the villages lying within the plateau, and run the standard directional ellipse tool to extract the centroid coordinates representing the mean center.",
+            "reference_solution_description": "Load the nationwide 2014 China POI point layer and run the kernel density tool to automatically estimate an appropriate bandwidth, generate the hotspot surface, and visualize the density map.",
             "reference_solutions": [
                 {
                     "steps": [
                         {
                             "function_name": "load_geodata",
                             "arguments": {
-                                "geodataset": "Loess Plateau Region",
-                                "output_geodataframe_name": "loess_plateau_region"
+                                "geodataset": "2014 China POI",
+                                "output_geodataframe_name": "china_poi_2014"
                             },
-                            "comment": "Load the Loess Plateau polygon boundary for spatial filtering."
+                            "comment": "Bring the OSM-based 2014 China POI shapefile into memory as 'china_poi_2014' for downstream analysis."
                         },
                         {
-                            "function_name": "load_geodata",
+                            "function_name": "create_point_kernel_density_map",
                             "arguments": {
-                                "geodataset": "Traditional Villages of China",
-                                "output_geodataframe_name": "villages_china"
+                                "geodataframe_name": "china_poi_2014",
+                                "output_variable_name": "china_poi_2014_kde",
+                                "grid_resolution": 360,
+                                "basemap_style": "Carto Positron",
+                                "cmap": "inferno",
+                                "include_points": true
                             },
-                            "comment": "Bring all Chinese traditional village points into memory."
-                        },
-                        {
-                            "function_name": "select_features_by_spatial_relationship",
-                            "arguments": {
-                                "features_geodataframe_name": "villages_china",
-                                "reference_geodataframe_name": "loess_plateau_region",
-                                "spatial_predicates": [
-                                    "within"
-                                ],
-                                "output_geodataframe_name": "villages_in_loess",
-                                "plot_result": false
-                            },
-                            "comment": "Select only the village points located inside the Loess Plateau boundary."
-                        },
-                        {
-                            "function_name": "calculate_standard_directional_ellipse",
-                            "arguments": {
-                                "geodataframe_name": "villages_in_loess",
-                                "output_geodataframe_name": "villages_in_loess_ellipse",
-                                "output_variable_name": "villages_in_loess_center",
-                                "num_standard_deviations": 1.0,
-                                "ellipse_points": 120
-                            },
-                            "comment": "Use the ellipse tool to report the mean center (center_x/center_y) of the filtered villages."
-                        }
-                    ]
-                }
-            ],
-            "generated_solution": null,
-            "generated_solution_input_tokens": null,
-            "generated_solution_output_tokens": null,
-            "match_reasoning_LLM": null,
-            "match_score_LLM": null,
-            "match_reasoning_Human": null,
-            "match_score_Human": null
-        },
-        {
-            "task_ID": "TASK_251128_120000_003003",
-            "task_text": "Generate contour lines from the Wei River Basin topographic slope raster to visualize slope intervals across the basin.",
-            "task_labels": [
-                "Spatial operations",
-                "Task Set 03",
-                "Process, Merge, Visualize",
-                "Merge, Visualize",
-                "Heatmaps, Contour Lines"
-            ],
-            "reference_solution_description": "Locate the Wei River Basin slope raster and run the contour-generation tool with an appropriate interval to export slope contour lines for inspection.",
-            "reference_solutions": [
-                {
-                    "steps": [
-                        {
-                            "function_name": "get_raster_path",
-                            "arguments": {
-                                "rasterdataset": "Wei River Basin Topographic Slope Classification Dataset"
-                            },
-                            "comment": "Obtain the full path to the slope raster before generating contours."
-                        },
-                        {
-                            "function_name": "generate_contours_display",
-                            "arguments": {
-                                "raster_path": "d:/code/GeoBenchX/GeoBenchX/data/Data/GeoData/WeiheBasin.tif",
-                                "output_filename": "weihe_slope_contours",
-                                "contour_interval": 5.0,
-                                "column_title": "slope_val",
-                                "nodataval": -9999,
-                                "output_geodataframe_name": "weihe_slope_contours_gdf",
-                                "output_folder": "d:/code/GeoBenchX/GeoBenchX/scratch",
-                                "plot_result": true,
-                                "plot_title": "Wei River Basin Slope Contours"
-                            },
-                            "comment": "Create slope contour lines at 5-unit intervals and store them in weihe_slope_contours_gdf for review."
+                            "comment": "Let the kernel density tool auto-select the search radius, render the hotspot map over a basemap, and store the resulting density grid in 'china_poi_2014_kde'."
                         }
                     ]
                 }

@@ -1,0 +1,820 @@
+{
+    "metadata": {
+        "author": "zsx",
+        "notes": "Aggregated custom tasks from zsx to zsx6"
+    },
+    "tasks": [
+        {
+            "task_ID": "TASK_251113_142843_001001",
+            "task_text": "Count the total number of POI points in the 2014 China POI data that fall within Chengdu City.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": "Load the Chengdu municipal polygon and the 2014 POI point shapefile from data/Data/GeoData, select the POIs located within the Chengdu boundary, and tally the resulting features to report the total count.",
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "load_geodata",
+                            "arguments": {
+                                "geodataset": "2014 China POI",
+                                "output_geodataframe_name": "china_poi_2014"
+                            },
+                            "comment": "Register '2014 China POI': 'data/Data/GeoData/2014_China_POI.shp' in GEO_CATALOG so this call loads all POI points into GeoDataFrame 'china_poi_2014'."
+                        },
+                        {
+                            "function_name": "load_geodata",
+                            "arguments": {
+                                "geodataset": "Chengdu Surface",
+                                "output_geodataframe_name": "chengdu_boundary"
+                            },
+                            "comment": "Register 'Chengdu Surface': 'data/Data/GeoData/Chengdu_Surface.shp' in GEO_CATALOG to bring the Chengdu city polygon into GeoDataFrame 'chengdu_boundary'."
+                        },
+                        {
+                            "function_name": "select_features_by_spatial_relationship",
+                            "arguments": {
+                                "features_geodataframe_name": "china_poi_2014",
+                                "reference_geodataframe_name": "chengdu_boundary",
+                                "spatial_predicates": [
+                                    "within"
+                                ],
+                                "output_geodataframe_name": "poi_within_chengdu",
+                                "plot_result": false
+                            },
+                            "comment": "Filter POI points that fall inside Chengdu's polygon; the returned message reports how many features satisfy the 'within' predicate and stores them in 'poi_within_chengdu'."
+                        },
+                        {
+                            "function_name": "calculate_column_statistics",
+                            "arguments": {
+                                "dataframe_name": "poi_within_chengdu",
+                                "column_name": "OBJECTID",
+                                "output_variable_name": "poi_within_chengdu_stats",
+                                "include_quantiles": false,
+                                "additional_quantiles": null
+                            },
+                            "comment": "Use any stable numeric identifier column (e.g., OBJECTID or FID) to get the exact record count for POIs inside Chengdu; adjust column_name if the shapefile uses a different field."
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_251113_170215_002002",
+            "task_text": "Select the areas located within the Jiuzhaigou earthquake zone and classified as forest water conservation zones to be designated as ecological core restoration areas.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize"
+            ],
+            "reference_solution_description": "Use the national forest water retention layer and the Jiuzhaigou earthquake zone polygon to isolate the conservation areas that fall inside the seismic boundary, then output/visualize the candidate ecological core restoration areas.",
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "load_geodata",
+                            "arguments": {
+                                "geodataset": "Forest Water Conservation China",
+                                "output_geodataframe_name": "forest_water_retention"
+                            },
+                            "comment": "Register 'Forest Water Conservation China': 'data/Data/GeoData/ForestWaterRetentionChina.shp' in GEO_CATALOG so this call loads the forest water conservation polygons."
+                        },
+                        {
+                            "function_name": "load_geodata",
+                            "arguments": {
+                                "geodataset": "Jiuzhaigou Earthquake Zone",
+                                "output_geodataframe_name": "jiuzhai_quake_zone"
+                            },
+                            "comment": "Register 'Jiuzhaigou Earthquake Zone': 'data/Data/GeoData/jiuzhai.shp' in GEO_CATALOG to bring the earthquake-affected boundary into memory."
+                        },
+                        {
+                            "function_name": "select_features_by_spatial_relationship",
+                            "arguments": {
+                                "features_geodataframe_name": "forest_water_retention",
+                                "reference_geodataframe_name": "jiuzhai_quake_zone",
+                                "spatial_predicates": [
+                                    "within",
+                                    "intersects"
+                                ],
+                                "output_geodataframe_name": "core_restoration_candidates",
+                                "plot_result": false
+                            },
+                            "comment": "Clip the forest water retention polygons to the earthquake zone; using both 'within' and 'intersects' ensures partial overlaps are retained for restoration design."
+                        },
+                        {
+                            "function_name": "visualize_geographies",
+                            "arguments": {
+                                "geodataframe_names": [
+                                    "jiuzhai_quake_zone",
+                                    "core_restoration_candidates"
+                                ],
+                                "layer_styles": [
+                                    {
+                                        "color": "#8c510a",
+                                        "alpha": 0.4,
+                                        "linewidth": 0.8,
+                                        "label": "Jiuzhaigou earthquake zone"
+                                    },
+                                    {
+                                        "color": "#01665e",
+                                        "alpha": 0.7,
+                                        "linewidth": 0.5,
+                                        "label": "Forest water conservation areas inside zone"
+                                    }
+                                ],
+                                "basemap_style": "OpenStreetMap",
+                                "title": "Ecological Core Restoration Candidates in Jiuzhaigou"
+                            },
+                            "comment": "Map the resulting candidate polygons against the earthquake footprint to communicate where ecological core restoration should occur."
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_251113_173012_003003",
+            "task_text": "Calculate the total area of all urban parks in Wuhan. Please follow this exact tool sequence: 1) load_geodata(geodataset='Wuhan Urban Parks', output_geodataframe_name='wuhan_parks'); 2) calculate_column_total(dataframe_name='wuhan_parks', column_name='Area_sqm', output_variable_name='wuhan_parks_total_area'); 3) report the total from wuhan_parks_total_area['total'] (if 'Area_sqm' is missing, try 'Area').",
+            "task_labels": [
+                "Spatial operations",
+                "Process, Merge, Visualize",
+                "Task Set 03"
+            ],
+            "reference_solution_description": "Load the Wuhan urban park polygons, confirm the table exposes the 'Area_sqm' (or 'Area') attribute, and sum that column directly using the total-calculation tool to report the total park area in square metres.",
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "load_geodata",
+                            "arguments": {
+                                "geodataset": "Wuhan Urban Parks",
+                                "output_geodataframe_name": "wuhan_parks"
+                            },
+                            "comment": "Register 'Wuhan Urban Parks': 'data/Data/GeoData/park_in_wuhan.shp' in GEO_CATALOG so the shapefile with every park polygon can be loaded."
+                        },
+                        {
+                            "function_name": "get_unique_values",
+                            "arguments": {
+                                "dataframe_name": "wuhan_parks",
+                                "column": "Area_sqm"
+                            },
+                            "comment": "Any inspection tool works; alternatively call get_dataframe_info. The key is to confirm that the attribute table already contains the 'Area_sqm' numeric field with each park's area in square metres so we can sum it without recomputing geometry."
+                        },
+                        {
+                            "function_name": "calculate_column_total",
+                            "arguments": {
+                                "dataframe_name": "wuhan_parks",
+                                "column_name": "Area_sqm",
+                                "output_variable_name": "wuhan_parks_total_area"
+                            },
+                            "comment": "Sum the Area_sqm attribute directly; the stored result exposes the 'total' key representing the combined park area in square metres."
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_251113_181735_004004",
+            "task_text": "Count the total number of POI points in the 2014 China POI data that are located within the Beijing-Tianjin-Hebei region.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": "Load the 2014 national POI point dataset and the Beijing-Tianjin-Hebei boundary, select POIs that lie within that region, and use a statistics call to report the total count of qualifying POIs.",
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "load_geodata",
+                            "arguments": {
+                                "geodataset": "2014 China POI",
+                                "output_geodataframe_name": "china_poi_2014"
+                            },
+                            "comment": "Same dataset as Task 1; keep '2014 China POI': 'data/Data/GeoData/2014_China_POI.shp' registered so all national POI points are available."
+                        },
+                        {
+                            "function_name": "load_geodata",
+                            "arguments": {
+                                "geodataset": "Beijing Tianjin Hebei Region",
+                                "output_geodataframe_name": "bth_region"
+                            },
+                            "comment": "Add 'Beijing Tianjin Hebei Region': 'data/Data/GeoData/2020jjj.shp' to GEO_CATALOG so the Jing-Jin-Ji polygon is accessible."
+                        },
+                        {
+                            "function_name": "select_features_by_spatial_relationship",
+                            "arguments": {
+                                "features_geodataframe_name": "china_poi_2014",
+                                "reference_geodataframe_name": "bth_region",
+                                "spatial_predicates": [
+                                    "within"
+                                ],
+                                "output_geodataframe_name": "poi_within_bth",
+                                "plot_result": false
+                            },
+                            "comment": "Filter the POIs to those inside the Beijing-Tianjin-Hebei boundary and store them in 'poi_within_bth' for counting or visualization."
+                        },
+                        {
+                            "function_name": "calculate_column_statistics",
+                            "arguments": {
+                                "dataframe_name": "poi_within_bth",
+                                "column_name": "OBJECTID",
+                                "output_variable_name": "poi_within_bth_stats",
+                                "include_quantiles": false,
+                                "additional_quantiles": null
+                            },
+                            "comment": "Use a stable numeric identifier column (OBJECTID/FID) so the 'valid_count' in the statistics output equals the total number of POIs inside Jing-Jin-Ji."
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_251118_120501_005005",
+            "task_text": "Load the Loess Plateau Region shapefile and use the calculate_polygon_areas tool to report the total area in square kilometers.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": "This task validates the polygon-area tool: load the Loess Plateau Region boundary, run calculate_polygon_areas to project into the correct UTM zone, and read the total_area_sq_km result.",
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "load_geodata",
+                            "arguments": {
+                                "geodataset": "Loess Plateau Region",
+                                "output_geodataframe_name": "loess_plateau_region"
+                            },
+                            "comment": "Bring the Loess Plateau boundary (data/Data/GeoData/LoessPlateauRegion.shp) into memory for analysis."
+                        },
+                        {
+                            "function_name": "calculate_polygon_areas",
+                            "arguments": {
+                                "geodataframe_name": "loess_plateau_region",
+                                "output_variable_name": "loess_plateau_region_area",
+                                "area_column_name": "area_sq_km"
+                            },
+                            "comment": "Explicitly invoke the new polygon-area tool so the total area is available in loess_plateau_region_area['total_area_sq_km']."
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_251118_153200_006006",
+            "task_text": "Identify and count the number of traditional villages within the Loess Plateau region, and calculate their spatial density in the area (villages per 10,000 square kilometers).",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 04",
+                "Process, Merge, Visualize",
+                "Merge, Visualize"
+            ],
+            "reference_solution_description": "Load the Loess Plateau boundary and the national traditional village point layer, select the villages that fall inside the plateau, count them, and measure the plateau area with calculate_polygon_areas so density (villages per 10,000 sq km) can be derived.",
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "load_geodata",
+                            "arguments": {
+                                "geodataset": "Loess Plateau Region",
+                                "output_geodataframe_name": "loess_plateau_region"
+                            },
+                            "comment": "Load the Loess Plateau boundary (data/Data/GeoData/LoessPlateauRegion.shp) so it can be used as the spatial constraint for filtering."
+                        },
+                        {
+                            "function_name": "load_geodata",
+                            "arguments": {
+                                "geodataset": "Traditional Villages of China",
+                                "output_geodataframe_name": "villages_china"
+                            },
+                            "comment": "Load the nationwide traditional village points (data/Data/GeoData/VillagesChina.shp) to prepare for filtering."
+                        },
+                        {
+                            "function_name": "select_features_by_spatial_relationship",
+                            "arguments": {
+                                "features_geodataframe_name": "villages_china",
+                                "reference_geodataframe_name": "loess_plateau_region",
+                                "spatial_predicates": [
+                                    "within"
+                                ],
+                                "output_geodataframe_name": "villages_in_loess",
+                                "plot_result": false
+                            },
+                            "comment": "Select the traditional villages that fall within the Loess Plateau boundary and store them in 'villages_in_loess' for counting."
+                        },
+                        {
+                            "function_name": "calculate_column_statistics",
+                            "arguments": {
+                                "dataframe_name": "villages_in_loess",
+                                "column_name": "OBJECTID",
+                                "output_variable_name": "villages_in_loess_stats",
+                                "include_quantiles": false,
+                                "additional_quantiles": null
+                            },
+                            "comment": "Use the statistics tool to obtain 'valid_count', which equals the number of traditional villages within the plateau."
+                        },
+                        {
+                            "function_name": "calculate_polygon_areas",
+                            "arguments": {
+                                "geodataframe_name": "loess_plateau_region",
+                                "output_variable_name": "loess_plateau_area",
+                                "area_column_name": "area_sq_km"
+                            },
+                            "comment": "Run calculate_polygon_areas to obtain the total Loess Plateau area (loess_plateau_area['total_area_sq_km']) and document the projection used."
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_251118_174500_007007",
+            "task_text": "Calculate the distances from the three points of interest in Wuhan to their nearest parks using the 3_places_in_wuhan.shp dataset for the POIs.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 04",
+                "Process, Merge, Visualize"
+            ],
+            "reference_solution_description": "Load the Wuhan POI sample and park polygons, then use the nearest-distance tool to compute how far each POI is from the closest park, reporting the distances in kilometers.",
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "load_geodata",
+                            "arguments": {
+                                "geodataset": "Wuhan POIs (3 locations)",
+                                "output_geodataframe_name": "wuhan_pois"
+                            },
+                            "comment": "Load the three POIs from data/Data/GeoData/3_places_in_wuhan.shp so their coordinates are in memory."
+                        },
+                        {
+                            "function_name": "load_geodata",
+                            "arguments": {
+                                "geodataset": "Wuhan Urban Parks",
+                                "output_geodataframe_name": "wuhan_parks"
+                            },
+                            "comment": "Load the Wuhan park polygons (data/Data/GeoData/park_in_wuhan.shp) that will serve as candidate destinations."
+                        },
+                        {
+                            "function_name": "calculate_nearest_distances",
+                            "arguments": {
+                                "source_geodataframe_name": "wuhan_pois",
+                                "target_geodataframe_name": "wuhan_parks",
+                                "output_geodataframe_name": "wuhan_pois_with_distances",
+                                "output_variable_name": "wuhan_poi_distance_summary",
+                                "distance_column_name": "nearest_park_distance_km",
+                                "nearest_id_column_name": "nearest_park_index"
+                            },
+                            "comment": "Compute the distance from each POI to the nearest park; the resulting GeoDataFrame 'wuhan_pois_with_distances' stores the kilometers in 'nearest_park_distance_km'."
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_251118_191500_008008",
+            "task_text": "Analyze the spatial distribution of villages in China and identify their primary geographic extension directions.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 04",
+                "Process, Merge, Visualize"
+            ],
+            "reference_solution_description": "Load the national traditional village points and apply the Standard Deviational Ellipse tool to summarize their overall dispersion, reporting the dominant orientation and ellipse geometry.",
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "load_geodata",
+                            "arguments": {
+                                "geodataset": "Traditional Villages of China",
+                                "output_geodataframe_name": "villages_china"
+                            },
+                            "comment": "Load all traditional village points from data/Data/GeoData/VillagesChina.shp for analysis."
+                        },
+                        {
+                            "function_name": "calculate_standard_directional_ellipse",
+                            "arguments": {
+                                "geodataframe_name": "villages_china",
+                                "output_geodataframe_name": "villages_china_directional_ellipse",
+                                "output_variable_name": "villages_china_directional_summary",
+                                "num_standard_deviations": 1.5,
+                                "ellipse_points": 120
+                            },
+                            "comment": "Generate the Standard Deviational Ellipse, capturing semi-major/minor axes, orientation, and a visualization summarizing the primary extension direction of the villages."
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_251118_210000_001001",
+            "task_text": "Please conduct a directional analysis of the road network in the Inner Mongolia Autonomous Region.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": "Load the Inner Mongolia road polylines and run the line-direction rose tool to summarize their dominant orientations and visualize the rose diagram.",
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "load_geodata",
+                            "arguments": {
+                                "geodataset": "Inner Mongolia roads",
+                                "output_geodataframe_name": "inner_mongolia_roads"
+                            },
+                            "comment": "Load the road_in_neimenggu.shp dataset (data/Data/GeoData/road_in_neimenggu.shp) containing the region's road network."
+                        },
+                        {
+                            "function_name": "calculate_line_direction_rose",
+                            "arguments": {
+                                "geodataframe_name": "inner_mongolia_roads",
+                                "output_table_name": "inner_mongolia_road_direction_bins",
+                                "output_variable_name": "inner_mongolia_road_direction_summary",
+                                "number_of_bins": 24
+                            },
+                            "comment": "Use the custom rose-diagram tool to measure segment orientations, store the bin table, and capture the dominant directional trend for the road network."
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_251119_160500_002002",
+            "task_text": "Using the \"Wei River Basin Topographic Slope Classification Dataset,\" reclassify the slope into three levels: gentle (icons 6-7), moderate (icons 4-5), and steep (icons 1-3), and create a graph to visualize the results.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 04",
+                "Process, Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": "Resolve the GeoTIFF path and use the dedicated reclassify_raster_by_table tool to bin icon values into gentle/moderate/steep classes while producing a ready-made visualization of the three slope levels.",
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "get_raster_path",
+                            "arguments": {
+                                "rasterdataset": "Wei River Basin Topographic Slope Classification Dataset"
+                            },
+                            "comment": "Resolve the catalog path for data/Data/GeoData/WeiheBasin.tif before downstream processing."
+                        },
+                        {
+                            "function_name": "reclassify_raster_by_table",
+                            "arguments": {
+                                "raster_path": "data/Data/GeoData/WeiheBasin.tif",
+                                "reclassification_table": [
+                                    {
+                                        "min_value": 6,
+                                        "max_value": 7,
+                                        "new_value": 3,
+                                        "label": "Gentle (icons 6–7)",
+                                        "color": "#2ca25f"
+                                    },
+                                    {
+                                        "min_value": 4,
+                                        "max_value": 5,
+                                        "new_value": 2,
+                                        "label": "Moderate (icons 4–5)",
+                                        "color": "#feb24c"
+                                    },
+                                    {
+                                        "min_value": 1,
+                                        "max_value": 3,
+                                        "new_value": 1,
+                                        "label": "Steep (icons 1–3)",
+                                        "color": "#de2d26"
+                                    }
+                                ],
+                                "output_variable_name": "weihe_slope_reclass",
+                                "plot_title": "Wei River Basin Slope Classes"
+                            },
+                            "comment": "Use the reclassify_raster_by_table tool to group icon ranges into the three requested slope levels and visualize the resulting raster."
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_251126_160950_004001",
+            "task_text": "Create a 1000-meter merged buffer zone for all major urban parks in Wuhan.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": "Load the Wuhan Urban Parks dataset and use the dissolved buffer tool to generate a single 1000-meter protection zone that merges overlapping park buffers.",
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "load_geodata",
+                            "arguments": {
+                                "geodataset": "Wuhan Urban Parks",
+                                "output_geodataframe_name": "wuhan_urban_parks"
+                            },
+                            "comment": "Load the park_in_wuhan.shp file to access the major park polygons within the city."
+                        },
+                        {
+                            "function_name": "create_dissolved_buffer",
+                            "arguments": {
+                                "geodataframe_name": "wuhan_urban_parks",
+                                "buffer_size_meters": 1000,
+                                "output_geodataframe_name": "wuhan_parks_1000m_merged_buffer",
+                                "dissolve_by_attribute": null
+                            },
+                            "comment": "Generate a metric 1000-meter buffer around every park and dissolve overlaps into one merged impact zone suitable for further planning analysis."
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_251128_101650_001001",
+            "task_text": "Based on the Xinxiang City Rainstorm and Flooding Dataset, use the erosion operation to simulate an inward contraction of 1000 meters and review the generated outputs.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": "Retrieve the Xinxiang flood raster path and call the erode_raster_regions tool with a 1000-meter erosion distance so the contracted GeoTIFF, HTML preview, and summary statistics are recorded for review.",
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "get_raster_path",
+                            "arguments": {
+                                "rasterdataset": "XinxiangCity Rainstorm and Flooding Dataset"
+                            },
+                            "comment": "Confirm the on-disk path to the Xinxiang flood raster before running any processing tools."
+                        },
+                        {
+                            "function_name": "erode_raster_regions",
+                            "arguments": {
+                                "raster_path": "d:/code/GeoBenchX/GeoBenchX/data/Data/GeoData/Xinxiang City Rainstorm and Flooding Dataset.tif",
+                                "output_variable_name": "xinxiang_flood_erosion_summary",
+                                "erosion_distance_meters": 1000,
+                                "presence_threshold": 0.0,
+                                "output_raster_path": "d:/code/GeoBenchX/GeoBenchX/scratch/xinxiang_flood_erosion.tif",
+                                "append_timestamp_to_output": true,
+                                "preview_title": "Xinxiang flood extent eroded inward by 1000 m"
+                            },
+                            "comment": "Apply the dedicated erosion tool to shrink the flooded zones by 1000 meters, saving a timestamped GeoTIFF plus the HTML preview for QA."
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_251128_120000_001001",
+            "task_text": "Calculate the basic statistics (mean and standard deviation) of the Wei River Basin topographic slope raster dataset.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": "Retrieve the raster path for the Wei River Basin slope dataset and use the raster-description tool to list the mean and standard deviation for the slope band.",
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "get_raster_path",
+                            "arguments": {
+                                "rasterdataset": "Wei River Basin Topographic Slope Classification Dataset"
+                            },
+                            "comment": "Confirm the on-disk path to WeiheBasin.tif before computing statistics."
+                        },
+                        {
+                            "function_name": "get_raster_description",
+                            "arguments": {
+                                "raster_path": "d:/code/GeoBenchX/GeoBenchX/data/Data/GeoData/WeiheBasin.tif",
+                                "output_variable_name": "weihe_slope_stats"
+                            },
+                            "comment": "Read the slope raster metadata and record mean/stddev for the band in weiher_slope_stats."
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_251128_120000_002002",
+            "task_text": "Determine the mean center of the spatial distribution of all Chinese traditional villages that fall within the Loess Plateau Region.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": "Load the Loess Plateau boundary and the national traditional village points, select the villages lying within the plateau, and run the standard directional ellipse tool to extract the centroid coordinates representing the mean center.",
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "load_geodata",
+                            "arguments": {
+                                "geodataset": "Loess Plateau Region",
+                                "output_geodataframe_name": "loess_plateau_region"
+                            },
+                            "comment": "Load the Loess Plateau polygon boundary for spatial filtering."
+                        },
+                        {
+                            "function_name": "load_geodata",
+                            "arguments": {
+                                "geodataset": "Traditional Villages of China",
+                                "output_geodataframe_name": "villages_china"
+                            },
+                            "comment": "Bring all Chinese traditional village points into memory."
+                        },
+                        {
+                            "function_name": "select_features_by_spatial_relationship",
+                            "arguments": {
+                                "features_geodataframe_name": "villages_china",
+                                "reference_geodataframe_name": "loess_plateau_region",
+                                "spatial_predicates": [
+                                    "within"
+                                ],
+                                "output_geodataframe_name": "villages_in_loess",
+                                "plot_result": false
+                            },
+                            "comment": "Select only the village points located inside the Loess Plateau boundary."
+                        },
+                        {
+                            "function_name": "calculate_standard_directional_ellipse",
+                            "arguments": {
+                                "geodataframe_name": "villages_in_loess",
+                                "output_geodataframe_name": "villages_in_loess_ellipse",
+                                "output_variable_name": "villages_in_loess_center",
+                                "num_standard_deviations": 1.0,
+                                "ellipse_points": 120
+                            },
+                            "comment": "Use the ellipse tool to report the mean center (center_x/center_y) of the filtered villages."
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_251128_120000_003003",
+            "task_text": "Generate contour lines from the Wei River Basin topographic slope raster to visualize slope intervals across the basin.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": "Locate the Wei River Basin slope raster and run the contour-generation tool with an appropriate interval to export slope contour lines for inspection.",
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "get_raster_path",
+                            "arguments": {
+                                "rasterdataset": "Wei River Basin Topographic Slope Classification Dataset"
+                            },
+                            "comment": "Obtain the full path to the slope raster before generating contours."
+                        },
+                        {
+                            "function_name": "generate_contours_display",
+                            "arguments": {
+                                "raster_path": "d:/code/GeoBenchX/GeoBenchX/data/Data/GeoData/WeiheBasin.tif",
+                                "output_filename": "weihe_slope_contours",
+                                "contour_interval": 5.0,
+                                "column_title": "slope_val",
+                                "nodataval": -9999,
+                                "output_geodataframe_name": "weihe_slope_contours_gdf",
+                                "output_folder": "d:/code/GeoBenchX/GeoBenchX/scratch",
+                                "plot_result": true,
+                                "plot_title": "Wei River Basin Slope Contours"
+                            },
+                            "comment": "Create slope contour lines at 5-unit intervals and store them in weihe_slope_contours_gdf for review."
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        }
+    ]
+}

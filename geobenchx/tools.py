@@ -39,6 +39,7 @@ from shapely import affinity
 from shapely.ops import nearest_points
 from pyproj import CRS, exceptions as pyproj_exceptions
 from scipy.ndimage import distance_transform_edt
+from sklearn.neighbors import KernelDensity
 
 
 from geobenchx.utils import get_dataframe_info
@@ -2821,6 +2822,194 @@ def make_heatmap(
     except Exception as e:
         return f"Error creating heatmap: {type(e).__name__} : {str(e)}"
 
+def create_point_kernel_density_map(
+    geodataframe_name: Annotated[str, "Name of the GeoDataFrame containing point features"],
+    output_variable_name: Annotated[str, "Name under which the density grid metadata will be stored"],
+    state: Annotated[dict, InjectedState],
+    grid_resolution: Annotated[int, "Number of cells along each axis for the density grid"] = 300,
+    bandwidth: Annotated[float | None, "Kernel bandwidth (meters). Leave empty to auto-estimate"] = None,
+    basemap_style: Annotated[
+        Literal["OpenStreetMap", "Carto Positron", "Carto Dark"],
+        "Basemap style for visualization"
+    ] = "Carto Positron",
+    cmap: Annotated[str, "Matplotlib colormap name used for density rendering"] = "inferno",
+    include_points: Annotated[bool, "Whether to overlay original points on the map"] = True
+) -> str:
+    """
+    Generate a kernel density surface from point data and visualize hotspot regions.
+
+    The function reprojects geometries to EPSG:3857, builds a grid, fits a Gaussian KDE
+    (auto-selecting bandwidth if not specified), produces a visualization, and stores
+    the resulting grid metadata in the agent state for further use.
+    """
+    try:
+        geodataframe = state["data_store"].get(geodataframe_name) if "data_store" in state else None
+        if geodataframe is None:
+            return f"Error: GeoDataFrame '{geodataframe_name}' not found in data store"
+
+        gdf = geodataframe.copy()
+        gdf = gdf[gdf.geometry.notna() & ~gdf.geometry.is_empty]
+        if gdf.empty:
+            return f"Error: GeoDataFrame '{geodataframe_name}' has no valid geometries for processing"
+
+        if not gdf.geom_type.isin(["Point", "MultiPoint"]).all():
+            gdf = gdf.to_crs(epsg=3857)
+            gdf["geometry"] = gdf.geometry.centroid
+        else:
+            gdf = gdf.to_crs(epsg=3857)
+
+        if gdf.empty:
+            return f"Error: GeoDataFrame '{geodataframe_name}' has no point features after processing"
+
+        # Explode multipoints to ensure one coordinate per row
+        try:
+            gdf = gdf.explode(index_parts=False, ignore_index=True)
+        except TypeError:
+            try:
+                gdf = gdf.explode(index_parts=False).reset_index(drop=True)
+            except TypeError:
+                gdf = gdf.explode().reset_index(drop=True)
+
+        coords = np.vstack((gdf.geometry.x.values, gdf.geometry.y.values)).T
+        num_points = coords.shape[0]
+        if num_points < 2:
+            return "Error: At least two point features are required to compute kernel density"
+
+        grid_resolution = int(grid_resolution)
+        if grid_resolution < 50:
+            return "Error: grid_resolution must be 50 or greater for a meaningful density surface"
+
+        minx, miny, maxx, maxy = gdf.total_bounds
+        span_x = maxx - minx
+        span_y = maxy - miny
+        spatial_span = max(span_x, span_y)
+
+        if bandwidth is not None and bandwidth <= 0:
+            return "Error: bandwidth must be a positive value when specified"
+
+        if bandwidth is None:
+            std_vals = np.std(coords, axis=0, ddof=1)
+            positive_std = std_vals[std_vals > 0]
+            if positive_std.size == 0:
+                base_scale = spatial_span / 6 if spatial_span > 0 else 1000.0
+            else:
+                base_scale = float(np.mean(positive_std))
+            auto_bw = 1.06 * base_scale * (num_points ** (-1 / 5))
+            min_bw = max(spatial_span / 75, 500.0)
+            kernel_bandwidth = float(max(auto_bw, min_bw))
+        else:
+            kernel_bandwidth = float(bandwidth)
+
+        padding_x = max(span_x * 0.05, kernel_bandwidth * 2.0, 1000.0)
+        padding_y = max(span_y * 0.05, kernel_bandwidth * 2.0, 1000.0)
+
+        x_min = minx - padding_x
+        x_max = maxx + padding_x
+        y_min = miny - padding_y
+        y_max = maxy + padding_y
+
+        x_coords = np.linspace(x_min, x_max, grid_resolution)
+        y_coords = np.linspace(y_min, y_max, grid_resolution)
+        xx, yy = np.meshgrid(x_coords, y_coords)
+        grid_points = np.column_stack([xx.ravel(), yy.ravel()])
+
+        kde = KernelDensity(
+            bandwidth=kernel_bandwidth,
+            kernel="gaussian"
+        )
+        kde.fit(coords)
+
+        log_density = kde.score_samples(grid_points)
+        density = np.exp(log_density).reshape(grid_resolution, grid_resolution)
+        normalized_density = density / np.max(density) if np.max(density) > 0 else density
+
+        # Visualization
+        fig, ax = plt.subplots(figsize=(10, 8))
+        density_image = ax.imshow(
+            normalized_density,
+            origin="lower",
+            extent=(x_min, x_max, y_min, y_max),
+            cmap=cmap,
+            alpha=0.85
+        )
+
+        providers = {
+            "OpenStreetMap": ctx.providers.OpenStreetMap.Mapnik,
+            "Carto Positron": ctx.providers.CartoDB.Positron,
+            "Carto Dark": ctx.providers.CartoDB.DarkMatter,
+        }
+        ctx.add_basemap(ax, source=providers[basemap_style], zoom="auto")
+
+        if include_points:
+            ax.scatter(
+                coords[:, 0],
+                coords[:, 1],
+                s=6,
+                c="white",
+                edgecolor="black",
+                linewidth=0.2,
+                alpha=0.6
+            )
+
+        cbar = plt.colorbar(density_image, ax=ax, fraction=0.036, pad=0.02)
+        cbar.set_label("Relative density")
+        ax.set_title(f"Kernel Density Hotspots for '{geodataframe_name}'")
+        ax.set_axis_off()
+
+        buf = io.BytesIO()
+        fig.savefig(buf, format="png", bbox_inches="tight", dpi=180)
+        buf.seek(0)
+        img_base64 = base64.b64encode(buf.read()).decode("utf-8")
+        buf.close()
+        plt.close(fig)
+
+        if "image_store" not in state:
+            state["image_store"] = []
+        state["image_store"].append({
+            "type": "map",
+            "description": f"Kernel density visualization for '{geodataframe_name}'",
+            "base64": img_base64
+        })
+
+        if "data_store" not in state:
+            state["data_store"] = {}
+
+        density_package = {
+            "grid_resolution": grid_resolution,
+            "x_coordinates": x_coords,
+            "y_coordinates": y_coords,
+            "density_values": density,
+            "normalized_density": normalized_density,
+            "extent": [x_min, x_max, y_min, y_max],
+            "bandwidth": kernel_bandwidth,
+            "crs": "EPSG:3857",
+            "source_geodataframe": geodataframe_name
+        }
+        state["data_store"][output_variable_name] = density_package
+
+        result_msg = (
+            f"Generated kernel density surface from '{geodataframe_name}'.\n"
+            f"- Auto-selected bandwidth: {kernel_bandwidth:,.2f} meters\n"
+            f"- Grid resolution: {grid_resolution}x{grid_resolution}\n"
+            f"- Extent (Web Mercator): [{x_min:,.0f}, {y_min:,.0f}] to [{x_max:,.0f}, {y_max:,.0f}]"
+        )
+
+        if "visualize" in state and state["visualize"]:
+            fig, ax = plt.subplots()
+            ax.imshow(
+                normalized_density,
+                origin="lower",
+                cmap=cmap
+            )
+            ax.set_title("Kernel Density Preview")
+            ax.set_axis_off()
+            plt.show()
+
+        return result_msg
+
+    except Exception as e:
+        return f"Error creating kernel density map: {type(e).__name__} : {str(e)}"
+
 def visualize_geographies(
     geodataframe_names: Annotated[list[str] | str , '''List of GeoDataFrame names to visualize or JSON-string representation of this list, example ["geodataframe_name_1", "geodataframe_name_2"]'''],
     state: Annotated[dict, InjectedState],
@@ -3794,6 +3983,13 @@ make_heatmap_tool = StructuredTool.from_function(
     description='The make_heatmap tool creates an interactive heatmap visualization from point data in a GeoDataFrame, with intensity based on values from a specified column. \
         It returns a visualization where color intensity represents data density or magnitude, and can optionally store the HTML output. \
         The tool supports customization of map appearance including basemap style, zoom level, and color radius.'
+)
+
+create_point_kernel_density_map_tool = StructuredTool.from_function(
+    func=create_point_kernel_density_map,
+    name='create_point_kernel_density_map',
+    description='Generates a kernel density surface from point data, auto-selecting a sensible bandwidth when not provided, \
+        storing the grid metadata, and returning a basemap-backed visualization that highlights hotspot areas.'
 )
 
 visualize_geographies_tool = StructuredTool.from_function(
