@@ -121,6 +121,7 @@ RASTER_CATALOG = {
     "Wei River Basin Topographic Slope Classification Dataset": "WeiheBasin.tif",
     "XinxiangCity Rainstorm and Flooding Dataset": "Xinxiang City Rainstorm and Flooding Dataset.tif",
     "Guangming District DEM (Shenzhen)": "guangming.tif",
+    "Guangming District Slope (Shenzhen)": "guangmingSlope.tif",
 }
 
 COLORMAPS = {
