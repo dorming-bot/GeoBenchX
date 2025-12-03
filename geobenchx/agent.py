@@ -28,7 +28,8 @@ from geobenchx.constants import (
     MODEL_CLAUDE_ADV3,
     MODEL_CLAUDE_ADV4,
     MODEL_SHER_LOCKER,
-    MODEL_SHER_LOCKER_4o
+    MODEL_SHER_LOCKER_4o,
+    MODEL_SHER_LOCKER_GEMINI_FLASH
     
 )
 from geobenchx.tools import (
@@ -76,7 +77,19 @@ openai.api_key  = os.getenv('OPENAI_API_KEY')
 google_api_key = os.getenv("GOOGLE_API_KEY")
 anthropic_api_key = os.getenv("ANTHROPIC_API_KEY")
 _sher_locker_api_key = os.getenv("SHER_LOCKER_API_KEY")
-_sher_locker_base_url = os.getenv("SHER_LOCKER_BASE_URL", "https://sher.locker/v1/")
+_DEFAULT_SHER_OPENAI_BASE_URL = "https://sher.locker/openai/v1/"
+_DEFAULT_SHER_GOOGLE_BASE_URL = "https://sher.locker/google/v1beta/"
+_sher_locker_openai_base_url = os.getenv("SHER_LOCKER_OPENAI_BASE_URL", _DEFAULT_SHER_OPENAI_BASE_URL)
+_sher_locker_google_base_url = os.getenv("SHER_LOCKER_GOOGLE_BASE_URL", _DEFAULT_SHER_GOOGLE_BASE_URL)
+_sher_locker_base_url = os.getenv("SHER_LOCKER_BASE_URL")
+
+
+def _resolve_sher_locker_base_url(model: str) -> str:
+    """Return vendor-specific Sher Locker base URL based on model name."""
+    model_lower = model.lower()
+    if "gemini" in model_lower:
+        return _sher_locker_google_base_url or _sher_locker_base_url or _DEFAULT_SHER_GOOGLE_BASE_URL
+    return _sher_locker_openai_base_url or _sher_locker_base_url or _DEFAULT_SHER_OPENAI_BASE_URL
 
 tools = [
     load_data_tool, 
@@ -132,14 +145,15 @@ def execute_task(task_text: str, temperature: float = 0, model: str = MODEL_GPT_
         llm = ChatOpenAI(model=model, temperature=None)
     elif model in [MODEL_GEMINI, MODEL_GEMINI_ADV]:
         llm = ChatGoogleGenerativeAI(model=model, temperature=temperature)
-    elif model in [MODEL_SHER_LOCKER,MODEL_SHER_LOCKER_4o]:
+    elif model in [MODEL_SHER_LOCKER, MODEL_SHER_LOCKER_4o, MODEL_SHER_LOCKER_GEMINI_FLASH]:
         if not _sher_locker_api_key:
             raise ValueError("SHER_LOCKER_API_KEY is not set in the environment.")
+        base_url = _resolve_sher_locker_base_url(model)
         llm = ChatOpenAI(
             model=model,
             temperature=temperature,
             api_key=_sher_locker_api_key,
-            base_url=_sher_locker_base_url,
+            base_url=base_url,
         )
     else:
         raise ValueError("Model is outside the predetermined list")

@@ -40,6 +40,7 @@ from shapely.ops import nearest_points
 from pyproj import CRS, exceptions as pyproj_exceptions
 from scipy.ndimage import distance_transform_edt
 from sklearn.neighbors import KernelDensity
+import re
 
 
 from geobenchx.utils import get_dataframe_info
@@ -722,11 +723,14 @@ def classify_raster_zones(
     overwrite_existing: Annotated[bool, "If True, overwrite an existing output raster at the same path"] = True,
     output_dtype: Annotated[Literal["float32", "float64", "int32", "int16", "uint8"], "Data type for the output raster"] = "float32",
     plot_title: Annotated[str, "Title for the visualization"] = "Reclassified Raster",
-    legend_location: Annotated[str, "Matplotlib legend location string"] = "upper right"
+    legend_location: Annotated[str, "Matplotlib legend location string"] = "upper right",
+    classification_model_name: Annotated[str, "Name of the classification model or rule set applied"] = "manual_reclass",
+    append_timestamp_to_output: Annotated[bool, "If True, append UTC timestamp and model name to the saved raster filename"] = True
 ) -> str:
     """
     Classify a raster using a table of value ranges, similar to QGIS "Reclassify by table".
-    Generates a GeoTIFF with the new classes, stores metadata, and plots the classes with user-provided colors.
+    Generates a GeoTIFF with the new classes, stores metadata (including model name and timestamp),
+    and plots the classes with user-provided colors.
     """
     try:
         if "data_store" not in state:
@@ -840,6 +844,12 @@ def classify_raster_zones(
 
         del raster_data
 
+        timestamp_utc = datetime.utcnow().strftime("%Y%m%dT%H%M%S")
+        sanitized_model = ""
+        if isinstance(classification_model_name, str):
+            sanitized_model = re.sub(r"[^A-Za-z0-9]+", "_", classification_model_name.strip())
+        sanitized_model = sanitized_model.strip("_") or "model"
+
         if output_raster_path is None:
             Path(SCRATCH_PATH).mkdir(parents=True, exist_ok=True)
             default_name = f"classified_{Path(raster_path).stem}.tif"
@@ -847,6 +857,13 @@ def classify_raster_zones(
 
         output_path_obj = Path(output_raster_path)
         output_path_obj.parent.mkdir(parents=True, exist_ok=True)
+
+        if append_timestamp_to_output:
+            suffix = output_path_obj.suffix or ".tif"
+            new_stem = f"{output_path_obj.stem}_{sanitized_model}_{timestamp_utc}"
+            new_name = f"{new_stem}{suffix}"
+            output_path_obj = output_path_obj.with_name(new_name)
+
         if output_path_obj.exists():
             if overwrite_existing:
                 output_path_obj.unlink()
@@ -901,7 +918,9 @@ def classify_raster_zones(
             "class_info": class_info,
             "nodata_value": nodata_used,
             "band_number": band_number,
-            "table": sorted_table
+            "table": sorted_table,
+            "classification_model_name": classification_model_name,
+            "processing_timestamp_utc": timestamp_utc
         }
 
         summary_lines = [
@@ -910,7 +929,8 @@ def classify_raster_zones(
         ]
 
         summary = (
-            f"Classified raster '{Path(raster_path).name}' into {len(class_info)} classes.\n"
+            f"Classified raster '{Path(raster_path).name}' into {len(class_info)} classes using model '{classification_model_name}'.\n"
+            f"Processing timestamp (UTC): {timestamp_utc}.\n"
             f"Output saved to '{output_raster_path}'.\n" +
             "\n".join(summary_lines)
         )
@@ -918,6 +938,8 @@ def classify_raster_zones(
             summary += f"\n(Note: nodata value adjusted to {nodata_used} to match dtype {output_dtype}.)"
         if overwrite_existing:
             summary += "\n(Existing output at this path is overwritten each run to avoid duplicate .tif files.)"
+        if append_timestamp_to_output:
+            summary += "\n(Output filename tagged with model name and timestamp.)"
         return summary
 
     except Exception as e:
