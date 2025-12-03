@@ -1,0 +1,53 @@
+{
+    "metadata": {
+        "author": "zsx7",
+        "notes": "Tasks focusing on DEM-to-slope conversion"
+    },
+    "tasks": [
+        {
+            "task_ID": "TASK_251203_134501_009009",
+            "task_text": "Based on the DEM data of Guangming District, Shenzhen, convert this DEM data into slope data (unit in \"degrees\").",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": "Use the Guangming District DEM raster and run the DEM-to-slope tool so a timestamped slope GeoTIFF (degrees) is saved in scratch along with summary statistics.",
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "get_raster_path",
+                            "arguments": {
+                                "rasterdataset": "Guangming District DEM (Shenzhen)"
+                            },
+                            "comment": "Retrieve the absolute path for data/Data/GeoData/guangming.tif before converting it to slope values."
+                        },
+                        {
+                            "function_name": "convert_dem_to_slope",
+                            "arguments": {
+                                "dem_raster_path": "d:/code/GeoBenchX/GeoBenchX/data/Data/GeoData/guangming.tif",
+                                "output_variable_name": "guangming_slope_summary",
+                                "output_raster_path": "d:/code/GeoBenchX/GeoBenchX/scratch/guangming_slope.tif",
+                                "band_number": 1,
+                                "append_timestamp_to_output": true,
+                                "plot_title": "Guangming District Slope (degrees)",
+                                "colormap": "viridis"
+                            },
+                            "comment": "Convert the Guangming DEM into a slope raster stored in scratch with a timestamped filename; keep metadata in 'guangming_slope_summary'."
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        }
+    ]
+}

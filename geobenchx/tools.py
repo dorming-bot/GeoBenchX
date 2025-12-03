@@ -120,6 +120,7 @@ RASTER_CATALOG = {
     "Algeria population density per 1 km 2020, 1 km resolution": "dza_pd_2020_1km_UNadj.tif",
     "Wei River Basin Topographic Slope Classification Dataset": "WeiheBasin.tif",
     "XinxiangCity Rainstorm and Flooding Dataset": "Xinxiang City Rainstorm and Flooding Dataset.tif",
+    "Guangming District DEM (Shenzhen)": "guangming.tif",
 }
 
 COLORMAPS = {
@@ -1164,6 +1165,175 @@ def erode_raster_regions(
 
     except Exception as e:
         return f"Error eroding raster: {type(e).__name__} : {str(e)}"
+
+def convert_dem_to_slope(
+    dem_raster_path: Annotated[str, "Path to the DEM raster to convert into slope"],
+    output_variable_name: Annotated[str, "Name used to store slope metadata in the state"],
+    state: Annotated[dict, InjectedState],
+    band_number: Annotated[int, "1-based DEM band used for slope calculation"] = 1,
+    output_raster_path: Annotated[str | None, "Optional custom path for saving the slope raster (defaults to SCRATCHPATH/slope_<name>.tif)"] = None,
+    overwrite_existing: Annotated[bool, "Allow overwriting if the slope file already exists at the destination"] = True,
+    append_timestamp_to_output: Annotated[bool, "Append UTC timestamp to the slope filename for bookkeeping"] = True,
+    plot_title: Annotated[str, "Title displayed on the generated slope map"] = "DEM-derived Slope (degrees)",
+    colormap: Annotated[str, "Matplotlib colormap used for the slope preview"] = "terrain"
+) -> str:
+    """
+    Convert a DEM raster into a slope raster (degrees) similar to QGIS's Slope tool.
+    The resulting slope GeoTIFF is stored in the scratch directory with a timestamped name,
+    a preview image is captured, and summary statistics are saved to the agent state.
+    """
+    try:
+        if "data_store" not in state:
+            state["data_store"] = {}
+        if "image_store" not in state:
+            state["image_store"] = []
+
+        if not dem_raster_path:
+            return "Error: dem_raster_path must be provided."
+
+        def _translate_zip_path(path: str) -> str:
+            if path.startswith("zip://"):
+                inner = path[len("zip://"):]
+                if "!/" in inner:
+                    zip_part, inner_file = inner.split("!/", 1)
+                else:
+                    zip_part, inner_file = inner, ""
+                return f"/vsizip/{zip_part}/{inner_file}"
+            return path
+
+        translated_path = _translate_zip_path(dem_raster_path)
+
+        if not dem_raster_path.startswith("zip://") and not os.path.exists(dem_raster_path):
+            return f"Error: DEM raster '{dem_raster_path}' not found."
+
+        src_ds = gdal.OpenEx(translated_path, gdal.OF_RASTER)
+        if src_ds is None:
+            return f"Error: Unable to open DEM raster '{dem_raster_path}'."
+        raster_count = src_ds.RasterCount
+        if band_number < 1 or band_number > raster_count:
+            src_ds = None
+            return f"Error: band_number {band_number} is outside available bands (1-{raster_count})."
+
+        timestamp_utc = datetime.utcnow().strftime("%Y%m%dT%H%M%S")
+
+        if output_raster_path is None:
+            Path(SCRATCH_PATH).mkdir(parents=True, exist_ok=True)
+            default_name = f"slope_{Path(dem_raster_path).stem}.tif"
+            output_path_obj = Path(SCRATCH_PATH) / default_name
+        else:
+            output_path_obj = Path(output_raster_path)
+            output_path_obj.parent.mkdir(parents=True, exist_ok=True)
+
+        if append_timestamp_to_output:
+            suffix = output_path_obj.suffix or ".tif"
+            output_path_obj = output_path_obj.with_name(f"{output_path_obj.stem}_{timestamp_utc}{suffix}")
+
+        if output_path_obj.exists():
+            if overwrite_existing:
+                output_path_obj.unlink()
+                aux_file = output_path_obj.with_suffix(output_path_obj.suffix + ".aux.xml")
+                if aux_file.exists():
+                    aux_file.unlink()
+            else:
+                src_ds = None
+                return f"Error: Output raster '{output_path_obj.as_posix()}' already exists. Enable overwrite or choose another path."
+
+        dem_processing_options = gdal.DEMProcessingOptions(
+            band=band_number,
+            slopeFormat="degree"
+        )
+        dem_result = gdal.DEMProcessing(
+            destName=output_path_obj.as_posix(),
+            srcDS=src_ds,
+            processing="slope",
+            options=dem_processing_options
+        )
+        src_ds = None
+
+        if dem_result is None:
+            return "Error: GDAL DEMProcessing failed to create the slope raster."
+        dem_result = None
+
+        with rasterio.open(output_path_obj.as_posix()) as slope_src:
+            slope_data = slope_src.read(1)
+            slope_nodata = slope_src.nodata
+            bounds = slope_src.bounds
+            valid_mask = np.isfinite(slope_data)
+            if slope_nodata is not None:
+                valid_mask &= slope_data != slope_nodata
+
+            if np.any(valid_mask):
+                values = slope_data[valid_mask]
+                stats = {
+                    "count": int(values.size),
+                    "min": float(values.min()),
+                    "max": float(values.max()),
+                    "mean": float(values.mean()),
+                    "std": float(values.std(ddof=1)) if values.size > 1 else 0.0
+                }
+            else:
+                stats = {
+                    "count": 0,
+                    "min": None,
+                    "max": None,
+                    "mean": None,
+                    "std": None
+                }
+
+            masked_array = np.ma.masked_where(~valid_mask, slope_data)
+            fig, ax = plt.subplots(1, 1, figsize=(10, 8))
+            img = ax.imshow(
+                masked_array,
+                cmap=colormap,
+                extent=(bounds.left, bounds.right, bounds.bottom, bounds.top),
+                origin="upper"
+            )
+            ax.set_title(plot_title)
+            ax.set_axis_off()
+            cbar = plt.colorbar(img, ax=ax, fraction=0.036, pad=0.02)
+            cbar.set_label("Slope (degrees)")
+
+            buf = io.BytesIO()
+            fig.savefig(buf, format="png", bbox_inches="tight", dpi=150)
+            buf.seek(0)
+            img_base64 = base64.b64encode(buf.read()).decode("utf-8")
+            buf.close()
+            plt.close(fig)
+
+        state["image_store"].append({
+            "type": "map",
+            "description": f"Slope raster preview for {Path(dem_raster_path).name}",
+            "base64": img_base64
+        })
+
+        state["data_store"][output_variable_name] = {
+            "slope_raster_path": output_path_obj.as_posix(),
+            "statistics": stats,
+            "dem_raster_path": dem_raster_path,
+            "timestamp_utc": timestamp_utc,
+            "band_number": band_number
+        }
+
+        summary_lines = [
+            f"- Min slope: {stats['min']:.2f}°" if stats["min"] is not None else "- Min slope: N/A",
+            f"- Max slope: {stats['max']:.2f}°" if stats["max"] is not None else "- Max slope: N/A",
+            f"- Mean slope: {stats['mean']:.2f}°" if stats["mean"] is not None else "- Mean slope: N/A",
+            f"- Valid pixels: {stats['count']:,}"
+        ]
+
+        summary = (
+            f"Converted DEM '{Path(dem_raster_path).name}' to slope (degrees).\n"
+            f"Processing timestamp (UTC): {timestamp_utc}.\n"
+            f"Output saved to '{output_path_obj.as_posix()}'.\n" +
+            "\n".join(summary_lines)
+        )
+        if append_timestamp_to_output:
+            summary += "\n(Output filename includes the UTC timestamp for traceability.)"
+
+        return summary
+
+    except Exception as e:
+        return f"Error generating slope raster: {type(e).__name__} : {str(e)}"
 
 # Create tool function to merge 2 dataframes, or a dataframe and a geodataframe
 def merge_dataframes(
@@ -3868,6 +4038,12 @@ erode_raster_regions_tool = StructuredTool.from_function(
     func=erode_raster_regions,
     name='erode_raster_regions',
     description='Apply morphological erosion to a raster mask using a metric distance, produce a timestamped GeoTIFF, and store a before/after preview in the HTML store.'
+)
+
+convert_dem_to_slope_tool = StructuredTool.from_function(
+    func=convert_dem_to_slope,
+    name='convert_dem_to_slope',
+    description='Converts a DEM raster into a slope raster in degrees (similar to QGIS Slope), saves a timestamped GeoTIFF into the scratch folder, stores summary statistics, and adds a preview image.'
 )
 
 merge_dataframes_tool = StructuredTool.from_function(
