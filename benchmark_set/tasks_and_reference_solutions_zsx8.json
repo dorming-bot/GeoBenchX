@@ -1,12 +1,12 @@
 {
     "metadata": {
         "author": "zsx8",
-        "notes": "Reclassification tasks for Guangming slope data"
+        "notes": "Aspect generation tasks for Guangming DEM"
     },
     "tasks": [
         {
-            "task_ID": "TASK_251203_150100_010010",
-            "task_text": "Reclassify the slope data of Guangming District, Shenzhen, into seven levels as follows: Level 1 (0–1 degrees), Level 2 (1–3 degrees), Level 3 (3–7 degrees), Level 4 (7–15 degrees), Level 5 (15–25 degrees), Level 6 (25–35 degrees), and Level 7 (above 35 degrees).",
+            "task_ID": "TASK_251203_153500_012012",
+            "task_text": "Generate an aspect map of the region based on the Guangming District DEM (Shenzhen).",
             "task_labels": [
                 "Spatial operations",
                 "Task Set 03",
@@ -14,39 +14,29 @@
                 "Merge, Visualize",
                 "Heatmaps, Contour Lines"
             ],
-            "reference_solution_description": "Load the Guangming slope raster, feed it to classify_raster_zones with seven degree-based ranges, and save the timestamped output GeoTIFF plus summary stats for each slope level.",
+            "reference_solution_description": "Use the Guangming DEM with the aspect-generation tool to derive 0-360 degree orientations, saving a timestamped pseudocolor GeoTIFF plus summary stats.",
             "reference_solutions": [
                 {
                     "steps": [
                         {
                             "function_name": "get_raster_path",
                             "arguments": {
-                                "rasterdataset": "Guangming District Slope (Shenzhen)"
+                                "rasterdataset": "Guangming District DEM (Shenzhen)"
                             },
-                            "comment": "Resolve the absolute path to data/Data/GeoData/guangmingSlope.tif before reclassification."
+                            "comment": "Resolve the absolute path to data/Data/GeoData/guangming.tif before sending it to the aspect conversion tool."
                         },
                         {
-                            "function_name": "classify_raster_zones",
+                            "function_name": "generate_aspect_map",
                             "arguments": {
-                                "raster_path": "d:/code/GeoBenchX/GeoBenchX/data/Data/GeoData/guangmingSlope.tif",
-                                "reclassification_table": [
-                                    {"min_value": 0.0, "max_value": 1.0, "new_value": 1, "label": "Level 1: 0–1°", "color": "#f7fcfd"},
-                                    {"min_value": 1.0, "max_value": 3.0, "new_value": 2, "label": "Level 2: 1–3°", "color": "#e0ecf4"},
-                                    {"min_value": 3.0, "max_value": 7.0, "new_value": 3, "label": "Level 3: 3–7°", "color": "#bfd3e6"},
-                                    {"min_value": 7.0, "max_value": 15.0, "new_value": 4, "label": "Level 4: 7–15°", "color": "#9ebcda"},
-                                    {"min_value": 15.0, "max_value": 25.0, "new_value": 5, "label": "Level 5: 15–25°", "color": "#8c96c6"},
-                                    {"min_value": 25.0, "max_value": 35.0, "new_value": 6, "label": "Level 6: 25–35°", "color": "#8856a7"},
-                                    {"min_value": 35.0, "max_value": 90.0, "new_value": 7, "label": "Level 7: >35°", "color": "#810f7c"}
-                                ],
-                                "output_variable_name": "guangming_slope_levels",
-                                "output_raster_path": "d:/code/GeoBenchX/GeoBenchX/scratch/guangming_slope_levels.tif",
-                                "output_dtype": "uint8",
-                                "classification_model_name": "slope_levels_7",
+                                "dem_raster_path": "d:/code/GeoBenchX/GeoBenchX/data/Data/GeoData/guangming.tif",
+                                "output_variable_name": "guangming_aspect_summary",
+                                "output_raster_path": "d:/code/GeoBenchX/GeoBenchX/scratch/guangming_aspect.tif",
+                                "band_number": 1,
                                 "append_timestamp_to_output": true,
-                                "plot_title": "Guangming Slope Levels (degrees)",
-                                "legend_location": "upper right"
+                                "plot_title": "Guangming District Aspect (degrees)",
+                                "colormap": "Spectral"
                             },
-                            "comment": "Apply the seven-level reclassification so each slope range is assigned a numeric level and exported as a timestamped GeoTIFF with custom legend colors."
+                            "comment": "Generate the aspect map (QGIS Aspect equivalent) with a Spectral singleband pseudocolor render and store metadata in 'guangming_aspect_summary'."
                         }
                     ]
                 }

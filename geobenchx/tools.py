@@ -1336,6 +1336,169 @@ def convert_dem_to_slope(
     except Exception as e:
         return f"Error generating slope raster: {type(e).__name__} : {str(e)}"
 
+def generate_aspect_map(
+    dem_raster_path: Annotated[str, "Path to the DEM raster used for aspect calculation"],
+    output_variable_name: Annotated[str, "Name for storing aspect metadata in the state"],
+    state: Annotated[dict, InjectedState],
+    band_number: Annotated[int, "1-based DEM band used for aspect calculation"] = 1,
+    output_raster_path: Annotated[str | None, "Optional custom path for saving the aspect raster (defaults to SCRATCHPATH/aspect_<name>.tif)"] = None,
+    overwrite_existing: Annotated[bool, "Allow overwriting if the aspect file already exists at the destination"] = True,
+    append_timestamp_to_output: Annotated[bool, "Append UTC timestamp to the aspect filename for bookkeeping"] = True,
+    plot_title: Annotated[str, "Title displayed on the aspect visualization"] = "DEM-derived Aspect (degrees)",
+    colormap: Annotated[str, "Matplotlib colormap name used for pseudocolor rendering"] = "Spectral"
+) -> str:
+    """
+    Generate an aspect raster (degrees 0-360) from a DEM using GDAL's Aspect algorithm.
+    Saves a timestamped GeoTIFF into the scratch folder, renders a singleband pseudocolor preview,
+    and stores summary statistics in the agent state.
+    """
+    try:
+        if "data_store" not in state:
+            state["data_store"] = {}
+        if "image_store" not in state:
+            state["image_store"] = []
+
+        if not dem_raster_path:
+            return "Error: dem_raster_path must be provided."
+
+        def _translate_zip_path(path: str) -> str:
+            if path.startswith("zip://"):
+                inner = path[len("zip://"):]
+                if "!/" in inner:
+                    zip_part, inner_file = inner.split("!/", 1)
+                else:
+                    zip_part, inner_file = inner, ""
+                return f"/vsizip/{zip_part}/{inner_file}"
+            return path
+
+        translated_path = _translate_zip_path(dem_raster_path)
+
+        if not dem_raster_path.startswith("zip://") and not os.path.exists(dem_raster_path):
+            return f"Error: DEM raster '{dem_raster_path}' not found."
+
+        src_ds = gdal.OpenEx(translated_path, gdal.OF_RASTER)
+        if src_ds is None:
+            return f"Error: Unable to open DEM raster '{dem_raster_path}'."
+        raster_count = src_ds.RasterCount
+        if band_number < 1 or band_number > raster_count:
+            src_ds = None
+            return f"Error: band_number {band_number} is outside available bands (1-{raster_count})."
+
+        timestamp_utc = datetime.utcnow().strftime("%Y%m%dT%H%M%S")
+
+        if output_raster_path is None:
+            Path(SCRATCH_PATH).mkdir(parents=True, exist_ok=True)
+            default_name = f"aspect_{Path(dem_raster_path).stem}.tif"
+            output_path_obj = Path(SCRATCH_PATH) / default_name
+        else:
+            output_path_obj = Path(output_raster_path)
+            output_path_obj.parent.mkdir(parents=True, exist_ok=True)
+
+        if append_timestamp_to_output:
+            suffix = output_path_obj.suffix or ".tif"
+            output_path_obj = output_path_obj.with_name(f"{output_path_obj.stem}_{timestamp_utc}{suffix}")
+
+        if output_path_obj.exists():
+            if overwrite_existing:
+                output_path_obj.unlink()
+                aux_file = output_path_obj.with_suffix(output_path_obj.suffix + ".aux.xml")
+                if aux_file.exists():
+                    aux_file.unlink()
+            else:
+                src_ds = None
+                return f"Error: Output raster '{output_path_obj.as_posix()}' already exists. Enable overwrite or choose another path."
+
+        aspect_options = gdal.DEMProcessingOptions(
+            band=band_number
+        )
+        aspect_result = gdal.DEMProcessing(
+            destName=output_path_obj.as_posix(),
+            srcDS=src_ds,
+            processing="aspect",
+            options=aspect_options
+        )
+        src_ds = None
+
+        if aspect_result is None:
+            return "Error: GDAL DEMProcessing failed to create the aspect raster."
+        aspect_result = None
+
+        with rasterio.open(output_path_obj.as_posix()) as aspect_src:
+            aspect_data = aspect_src.read(1)
+            aspect_nodata = aspect_src.nodata
+            bounds = aspect_src.bounds
+            valid_mask = np.isfinite(aspect_data)
+            if aspect_nodata is not None:
+                valid_mask &= aspect_data != aspect_nodata
+
+            if np.any(valid_mask):
+                values = aspect_data[valid_mask]
+                stats = {
+                    "count": int(values.size),
+                    "min": float(values.min()),
+                    "max": float(values.max()),
+                    "mean": float(values.mean()),
+                    "std": float(values.std(ddof=1)) if values.size > 1 else 0.0
+                }
+            else:
+                stats = {"count": 0, "min": None, "max": None, "mean": None, "std": None}
+
+            cmap = plt.cm.get_cmap(colormap)
+            masked_array = np.ma.masked_where(~valid_mask, aspect_data)
+            fig, ax = plt.subplots(1, 1, figsize=(10, 8))
+            img = ax.imshow(
+                masked_array,
+                cmap=cmap,
+                extent=(bounds.left, bounds.right, bounds.bottom, bounds.top),
+                origin="upper"
+            )
+            ax.set_title(plot_title)
+            ax.set_axis_off()
+            cbar = plt.colorbar(img, ax=ax, fraction=0.036, pad=0.02)
+            cbar.set_label("Aspect (degrees 0-360)")
+
+            buf = io.BytesIO()
+            fig.savefig(buf, format="png", bbox_inches="tight", dpi=150)
+            buf.seek(0)
+            img_base64 = base64.b64encode(buf.read()).decode("utf-8")
+            buf.close()
+            plt.close(fig)
+
+        state["image_store"].append({
+            "type": "map",
+            "description": f"Aspect raster preview for {Path(dem_raster_path).name}",
+            "base64": img_base64
+        })
+
+        state["data_store"][output_variable_name] = {
+            "aspect_raster_path": output_path_obj.as_posix(),
+            "statistics": stats,
+            "dem_raster_path": dem_raster_path,
+            "band_number": band_number,
+            "timestamp_utc": timestamp_utc
+        }
+
+        summary_lines = [
+            f"- Min aspect: {stats['min']:.2f}°" if stats["min"] is not None else "- Min aspect: N/A",
+            f"- Max aspect: {stats['max']:.2f}°" if stats["max"] is not None else "- Max aspect: N/A",
+            f"- Mean aspect: {stats['mean']:.2f}°" if stats["mean"] is not None else "- Mean aspect: N/A",
+            f"- Valid pixels: {stats['count']:,}"
+        ]
+
+        summary = (
+            f"Generated aspect map from DEM '{Path(dem_raster_path).name}'.\n"
+            f"Processing timestamp (UTC): {timestamp_utc}.\n"
+            f"Output saved to '{output_path_obj.as_posix()}'.\n" +
+            "\n".join(summary_lines)
+        )
+        if append_timestamp_to_output:
+            summary += "\n(Output filename includes the UTC timestamp for traceability.)"
+
+        return summary
+
+    except Exception as e:
+        return f"Error generating aspect raster: {type(e).__name__} : {str(e)}"
+
 # Create tool function to merge 2 dataframes, or a dataframe and a geodataframe
 def merge_dataframes(
     dataframe_name: Annotated[str, "Name of DataFrame containing statistical data"],
@@ -4045,6 +4208,12 @@ convert_dem_to_slope_tool = StructuredTool.from_function(
     func=convert_dem_to_slope,
     name='convert_dem_to_slope',
     description='Converts a DEM raster into a slope raster in degrees (similar to QGIS Slope), saves a timestamped GeoTIFF into the scratch folder, stores summary statistics, and adds a preview image.'
+)
+
+generate_aspect_map_tool = StructuredTool.from_function(
+    func=generate_aspect_map,
+    name='generate_aspect_map',
+    description='Creates an aspect raster (0-360 degrees) from a DEM using GDAL, saves a timestamped GeoTIFF, and renders a Spectral singleband pseudocolor preview with summary statistics.'
 )
 
 merge_dataframes_tool = StructuredTool.from_function(
