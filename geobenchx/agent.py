@@ -66,6 +66,7 @@ from geobenchx.tools import (
     visualize_geographies_tool,
     get_centroids_tool,
     generate_contours_display_tool,
+    generate_profile_curvature_map_tool,
     reject_task_tool,
     calculate_column_statistics_tool,
     create_point_kernel_density_map_tool
@@ -126,6 +127,7 @@ tools = [
     visualize_geographies_tool,
     get_centroids_tool,
     generate_contours_display_tool,
+    generate_profile_curvature_map_tool,
     reject_task_tool,
     calculate_column_statistics_tool,
     create_point_kernel_density_map_tool

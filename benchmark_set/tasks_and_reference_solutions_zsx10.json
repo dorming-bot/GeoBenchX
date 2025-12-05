@@ -1,0 +1,52 @@
+{
+    "metadata": {
+        "author": "zsx10",
+        "notes": "Profile curvature task for Guangming DEM"
+    },
+    "tasks": [
+        {
+            "task_ID": "TASK_251205_150501_015015",
+            "task_text": "Calculate the profile curvature of Guangming District DEM (Shenzhen).",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": "Use the Guangming DEM with the profile curvature tool to derive the QGIS-style curvature raster, storing the GeoTIFF in scratch along with summary statistics.",
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "get_raster_path",
+                            "arguments": {
+                                "rasterdataset": "Guangming District DEM (Shenzhen)"
+                            },
+                            "comment": "Resolve the absolute path to data/Data/GeoData/guangming.tif before invoking the curvature processor."
+                        },
+                        {
+                            "function_name": "generate_profile_curvature_map",
+                            "arguments": {
+                                "dem_raster_path": "d:/code/GeoBenchX/GeoBenchX/data/Data/GeoData/guangming.tif",
+                                "output_variable_name": "guangming_profile_curvature_summary",
+                                "output_raster_path": "d:/code/GeoBenchX/GeoBenchX/scratch/guangming_profile_curvature.tif",
+                                "append_timestamp_to_output": true,
+                                "plot_title": "Guangming DEM Profile Curvature",
+                                "colormap": "RdBu"
+                            },
+                            "comment": "Generate the DEM profile curvature (QGIS Profile Curvature equivalent), save the timestamped GeoTIFF in scratch, and retain metadata in 'guangming_profile_curvature_summary'."
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        }
+    ]
+}

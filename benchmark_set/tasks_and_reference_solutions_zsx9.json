@@ -1,0 +1,97 @@
+{
+    "metadata": {
+        "author": "zsx9",
+        "notes": "Centroid tasks for Chengdu and Wuhan datasets"
+    },
+    "tasks": [
+        {
+            "task_ID": "TASK_251203_160100_013013",
+            "task_text": "Please mark the centroid of Chengdu City.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": "Load the Chengdu municipal boundary and run the centroid-generation tool (single centroid) to export the timestamped TIFF map and point layer.",
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "load_geodata",
+                            "arguments": {
+                                "geodataset": "Chengdu Surface",
+                                "output_geodataframe_name": "chengdu_boundary"
+                            },
+                            "comment": "Load the Chengdu city polygon from data/Data/GeoData/Chengdu_Surface.shp."
+                        },
+                        {
+                            "function_name": "generate_centroids_map",
+                            "arguments": {
+                                "geodataframe_name": "chengdu_boundary",
+                                "output_geodataframe_name": "chengdu_centroid",
+                                "output_variable_name": "chengdu_centroid_summary",
+                                "output_tif_path": "d:/code/GeoBenchX/GeoBenchX/scratch/chengdu_centroid.tif",
+                                "title": "Centroid of Chengdu City"
+                            },
+                            "comment": "Create the centroid point for the Chengdu polygon, save the TIFF visualization in scratch, and keep metadata in 'chengdu_centroid_summary'."
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_251203_160200_014014",
+            "task_text": "Mark the centroid for each Wuhan Urban Parks.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": "Load the Wuhan park polygons and run the centroid tool with the per-part option enabled so every park is labeled by its own centroid point.",
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "load_geodata",
+                            "arguments": {
+                                "geodataset": "Wuhan Urban Parks",
+                                "output_geodataframe_name": "wuhan_parks"
+                            },
+                            "comment": "Bring the Wuhan park polygons (data/Data/GeoData/park_in_wuhan.shp) into memory."
+                        },
+                        {
+                            "function_name": "generate_centroids_map",
+                            "arguments": {
+                                "geodataframe_name": "wuhan_parks",
+                                "output_geodataframe_name": "wuhan_parks_centroids",
+                                "output_variable_name": "wuhan_parks_centroid_summary",
+                                "create_centroid_for_each_part": true,
+                                "output_tif_path": "d:/code/GeoBenchX/GeoBenchX/scratch/wuhan_parks_centroids.tif",
+                                "title": "Centroids of Wuhan Urban Parks"
+                            },
+                            "comment": "Create centroid points for each park polygon, save the timestamped TIFF visualization, and store the summary dictionary."
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        }
+    ]
+}

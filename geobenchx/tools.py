@@ -1499,6 +1499,181 @@ def generate_aspect_map(
     except Exception as e:
         return f"Error generating aspect raster: {type(e).__name__} : {str(e)}"
 
+def generate_profile_curvature_map(
+    dem_raster_path: Annotated[str, "Path to the DEM raster used for profile curvature calculation"],
+    output_variable_name: Annotated[str, "Name for storing profile curvature metadata in the state"],
+    state: Annotated[dict, InjectedState],
+    output_raster_path: Annotated[str | None, "Optional custom path for saving the curvature raster (defaults to SCRATCHPATH/profile_curvature_<name>.tif)"] = None,
+    overwrite_existing: Annotated[bool, "Allow overwriting if the curvature file already exists at the destination"] = True,
+    append_timestamp_to_output: Annotated[bool, "Append UTC timestamp to the curvature filename for bookkeeping"] = True,
+    plot_title: Annotated[str, "Title displayed on the curvature visualization"] = "DEM-derived Profile Curvature",
+    colormap: Annotated[str, "Matplotlib colormap name used for pseudocolor rendering"] = "RdBu"
+) -> str:
+    """
+    Generate the profile curvature raster from a DEM using finite-difference approximations of first- and second-order
+    derivatives (similar to the GRASS r.slope.aspect implementation). Saves a timestamped GeoTIFF in the scratch directory,
+    records summary statistics, and captures a diverging preview map.
+    """
+    try:
+        if "data_store" not in state:
+            state["data_store"] = {}
+        if "image_store" not in state:
+            state["image_store"] = []
+
+        if not dem_raster_path:
+            return "Error: dem_raster_path must be provided."
+        if not os.path.exists(dem_raster_path):
+            return f"Error: DEM raster '{dem_raster_path}' not found."
+
+        timestamp_utc = datetime.utcnow().strftime("%Y%m%dT%H%M%S")
+
+        if output_raster_path is None:
+            Path(SCRATCH_PATH).mkdir(parents=True, exist_ok=True)
+            default_name = f"profile_curvature_{Path(dem_raster_path).stem}.tif"
+            output_path_obj = Path(SCRATCH_PATH) / default_name
+        else:
+            output_path_obj = Path(output_raster_path)
+            output_path_obj.parent.mkdir(parents=True, exist_ok=True)
+
+        if append_timestamp_to_output:
+            suffix = output_path_obj.suffix or ".tif"
+            output_path_obj = output_path_obj.with_name(f"{output_path_obj.stem}_{timestamp_utc}{suffix}")
+
+        if output_path_obj.exists():
+            if overwrite_existing:
+                output_path_obj.unlink()
+                aux_file = output_path_obj.with_suffix(output_path_obj.suffix + ".aux.xml")
+                if aux_file.exists():
+                    aux_file.unlink()
+            else:
+                return f"Error: Output raster '{output_path_obj.as_posix()}' already exists. Enable overwrite or choose another path."
+
+        with rasterio.open(dem_raster_path) as src:
+            dem_data = src.read(1).astype("float64")
+            nodata = src.nodata
+            transform = src.transform
+            profile = src.profile
+
+        if dem_data.size == 0:
+            return "Error: DEM raster is empty."
+
+        valid_mask = np.isfinite(dem_data)
+        if nodata is not None:
+            valid_mask &= dem_data != nodata
+
+        dem_array = np.where(valid_mask, dem_data, np.nan)
+
+        pixel_width = abs(transform.a)
+        pixel_height = abs(transform.e)
+        if pixel_width == 0 or pixel_height == 0:
+            return "Error: DEM pixel size is zero, cannot compute curvature."
+
+        # First-order derivatives (p = dz/dx, q = dz/dy)
+        d_dy, d_dx = np.gradient(dem_array, pixel_height, pixel_width, edge_order=2)
+        p = d_dx
+        q = d_dy
+
+        # Second-order derivatives
+        r = np.gradient(p, pixel_width, axis=1, edge_order=2)   # d2z/dx2
+        t = np.gradient(q, pixel_height, axis=0, edge_order=2)  # d2z/dy2
+        s1 = np.gradient(p, pixel_height, axis=0, edge_order=2)
+        s2 = np.gradient(q, pixel_width, axis=1, edge_order=2)
+        s = 0.5 * (s1 + s2)  # symmetrized mixed derivative
+
+        p2 = p ** 2
+        q2 = q ** 2
+        sum_pq = p2 + q2
+        denom = sum_pq * np.power(1 + sum_pq, 1.5)
+        numerator = -(r * p2 + 2 * s * p * q + t * q2)
+
+        curvature = np.full_like(dem_array, np.nan, dtype=np.float64)
+        np.divide(
+            numerator,
+            denom,
+            out=curvature,
+            where=denom != 0
+        )
+
+        finite_vals = curvature[np.isfinite(curvature)]
+        if finite_vals.size > 0:
+            stats = {
+                "count": int(finite_vals.size),
+                "min": float(finite_vals.min()),
+                "max": float(finite_vals.max()),
+                "mean": float(finite_vals.mean()),
+                "std": float(finite_vals.std(ddof=1)) if finite_vals.size > 1 else 0.0
+            }
+            max_abs_value = float(np.nanmax(np.abs(finite_vals)))
+        else:
+            stats = {"count": 0, "min": None, "max": None, "mean": None, "std": None}
+            max_abs_value = None
+
+        profile.update(dtype="float32", nodata=-9999.0, count=1, compress="deflate")
+        curvature_to_write = np.where(np.isfinite(curvature), curvature, profile["nodata"]).astype("float32")
+
+        with rasterio.open(output_path_obj.as_posix(), "w", **profile) as dst:
+            dst.write(curvature_to_write, 1)
+
+        bounds = array_bounds(curvature_to_write.shape[0], curvature_to_write.shape[1], transform)
+        masked_array = np.ma.masked_where(~np.isfinite(curvature), curvature)
+        fig, ax = plt.subplots(1, 1, figsize=(10, 8))
+        img = ax.imshow(
+            masked_array,
+            cmap=plt.get_cmap(colormap),
+            extent=(bounds[0], bounds[2], bounds[1], bounds[3]),
+            origin="upper",
+            vmin=(-max_abs_value if max_abs_value is not None else None),
+            vmax=(max_abs_value if max_abs_value is not None else None)
+        )
+        ax.set_title(plot_title)
+        ax.set_axis_off()
+        cbar = plt.colorbar(img, ax=ax, fraction=0.036, pad=0.02)
+        cbar.set_label("Profile curvature (1/m)")
+        buf = io.BytesIO()
+        fig.savefig(buf, format="png", bbox_inches="tight", dpi=150)
+        buf.seek(0)
+        img_base64 = base64.b64encode(buf.read()).decode("utf-8")
+        buf.close()
+        plt.close(fig)
+
+        state["image_store"].append({
+            "type": "map",
+            "description": f"Profile curvature preview for {Path(dem_raster_path).name}",
+            "base64": img_base64
+        })
+
+        state["data_store"][output_variable_name] = {
+            "profile_curvature_raster_path": output_path_obj.as_posix(),
+            "statistics": stats,
+            "dem_raster_path": dem_raster_path,
+            "timestamp_utc": timestamp_utc,
+            "method": "finite_difference_profile_curvature"
+        }
+
+        def _fmt_stat(value: float | None) -> str:
+            return f"{value:.6f}" if value is not None else "N/A"
+
+        summary_lines = [
+            f"- Min curvature: {_fmt_stat(stats['min'])}",
+            f"- Max curvature: {_fmt_stat(stats['max'])}",
+            f"- Mean curvature: {_fmt_stat(stats['mean'])}",
+            f"- Valid pixels: {stats['count']:,}"
+        ]
+
+        summary = (
+            f"Generated profile curvature raster from DEM '{Path(dem_raster_path).name}'.\n"
+            f"Processing timestamp (UTC): {timestamp_utc}.\n"
+            f"Output saved to '{output_path_obj.as_posix()}'.\n" +
+            "\n".join(summary_lines)
+        )
+        if append_timestamp_to_output:
+            summary += "\n(Output filename includes the UTC timestamp for traceability.)"
+
+        return summary
+
+    except Exception as e:
+        return f"Error generating profile curvature raster: {type(e).__name__} : {str(e)}"
+
 # Create tool function to merge 2 dataframes, or a dataframe and a geodataframe
 def merge_dataframes(
     dataframe_name: Annotated[str, "Name of DataFrame containing statistical data"],
@@ -3536,50 +3711,182 @@ def visualize_geographies(
 def get_centroids(
     geodataframe_name: Annotated[str, "Name of GeoDataFrame containing polygon geometries"],
     output_geodataframe_name: Annotated[str, "Name for storing the GeoDataFrame with centroids"],
-    state: Annotated[dict, InjectedState]
+    state: Annotated[dict, InjectedState],
+    create_centroid_for_each_part: Annotated[bool, "Toggle to create centroids for every part of multipart geometries"] = False,
+    output_shapefile_path: Annotated[str | None, "Optional path to save centroid shapefile (defaults to SCRATCH/<output_geodataframe_name>.shp)"] = None,
+    output_tif_path: Annotated[str | None, "Optional path to save the basemap preview TIFF (defaults to SCRATCH/<output_geodataframe_name>_map.tif)"] = None,
+    title: Annotated[str | None, "Custom title for the generated map"] = None,
+    basemap_style: Annotated[
+        Literal["OpenStreetMap", "Carto Positron", "Carto Dark"],
+        "Basemap style for the preview map"
+    ] = "Carto Positron",
+    overwrite_existing: Annotated[bool, "Allow overwriting shapefile and TIFF outputs if they already exist"] = True,
+    output_variable_name: Annotated[str | None, "Optional state key to store centroid summary metadata"] = None
 ) -> str:
     """
-    Calculate centroids of polygons in a GeoDataFrame and create a new GeoDataFrame
-    where the geometry column is replaced with centroids while preserving all other columns.
-
-    Args:
-        geodataframe_name: Name of the source GeoDataFrame stored in data_store
-        output_geodataframe_name: Name for storing the resulting GeoDataFrame with centroids
-        state: Current graph state containing geodataframes and results
-
-    Returns:
-        str: Status message with operation details and GeoDataFrame information
+    QGIS-style centroid generator that stores centroid geometries in the data store, writes a shapefile
+    to the scratch directory, and captures a TIFF preview map. Supports optional per-part centroid creation.
     """
     try:
-        # Get the source GeoDataFrame
-        geodataframe = state["data_store"].get(geodataframe_name)
-        
-        if geodataframe is None:
-            return f"Error: GeoDataFrame '{geodataframe_name}' not found in data store"
-            
-        # Create a copy of the GeoDataFrame
-        centroids_gdf = geodataframe.copy()
-        
-        # Replace geometry column with centroids
-        centroids_gdf.geometry = geodataframe.geometry.centroid
-        
-        # Store result in data store
         if "data_store" not in state:
             state["data_store"] = {}
+        if "image_store" not in state:
+            state["image_store"] = []
+
+        geodataframe = state["data_store"].get(geodataframe_name)
+
+        if geodataframe is None:
+            return f"Error: GeoDataFrame '{geodataframe_name}' not found in data store"
+        if geodataframe.empty:
+            return f"Error: GeoDataFrame '{geodataframe_name}' is empty"
+        if geodataframe.crs is None:
+            return "Error: Source GeoDataFrame has no CRS. Please assign one before calculating centroids."
+
+        if create_centroid_for_each_part:
+            try:
+                exploded = geodataframe.explode(index_parts=False)
+            except TypeError:
+                exploded = geodataframe.explode()
+            centroids_source = exploded.reset_index(drop=True)
+        else:
+            centroids_source = geodataframe.copy()
+
+        centroids_gdf = centroids_source.copy()
+        centroids_gdf.geometry = centroids_source.geometry.centroid
+
         state["data_store"][output_geodataframe_name] = centroids_gdf
-        
-        # Generate result message
-        info_string, _ = get_dataframe_info(centroids_gdf)
-        result = (
-            f"Created centroids and stored result in GeoDataFrame '{output_geodataframe_name}'.\n"
-            f"Description of GeoDataFrame:\n{info_string}"
+
+        scratch_root = SCRATCH_PATH or os.path.join(os.getcwd(), "scratch")
+        Path(scratch_root).mkdir(parents=True, exist_ok=True)
+
+        # Configure shapefile output
+        if output_shapefile_path is None:
+            output_shapefile_path = os.path.join(scratch_root, f"{output_geodataframe_name}.shp")
+        shapefile_path = Path(output_shapefile_path)
+        shapefile_path.parent.mkdir(parents=True, exist_ok=True)
+
+        if shapefile_path.suffix.lower() != ".shp":
+            return "Error: output_shapefile_path must end with .shp to match the expected centroid export format."
+
+        if shapefile_path.exists():
+            if not overwrite_existing:
+                return (
+                    f"Error: Output file '{shapefile_path.as_posix()}' already exists. "
+                    "Enable overwrite_existing to replace it."
+                )
+            for shp_ext in [".shp", ".shx", ".dbf", ".cpg", ".prj", ".sbn", ".sbx"]:
+                candidate = shapefile_path.with_suffix(shp_ext)
+                if candidate.exists():
+                    candidate.unlink()
+
+        centroids_gdf.to_file(shapefile_path.as_posix())
+
+        # Configure preview TIFF output
+        if output_tif_path is None:
+            output_tif_path = os.path.join(scratch_root, f"{output_geodataframe_name}_map.tif")
+        tif_path = Path(output_tif_path)
+        tif_path.parent.mkdir(parents=True, exist_ok=True)
+
+        if tif_path.exists():
+            if not overwrite_existing:
+                return (
+                    f"Error: Preview TIFF '{tif_path.as_posix()}' already exists. "
+                    "Enable overwrite_existing to replace it."
+                )
+            tif_path.unlink()
+
+        providers = {
+            "OpenStreetMap": ctx.providers.OpenStreetMap.Mapnik,
+            "Carto Positron": ctx.providers.CartoDB.Positron,
+            "Carto Dark": ctx.providers.CartoDB.DarkMatter,
+        }
+        provider = providers.get(basemap_style, ctx.providers.CartoDB.Positron)
+
+        polygons_plot = geodataframe.to_crs(epsg=3857)
+        centroids_plot = centroids_gdf.to_crs(epsg=3857)
+
+        fig, ax = plt.subplots(1, 1, figsize=(10, 8))
+        polygons_plot.plot(
+            ax=ax,
+            color="#4292c6",
+            edgecolor="#08519c",
+            linewidth=0.8,
+            alpha=0.25,
+            label="Source polygons"
+        )
+        centroids_plot.plot(
+            ax=ax,
+            color="#d7301f",
+            markersize=40,
+            marker="*",
+            label="Centroids"
         )
 
-        return result
-        
+        bounds = polygons_plot.total_bounds
+        ax.set_xlim(bounds[0], bounds[2])
+        ax.set_ylim(bounds[1], bounds[3])
+
+        ctx.add_basemap(ax, source=provider, crs="EPSG:3857")
+        ax.set_axis_off()
+        map_title = title or "Feature centroids"
+        ax.set_title(map_title)
+        if len(centroids_gdf) > 1:
+            ax.legend(loc="lower left")
+
+        fig.savefig(
+            tif_path.as_posix(),
+            format="tif",
+            dpi=200,
+            bbox_inches="tight",
+            facecolor="white"
+        )
+
+        buf = io.BytesIO()
+        fig.savefig(buf, format="png", bbox_inches="tight", dpi=150)
+        buf.seek(0)
+        img_base64 = base64.b64encode(buf.read()).decode("utf-8")
+        buf.close()
+        plt.close(fig)
+
+        state["image_store"].append({
+            "type": "map",
+            "description": f"Centroid map for {geodataframe_name}",
+            "base64": img_base64
+        })
+
+        timestamp_utc = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
+        if output_variable_name:
+            state["data_store"][output_variable_name] = {
+                "source_geodataframe": geodataframe_name,
+                "output_geodataframe": output_geodataframe_name,
+                "centroid_count": int(len(centroids_gdf)),
+                "create_centroid_for_each_part": create_centroid_for_each_part,
+                "shapefile_path": shapefile_path.as_posix(),
+                "map_tif_path": tif_path.as_posix(),
+                "crs": str(centroids_gdf.crs),
+                "timestamp_utc": timestamp_utc,
+                "bounds": centroids_gdf.total_bounds.tolist()
+            }
+
+        info_string, _ = get_dataframe_info(centroids_gdf)
+        summary_parts = [
+            f"Created {len(centroids_gdf)} centroid(s) from '{geodataframe_name}'.",
+            f"- Per-part centroids: {'enabled' if create_centroid_for_each_part else 'disabled'}",
+            f"- Output GeoDataFrame: '{output_geodataframe_name}'",
+            f"- Shapefile saved to: '{shapefile_path.as_posix()}'",
+            f"- Map TIFF saved to: '{tif_path.as_posix()}'",
+        ]
+        if output_variable_name:
+            summary_parts.append(f"- Summary stored under: '{output_variable_name}'")
+        summary_parts.append("GeoDataFrame details:")
+        summary_parts.append(info_string)
+
+        return "\n".join(summary_parts)
+
     except Exception as e:
-        return f"Error calculating centroids: {type(e).__name__} : {str(e)}"
-    
+        return f"Error calculating centroids: {type(e).__name__} : {str(e)}"   
+
+
 # Tool function to plot contour lines from a raster pixels
 def plot_contour_lines(
     raster_path: Annotated[str, "Path to the raster file"],
@@ -4216,6 +4523,13 @@ generate_aspect_map_tool = StructuredTool.from_function(
     description='Creates an aspect raster (0-360 degrees) from a DEM using GDAL, saves a timestamped GeoTIFF, and renders a Spectral singleband pseudocolor preview with summary statistics.'
 )
 
+generate_profile_curvature_map_tool = StructuredTool.from_function(
+    func=generate_profile_curvature_map,
+    name='generate_profile_curvature_map',
+    description='Creates a profile curvature raster from a DEM (QGIS Profile Curvature equivalent), \
+        saves a timestamped GeoTIFF in scratch, captures a diverging preview map, and stores summary statistics.'
+)
+
 merge_dataframes_tool = StructuredTool.from_function(
     func=merge_dataframes, 
     name='merge_dataframes',
@@ -4371,9 +4685,9 @@ visualize_geographies_tool = StructuredTool.from_function(
 get_centroids_tool = StructuredTool.from_function(
     func=get_centroids, 
     name='get_centroids',
-    description='Calculates the geometric center points of polygon features in a GeoDataFrame. \
-        It returns a new GeoDataFrame that preserves all attribute columns from the original but replaces the geometry column with centroid points.\
-        Also returns description of the GeoDataFrame, inlcuding GeoDataFrame name, number of entries, columns names, number of non-null cells, data types, share of non-empty cells in columns.'
+    description='QGIS-style centroid generator that creates centroid points for polygon features, \
+        optionally handles multipart geometries per part, writes the centroids to a scratch shapefile, \
+        captures a TIFF preview map, and stores summary metadata in the agent state.'
 )
 
 plot_contour_lines_tool = StructuredTool.from_function(
