@@ -104,6 +104,7 @@ GEO_CATALOG = {
     "Wuhan Urban Parks": "park_in_wuhan.shp",
     "Beijing-Tianjin-Hebei boundary": "2020jjj.shp",
     "Traditional Villages of China": "VillagesChina.shp",
+    "The source region of the Yellow River": "YellowRiver_SourceRegion.shp"
     }
 
 RASTER_CATALOG = {
@@ -2656,6 +2657,54 @@ def calculate_polygon_areas(
     except Exception as e:
         return f"Error: {type(e).__name__} : {str(e)}"
 
+def analyze_vector_overlap(
+    geodataframe_a_name: Annotated[str, "Name of the first GeoDataFrame (reference)"],
+    geodataframe_b_name: Annotated[str, "Name of the second GeoDataFrame (comparison)"],
+    output_geodataframe_name: Annotated[str, "Name for storing the intersection GeoDataFrame"],
+    state: Annotated[dict, InjectedState]
+) -> str:
+    """
+    Compute only the geometric intersection between two vector datasets and store the overlap GeoDataFrame.
+    Use other tools (e.g., calculate_polygon_areas, perform_arithmetic_operation) for measurements and math.
+    """
+    try:
+        if "data_store" not in state:
+            state["data_store"] = {}
+
+        gdf_a = state["data_store"].get(geodataframe_a_name)
+        gdf_b = state["data_store"].get(geodataframe_b_name)
+
+        if gdf_a is None or gdf_b is None:
+            return "Error: One or both GeoDataFrames were not found in the data store."
+        if gdf_a.empty or gdf_b.empty:
+            return "Error: One or both GeoDataFrames are empty."
+        if gdf_a.crs is None or gdf_b.crs is None:
+            return "Error: Both GeoDataFrames must have a defined CRS before overlap analysis."
+
+        if gdf_a.crs != gdf_b.crs:
+            gdf_b = gdf_b.to_crs(gdf_a.crs)
+
+        try:
+            overlap_gdf = gpd.overlay(gdf_a, gdf_b, how="intersection", keep_geom_type=True)
+        except Exception as e:
+            return f"Error computing vector overlap: {type(e).__name__} : {str(e)}"
+
+        state["data_store"][output_geodataframe_name] = overlap_gdf
+
+        if overlap_gdf.empty:
+            return (
+                f"No overlapping area found between '{geodataframe_a_name}' and '{geodataframe_b_name}'.\n"
+                f"Empty GeoDataFrame stored as '{output_geodataframe_name}'."
+            )
+
+        return (
+            f"Computed intersection of '{geodataframe_a_name}' and '{geodataframe_b_name}'.\n"
+            f"Overlap layer stored as '{output_geodataframe_name}' with {len(overlap_gdf)} feature(s)."
+        )
+
+    except Exception as e:
+        return f"Error analyzing vector overlap: {type(e).__name__} : {str(e)}"
+
 def calculate_nearest_distances(
     source_geodataframe_name: Annotated[str, "Name of GeoDataFrame containing source point features"],
     target_geodataframe_name: Annotated[str, "Name of GeoDataFrame containing destination geometries (parks, facilities, etc.)"],
@@ -3234,6 +3283,110 @@ def scale_column_by_value(
 
     except Exception as e:
         return f"Error: {type(e).__name__} : {str(e)}"
+
+def perform_arithmetic_operation(
+    values: Annotated[list[Any] | str, "List of numeric values, JSON array string, or state references like 'state:my_stats.total_area_sq_km'"],
+    operation: Annotated[
+        Literal["add", "subtract", "multiply", "divide"],
+        "Arithmetic operation to apply"
+    ],
+    state: Annotated[dict, InjectedState],
+    output_variable_name: Annotated[str | None, "Optional name to store the numeric result"] = None
+) -> str:
+    """
+    General-purpose calculator for applying arithmetic operations to one or more numeric values.
+    Supports direct numbers, JSON arrays, or references to stored values using the prefix 'state:' (e.g.,
+    'state:loess_area_stats.total_area_sq_km').
+    """
+    try:
+        if isinstance(values, str):
+            try:
+                values = ast.literal_eval(values)
+            except Exception:
+                values = [values]
+
+        if not isinstance(values, (list, tuple)):
+            values = [values]
+
+        if "data_store" not in state:
+            state["data_store"] = {}
+
+        def resolve(value: Any) -> float:
+            if isinstance(value, (int, float)):
+                return float(value)
+
+            if isinstance(value, str):
+                stripped = value.strip()
+                if stripped.lower().startswith("state:"):
+                    path = stripped.split(":", 1)[1].strip()
+                    parts = [p for p in path.replace("[", ".").replace("]", ".").split(".") if p]
+                    if not parts:
+                        raise ValueError("State reference is empty.")
+                    current: Any = state["data_store"].get(parts[0])
+                    for part in parts[1:]:
+                        if current is None:
+                            break
+                        if isinstance(current, dict):
+                            current = current.get(part)
+                        else:
+                            current = getattr(current, part, None)
+                    if current is None:
+                        raise ValueError(f"State reference '{path}' not found.")
+                    return float(current)
+                try:
+                    return float(ast.literal_eval(stripped))
+                except Exception:
+                    return float(stripped)
+
+            if isinstance(value, dict) and "state_key" in value and "field" in value:
+                state_obj = state["data_store"].get(value["state_key"])
+                if not isinstance(state_obj, dict):
+                    raise ValueError(f"State key '{value['state_key']}' not found or not a dict.")
+                field_value = state_obj.get(value["field"])
+                if field_value is None:
+                    raise ValueError(f"Field '{value['field']}' not found in '{value['state_key']}'.")
+                return float(field_value)
+
+            return float(value)
+
+        numeric_values = [resolve(v) for v in values]
+
+        if not numeric_values:
+            return "Error: No numeric values provided."
+
+        if operation in {"subtract", "divide"} and len(numeric_values) < 2:
+            return f"Error: Operation '{operation}' requires at least two values."
+
+        if operation == "add":
+            result = sum(numeric_values)
+        elif operation == "multiply":
+            result = 1.0
+            for val in numeric_values:
+                result *= val
+        elif operation == "subtract":
+            result = numeric_values[0]
+            for val in numeric_values[1:]:
+                result -= val
+        else:  # divide
+            result = numeric_values[0]
+            for val in numeric_values[1:]:
+                if val == 0:
+                    return "Error: Division by zero is not allowed."
+                result /= val
+
+        if output_variable_name:
+            state["data_store"][output_variable_name] = result
+
+        return (
+            f"Performed '{operation}' on values {numeric_values}.\n"
+            f"Result: {result}"
+            + (f"\nStored under '{output_variable_name}'." if output_variable_name else "")
+        )
+
+    except (ValueError, SyntaxError) as e:
+        return f"Error: Unable to resolve numeric values ({e})."
+    except Exception as e:
+        return f"Error performing arithmetic operation: {type(e).__name__} : {str(e)}"
 
 # Tool function to create heatmap    
 def make_heatmap(
@@ -4626,6 +4779,11 @@ calculate_polygon_areas_tool = StructuredTool.from_function(
     description='Calculates areas of polygon features in a GeoDataFrame in square kilometers using an appropriate UTM projection. \
         Returns total area, projected GeoDataFrame with a per-feature area column, and UTM metadata.'
 )
+analyze_vector_overlap_tool = StructuredTool.from_function(
+    func=analyze_vector_overlap,
+    name='analyze_vector_overlap',
+    description='Intersect two GeoDataFrames and store the resulting overlap layer for downstream measurements or visualization.'
+)
 
 calculate_nearest_distances_tool = StructuredTool.from_function(
     func=calculate_nearest_distances,
@@ -4657,6 +4815,11 @@ scale_column_by_value_tool = StructuredTool.from_function(
     name='scale_column_by_value',
     description='Performs a basic mathematical operation (multiply, divide, add, or subtract) between a column\'s values and a specified numeric value. \
         It returns a new DataFrame/GeoDataFrame with the original data plus a new column containing the calculation results as well as and message about operation, resulting dataframe and column.'
+)
+perform_arithmetic_operation_tool = StructuredTool.from_function(
+    func=perform_arithmetic_operation,
+    name='perform_arithmetic_operation',
+    description='General-purpose calculator that applies add/subtract/multiply/divide to numeric values, with optional references to stored results using the "state:<key>.<field>" syntax.'
 )
 
 make_heatmap_tool = StructuredTool.from_function(

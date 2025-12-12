@@ -12,8 +12,8 @@ from geobenchx.save_chats import save_conversation_to_html
 
 
 wait_time = 120
-REQUEST_DELAY_SECONDS = 10.0  # 控制连续调用之间的最小间隔
-POST_TASK_DELAY_SECONDS = 30.0  # 每个任务结束后额外等待
+REQUEST_DELAY_SECONDS = 30.0  # 控制连续调用之间的最小间隔
+POST_TASK_DELAY_SECONDS = 60.0  # 每个任务结束后额外等待
 
 def generate_solutions(tasks: TaskSet, model: str, temperature: float, output_filename: str = None, max_steps: int =25, skip_solved = True, capture_history = False) -> tuple[TaskSet, int]:
     """

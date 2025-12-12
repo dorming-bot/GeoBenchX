@@ -1,0 +1,131 @@
+{
+    "metadata": {
+        "author": "mtl",
+        "notes": "Custom Wuhan diffusion and national comparison tasks"
+    },
+    "tasks": [
+        {
+            "task_ID": "TASK_251212_101700_901003",
+            "task_text": "Identify the centroid of the Loess Plateau, and use this point as the center to create a buffer zone (use tool create_dissolved_buffer to create 100000 meter) with a radius of 100 kilometers; then calculate the area of China's forest water conservation zones within this region.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": "Load the Yellow River source-region polygon and the Jiuzhaigou earthquake zone boundary, intersect them, measure areas for each dataset plus the overlap, and compute the percentage of overlap relative to both inputs.",
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "load_geodata",
+                            "arguments": {
+                                "geodataset": "The source region of the Yellow River",
+                                "output_geodataframe_name": "yellow_river_source_region"
+                            },
+                            "comment": "Load the Yellow River source polygon (data/Data/GeoData/YellowRiver_SourceRegion.shp)."
+                        },
+                        {
+                            "function_name": "load_geodata",
+                            "arguments": {
+                                "geodataset": "Jiuzhaigou earthquake zone",
+                                "output_geodataframe_name": "jiuzhaigou_quake_zone"
+                            },
+                            "comment": "Load the Jiuzhaigou earthquake polygon (data/Data/GeoData/Jiuzhai.shp)."
+                        },
+                        {
+                            "function_name": "analyze_vector_overlap",
+                            "arguments": {
+                                "geodataframe_a_name": "yellow_river_source_region",
+                                "geodataframe_b_name": "jiuzhaigou_quake_zone",
+                                "output_geodataframe_name": "source_vs_jiuzhai_overlap"
+                            },
+                            "comment": "Use the lightweight overlap tool to intersect the two regions and store the shared footprint for downstream area calculations."
+                        },
+                        {
+                            "function_name": "calculate_polygon_areas",
+                            "arguments": {
+                                "geodataframe_name": "yellow_river_source_region",
+                                "output_variable_name": "yellow_source_area_stats",
+                                "area_column_name": "yellow_source_area_sq_km"
+                            },
+                            "comment": "Measure the total area of the Yellow River source region."
+                        },
+                        {
+                            "function_name": "calculate_polygon_areas",
+                            "arguments": {
+                                "geodataframe_name": "jiuzhaigou_quake_zone",
+                                "output_variable_name": "jiuzhaigou_area_stats",
+                                "area_column_name": "jiuzhaigou_area_sq_km"
+                            },
+                            "comment": "Measure the total area of the Jiuzhaigou earthquake zone."
+                        },
+                        {
+                            "function_name": "calculate_polygon_areas",
+                            "arguments": {
+                                "geodataframe_name": "source_vs_jiuzhai_overlap",
+                                "output_variable_name": "source_vs_jiuzhai_overlap_area_stats",
+                                "area_column_name": "overlap_area_sq_km"
+                            },
+                            "comment": "Calculate the absolute size of the overlapping footprint."
+                        },
+                        {
+                            "function_name": "perform_arithmetic_operation",
+                            "arguments": {
+                                "values": "[\"state:source_vs_jiuzhai_overlap_area_stats.total_area_sq_km\", \"state:yellow_source_area_stats.total_area_sq_km\"]",
+                                "operation": "divide",
+                                "output_variable_name": "overlap_vs_source_ratio"
+                            },
+                            "comment": "Divide overlap area by the Yellow River source total to get the fractional coverage."
+                        },
+                        {
+                            "function_name": "perform_arithmetic_operation",
+                            "arguments": {
+                                "values": "[\"state:overlap_vs_source_ratio\", 100]",
+                                "operation": "multiply",
+                                "output_variable_name": "overlap_vs_source_pct"
+                            },
+                            "comment": "Convert the ratio into a percentage for easier reporting."
+                        },
+                        {
+                            "function_name": "perform_arithmetic_operation",
+                            "arguments": {
+                                "values": "[\"state:source_vs_jiuzhai_overlap_area_stats.total_area_sq_km\", \"state:jiuzhaigou_area_stats.total_area_sq_km\"]",
+                                "operation": "divide",
+                                "output_variable_name": "overlap_vs_jiuzhaigou_ratio"
+                            },
+                            "comment": "Repeat the ratio calculation using the Jiuzhaigou earthquake zone total area."
+                        },
+                        {
+                            "function_name": "perform_arithmetic_operation",
+                            "arguments": {
+                                "values": "[\"state:overlap_vs_jiuzhaigou_ratio\", 100]",
+                                "operation": "multiply",
+                                "output_variable_name": "overlap_vs_jiuzhaigou_pct"
+                            },
+                            "comment": "Convert the Jiuzhaigou ratio into a percentage."
+                        },
+                        {
+                            "function_name": "visualize_geographies",
+                            "arguments": {
+                                "geodataframe_names": "[\"jiuzhaigou_quake_zone\", \"yellow_river_source_region\", \"source_vs_jiuzhai_overlap\"]",
+                                "layer_styles": "[{\"color\": \"#fdae6b\", \"alpha\": 0.35, \"label\": \"Jiuzhaigou quake zone\"}, {\"color\": \"#3182bd\", \"alpha\": 0.2, \"linewidth\": 1.2, \"label\": \"Yellow River source\"}, {\"color\": \"#31a354\", \"alpha\": 0.5, \"label\": \"Overlap\"}]",
+                                "title": "Overlap between Yellow River Source Region and Jiuzhaigou Earthquake Zone",
+                                "add_legend": true
+                            },
+                            "comment": "Map both regions and the overlap to visually confirm the percentages reported in the calculator outputs."
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        }
+    ]
+}

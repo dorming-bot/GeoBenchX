@@ -29,7 +29,8 @@ from geobenchx.constants import (
     MODEL_CLAUDE_ADV4,
     MODEL_SHER_LOCKER,
     MODEL_SHER_LOCKER_4o,
-    MODEL_SHER_LOCKER_GEMINI_FLASH
+    MODEL_SHER_LOCKER_GEMINI_FLASH,
+    MODEL_SHER_LOCKER_4mini
     
 )
 from geobenchx.tools import (
@@ -69,7 +70,9 @@ from geobenchx.tools import (
     generate_profile_curvature_map_tool,
     reject_task_tool,
     calculate_column_statistics_tool,
-    create_point_kernel_density_map_tool
+    create_point_kernel_density_map_tool,
+    perform_arithmetic_operation_tool,
+    analyze_vector_overlap_tool
 )
 from geobenchx.utils import get_solution_code
 
@@ -130,7 +133,9 @@ tools = [
     generate_profile_curvature_map_tool,
     reject_task_tool,
     calculate_column_statistics_tool,
-    create_point_kernel_density_map_tool
+    create_point_kernel_density_map_tool,
+    perform_arithmetic_operation_tool,
+    analyze_vector_overlap_tool
 ]
 
 def execute_task(task_text: str, temperature: float = 0, model: str = MODEL_GPT_4o, max_steps: int = 25, capture_history=False):
@@ -151,7 +156,7 @@ def execute_task(task_text: str, temperature: float = 0, model: str = MODEL_GPT_
         llm = ChatOpenAI(model=model, temperature=None)
     elif model in [MODEL_GEMINI, MODEL_GEMINI_ADV]:
         llm = ChatGoogleGenerativeAI(model=model, temperature=temperature)
-    elif model in [MODEL_SHER_LOCKER, MODEL_SHER_LOCKER_4o, MODEL_SHER_LOCKER_GEMINI_FLASH]:
+    elif model in [MODEL_SHER_LOCKER, MODEL_SHER_LOCKER_4o, MODEL_SHER_LOCKER_GEMINI_FLASH,MODEL_SHER_LOCKER_4mini]:
         if not _sher_locker_api_key:
             raise ValueError("SHER_LOCKER_API_KEY is not set in the environment.")
         base_url = _resolve_sher_locker_base_url(model)

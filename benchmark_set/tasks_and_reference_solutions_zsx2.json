@@ -121,7 +121,7 @@
         },
         {
             "task_ID": "TASK_251118_174500_007007",
-            "task_text": "Calculate the distances from the three points of interest in Wuhan to their nearest parks using the 3_places_in_wuhan.shp dataset for the POIs.",
+            "task_text": "Calculate the distances from the three points of interest in Wuhan to their nearest parks using the Wuhan POIs (3 locations) dataset for the POIs.",
             "task_labels": [
                 "Spatial operations",
                 "Task Set 04",

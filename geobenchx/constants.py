@@ -28,6 +28,7 @@ MODEL_CLAUDE_ADV4 = 'claude-sonnet-4-20250514'
 MODEL_SHER_LOCKER = 'gpt-4.1-nano'
 MODEL_SHER_LOCKER_4o = 'gpt-4o'
 MODEL_SHER_LOCKER_GEMINI_FLASH = 'gemini-2.5-flash'
+MODEL_SHER_LOCKER_4mini = 'gpt-4o-mini-2024-07-18'
 
 
 class ScoreValues(IntEnum):
