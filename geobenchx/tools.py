@@ -1,4 +1,5 @@
 import os
+import math
 from dotenv import find_dotenv, load_dotenv
 import zipfile
 from typing import Annotated, Any, Dict, Literal, Union, List, Optional
@@ -30,13 +31,14 @@ import rasterio
 from rasterio.warp import reproject, Resampling
 from rasterio.mask import mask
 from rasterio.transform import array_bounds
+from rasterio.features import shapes
 import plotly.express as px
 import contextily as ctx
 from osgeo import gdal, gdal_array, ogr, osr
 from osgeo.gdalconst import *
-from shapely.geometry import LineString, Point
+from shapely.geometry import LineString, Point, shape, Polygon, MultiPolygon
 from shapely import affinity
-from shapely.ops import nearest_points
+from shapely.ops import nearest_points, unary_union
 from pyproj import CRS, exceptions as pyproj_exceptions
 from scipy.ndimage import distance_transform_edt
 from sklearn.neighbors import KernelDensity
@@ -947,6 +949,150 @@ def classify_raster_zones(
 
     except Exception as e:
         return f"Error classifying raster: {type(e).__name__} : {str(e)}"
+
+def extract_raster_boundary(
+    raster_path: Annotated[str, "Path to the raster covering the target area"],
+    output_geodataframe_name: Annotated[str, "Name used to store the extracted boundary GeoDataFrame"],
+    state: Annotated[dict, InjectedState],
+    band_number: Annotated[int, "Band index to inspect (1-based)"] = 1,
+    nodata_value: Annotated[float | None, "Optional nodata value if the raster lacks one"] = None,
+    simplify_tolerance_meters: Annotated[float | None, "Initial simplification tolerance in meters (optional)"] = None,
+    maximum_vertices: Annotated[int, "Upper bound on total exterior vertices after simplification"] = 10000,
+    dissolve_polygons: Annotated[bool, "Dissolve contiguous areas into a single geometry"] = True,
+    output_file_path: Annotated[str | None, "Optional path to save the boundary (supports .shp/.geojson/.gpkg)"] = None,
+    overwrite_existing: Annotated[bool, "Overwrite an existing output file if it exists"] = True
+) -> str:
+    """
+    Convert the valid portion of a raster (all non-nodata pixels) into a simplified polygon boundary
+    so downstream vector operations can reference the raster footprint without generating excessively
+    detailed geometries.
+    """
+    try:
+        if "data_store" not in state:
+            state["data_store"] = {}
+
+        if not os.path.exists(raster_path):
+            return f"Error: Raster file '{raster_path}' not found."
+
+        with rasterio.open(raster_path) as src:
+            if band_number < 1 or band_number > src.count:
+                return f"Error: band_number {band_number} is outside available bands (1-{src.count})."
+            data = src.read(band_number)
+            transform = src.transform
+            raster_crs = src.crs
+            nodata = nodata_value if nodata_value is not None else src.nodata
+
+        valid_mask = np.isfinite(data)
+        if nodata is not None:
+            valid_mask &= data != nodata
+
+        if not np.any(valid_mask):
+            return "Error: No valid pixels found to extract a boundary from."
+
+        mask_uint8 = np.where(valid_mask, 1, 0).astype(np.uint8)
+        polygon_geoms: List[Polygon] = []
+
+        for geom, value in shapes(mask_uint8, mask=valid_mask, transform=transform):
+            if int(value) != 1:
+                continue
+            polygon_geoms.append(shape(geom))
+
+        if not polygon_geoms:
+            return "Error: Unable to derive polygons from the supplied raster."
+
+        if dissolve_polygons:
+            merged = unary_union(polygon_geoms)
+            if merged.geom_type == "Polygon":
+                polygon_geoms = [merged]
+            elif merged.geom_type == "MultiPolygon":
+                polygon_geoms = list(merged.geoms)
+            else:
+                return "Error: Unexpected geometry generated during dissolve."
+
+        boundary_gdf = gpd.GeoDataFrame(
+            {"source_raster": [Path(raster_path).name] * len(polygon_geoms)},
+            geometry=polygon_geoms,
+            crs=raster_crs
+        )
+
+        def count_vertices(geom):
+            if geom.is_empty:
+                return 0
+            if isinstance(geom, Polygon):
+                return len(geom.exterior.coords)
+            if isinstance(geom, MultiPolygon):
+                return sum(len(poly.exterior.coords) for poly in geom.geoms)
+            return 0
+
+        if maximum_vertices and maximum_vertices > 0:
+            try:
+                metric_crs = boundary_gdf.estimate_utm_crs()
+            except pyproj_exceptions.CRSError:
+                metric_crs = CRS.from_epsg(3857)
+            working_gdf = boundary_gdf.to_crs(metric_crs)
+            bounds = working_gdf.total_bounds
+            diag = math.hypot(bounds[2] - bounds[0], bounds[3] - bounds[1])
+            tolerance = simplify_tolerance_meters if simplify_tolerance_meters and simplify_tolerance_meters > 0 else max(diag * 0.001, 50.0)
+            for _ in range(8):
+                simplified = working_gdf.copy()
+                simplified["geometry"] = simplified.geometry.simplify(tolerance, preserve_topology=True)
+                vertex_count = int(sum(count_vertices(geom) for geom in simplified.geometry))
+                if vertex_count <= maximum_vertices:
+                    working_gdf = simplified
+                    break
+                tolerance *= 1.5
+            boundary_gdf = working_gdf.to_crs(raster_crs)
+        elif simplify_tolerance_meters and simplify_tolerance_meters > 0:
+            try:
+                metric_crs = boundary_gdf.estimate_utm_crs()
+            except pyproj_exceptions.CRSError:
+                metric_crs = CRS.from_epsg(3857)
+            metric_gdf = boundary_gdf.to_crs(metric_crs)
+            metric_gdf["geometry"] = metric_gdf.geometry.simplify(simplify_tolerance_meters, preserve_topology=True)
+            boundary_gdf = metric_gdf.to_crs(raster_crs)
+
+        vertex_total = int(sum(count_vertices(geom) for geom in boundary_gdf.geometry))
+
+        if output_file_path:
+            vector_path = Path(output_file_path)
+            vector_path.parent.mkdir(parents=True, exist_ok=True)
+            driver_lookup = {
+                ".shp": "ESRI Shapefile",
+                ".geojson": "GeoJSON",
+                ".json": "GeoJSON",
+                ".gpkg": "GPKG"
+            }
+            ext = vector_path.suffix.lower()
+            if ext not in driver_lookup:
+                return f"Error: Unsupported vector extension '{ext}'. Use .shp, .geojson, or .gpkg."
+            if vector_path.exists():
+                if not overwrite_existing:
+                    return f"Error: Output file '{vector_path.as_posix()}' already exists."
+                if ext == ".shp":
+                    for shp_ext in [".shp", ".shx", ".dbf", ".cpg", ".prj", ".sbx", ".sbn"]:
+                        candidate = vector_path.with_suffix(shp_ext)
+                        if candidate.exists():
+                            candidate.unlink()
+                else:
+                    vector_path.unlink()
+            boundary_gdf.to_file(vector_path.as_posix(), driver=driver_lookup[ext])
+
+        state["data_store"][output_geodataframe_name] = boundary_gdf
+
+        try:
+            metric_area_crs = boundary_gdf.estimate_utm_crs()
+        except pyproj_exceptions.CRSError:
+            metric_area_crs = CRS.from_epsg(3857)
+        area_sq_km = float(boundary_gdf.to_crs(metric_area_crs).geometry.area.sum()) / 1_000_000
+
+        return (
+            f"Extracted raster footprint from '{Path(raster_path).name}' into GeoDataFrame '{output_geodataframe_name}'.\n"
+            f"Polygons: {len(boundary_gdf)}, total area ~{area_sq_km:,.2f} sq km, vertices: {vertex_total}.\n"
+            + (f"Saved boundary to '{output_file_path}'." if output_file_path else "Boundary retained in memory.")
+        )
+
+    except Exception as e:
+        return f"Error extracting raster boundary: {type(e).__name__} : {str(e)}"
 
 def erode_raster_regions(
     raster_path: Annotated[str, "Path to the raster file that contains the inundation or mask values to erode"],
@@ -3328,6 +3474,15 @@ def perform_arithmetic_operation(
                             break
                         if isinstance(current, dict):
                             current = current.get(part)
+                        elif isinstance(current, list):
+                            try:
+                                idx = int(part)
+                            except ValueError:
+                                raise ValueError(f"Invalid list index '{part}' in reference '{path}'.")
+                            if idx < 0 or idx >= len(current):
+                                current = None
+                            else:
+                                current = current[idx]
                         else:
                             current = getattr(current, part, None)
                     if current is None:
@@ -4656,6 +4811,11 @@ classify_raster_zones_tool = StructuredTool.from_function(
     name='classify_raster_zones',
     description='Classify or reclassify raster values based on range definitions (min <= value <= max), similar to QGIS Reclassify by Table. \
         Produces a new raster with specified dtype, stores class statistics, and visualizes the resulting zones with optional custom colors/labels.'
+)
+extract_raster_boundary_tool = StructuredTool.from_function(
+    func=extract_raster_boundary,
+    name='extract_raster_boundary',
+    description='Convert the valid pixels of a raster into a simplified polygon boundary, optionally saving a lightweight vector file for further spatial analysis.'
 )
 
 erode_raster_regions_tool = StructuredTool.from_function(

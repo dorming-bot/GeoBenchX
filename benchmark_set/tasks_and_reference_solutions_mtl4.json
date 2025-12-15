@@ -1,0 +1,137 @@
+{
+    "metadata": {
+        "author": "mtl",
+        "notes": "Custom Wuhan diffusion and national comparison tasks"
+    },
+    "tasks": [
+        {
+            "task_ID": "TASK_251212_101700_901003",
+            "task_text": "Identify all areas within the Weihe River Basin where the slope is greater than icon 5 and the distance to the nearest traditional village exceeds 20 kilometers. (You can first extract the boundary of the Weihe River Basin as a vector polygon, then use select_features_by_spatial_relationship​ to extract all scattered points within the region, and create a 20,000‑meter dissolved buffer only for these points. Next, reload the Weihe River Basin raster data and reclassify it to filter out values greater than 5, converting the result to vector format. Finally, process this vector with the buffer to obtain the final result.)",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": "Load the Weihe slope raster and traditional village points, convert the raster footprint into a lightweight polygon to select overlapping villages, build a unified 20 km exclusion buffer, reclassify the raster to isolate slope classes >5, and subtract the buffered overlap from the steep-area totals.",
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "load_geodata",
+                            "arguments": {
+                                "geodataset": "Traditional Villages of China",
+                                "output_geodataframe_name": "villages_china"
+                            },
+                            "comment": "Load the nationwide traditional village points (data/Data/GeoData/VillagesChina.shp) so we can check which ones fall on the Weihe slope dataset."
+                        },
+                        {
+                            "function_name": "get_raster_path",
+                            "arguments": {
+                                "rasterdataset": "Wei River Basin Topographic Slope Classification Dataset"
+                            },
+                            "comment": "Resolve the absolute path to data/Data/GeoData/WeiheBasin.tif so the downstream raster tools reference the correct slope grid."
+                        },
+                        {
+                            "function_name": "extract_raster_boundary",
+                            "arguments": {
+                                "raster_path": "d:/code/GeoBenchX/GeoBenchX/data/Data/GeoData/WeiheBasin.tif",
+                                "output_geodataframe_name": "weihe_basin_boundary",
+                                "band_number": 1,
+                                "maximum_vertices": 8000,
+                                "dissolve_polygons": true,
+                                "simplify_tolerance_meters": null,
+                                "output_file_path": null,
+                                "overwrite_existing": true
+                            },
+                            "comment": "Convert the Weihe slope raster footprint into a compact polygon boundary that can be used for vector selections."
+                        },
+                        {
+                            "function_name": "select_features_by_spatial_relationship",
+                            "arguments": {
+                                "features_geodataframe_name": "villages_china",
+                                "reference_geodataframe_name": "weihe_basin_boundary",
+                                "spatial_predicates": "[\"within\"]",
+                                "output_geodataframe_name": "villages_on_weihe",
+                                "plot_result": false
+                            },
+                            "comment": "Keep only the villages that fall inside the Weihe Basin boundary."
+                        },
+                        {
+                            "function_name": "create_dissolved_buffer",
+                            "arguments": {
+                                "geodataframe_name": "villages_on_weihe",
+                                "buffer_size_meters": 20000,
+                                "output_geodataframe_name": "villages_on_weihe_buffer",
+                                "dissolve_by_attribute": null,
+                                "output_file_path": null,
+                                "overwrite_existing": true
+                            },
+                            "comment": "Build a fused 20 km exclusion buffer around the overlapping villages so the final mask removes every buffered area as a single geometry."
+                        },
+                        {
+                            "function_name": "classify_raster_zones",
+                            "arguments": {
+                                "raster_path": "d:/code/GeoBenchX/GeoBenchX/data/Data/GeoData/WeiheBasin.tif",
+                                "reclassification_table": "[{\"min_value\": 5.0001, \"max_value\": 7.0, \"new_value\": 1, \"label\": \"Slope > 5\", \"color\": \"#b30000\"}]",
+                                "output_variable_name": "weihe_high_slope_summary",
+                                "output_raster_path": "d:/code/GeoBenchX/GeoBenchX/scratch/weihe_high_slope_mask.tif",
+                                "output_dtype": "uint8",
+                                "classification_model_name": "weihe_gt5",
+                                "append_timestamp_to_output": false,
+                                "plot_title": "Weihe Basin Slope > 5",
+                                "legend_location": "lower left"
+                            },
+                            "comment": "Create a binary raster where class value 1 marks every Weihe pixel whose slope class exceeds 5, and store the summary (including pixel area for later area calculations)."
+                        },
+                        {
+                            "function_name": "get_values_from_raster_with_geometries",
+                            "arguments": {
+                                "raster_path": "d:/code/GeoBenchX/GeoBenchX/scratch/weihe_high_slope_mask.tif",
+                                "geodataframe_name": "villages_on_weihe_buffer",
+                                "output_variable_name": "buffer_overlap_stats",
+                                "plot_result": false
+                            },
+                            "comment": "Mask the high-slope raster by the fused buffer to quantify how many steep pixels are disqualified because they fall inside the buffered exclusion zone."
+                        },
+                        {
+                            "function_name": "perform_arithmetic_operation",
+                            "arguments": {
+                                "values": "[\"state:weihe_high_slope_summary.class_info[0].area_sq_km\", \"state:weihe_high_slope_summary.class_info[0].pixel_count\"]",
+                                "operation": "divide",
+                                "output_variable_name": "weihe_gt5_pixel_area_sq_km"
+                            },
+                            "comment": "Derive the square-kilometer size of a single classified pixel by dividing the high-slope area by its pixel count."
+                        },
+                        {
+                            "function_name": "perform_arithmetic_operation",
+                            "arguments": {
+                                "values": "[\"state:buffer_overlap_stats.count\", \"state:weihe_gt5_pixel_area_sq_km\"]",
+                                "operation": "multiply",
+                                "output_variable_name": "buffer_overlap_area_sq_km"
+                            },
+                            "comment": "Convert the number of overlapping pixels into square kilometers using the per-pixel area derived above."
+                        },
+                        {
+                            "function_name": "perform_arithmetic_operation",
+                            "arguments": {
+                                "values": "[\"state:weihe_high_slope_summary.class_info[0].area_sq_km\", \"state:buffer_overlap_area_sq_km\"]",
+                                "operation": "subtract",
+                                "output_variable_name": "eligible_high_slope_area_sq_km"
+                            },
+                            "comment": "Subtract the buffered-overlap area from the total square kilometers of slope>5 pixels to report the eligible steep region that still satisfies the 20 km separation constraint."
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        }
+    ]
+}
