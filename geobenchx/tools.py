@@ -1,5 +1,8 @@
 import os
 import math
+import time
+import threading
+from functools import wraps
 from dotenv import find_dotenv, load_dotenv
 import zipfile
 from typing import Annotated, Any, Dict, Literal, Union, List, Optional
@@ -31,13 +34,41 @@ import rasterio
 from rasterio.warp import reproject, Resampling
 from rasterio.mask import mask
 from rasterio.transform import array_bounds
-from rasterio.features import shapes
+from rasterio.features import shapes, rasterize
 import plotly.express as px
 import contextily as ctx
 from osgeo import gdal, gdal_array, ogr, osr
 from osgeo.gdalconst import *
-from shapely.geometry import LineString, Point, shape, Polygon, MultiPolygon
+from shapely.geometry import LineString, Point, shape, Polygon, MultiPolygon, mapping
 from shapely import affinity
+
+
+TOOL_CALL_DELAY_SECONDS = 20.0  # 限制任意两次工具调用之间的最小时间间隔
+_last_tool_call_ts = 0.0
+_tool_call_lock = threading.Lock()
+
+
+def _wait_for_tool_slot() -> None:
+    """阻塞直到距离上一次工具调用至少间隔 TOOL_CALL_DELAY_SECONDS。"""
+    global _last_tool_call_ts
+    with _tool_call_lock:
+        now = time.time()
+        remaining = TOOL_CALL_DELAY_SECONDS - (now - _last_tool_call_ts)
+        if remaining > 0:
+            time.sleep(remaining)
+            now = time.time()
+        _last_tool_call_ts = now
+
+
+def _wrap_tool_function(func):
+    """为工具函数增加冷却时间控制。"""
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        _wait_for_tool_slot()
+        return func(*args, **kwargs)
+    return wrapper
+
+
 from shapely.ops import nearest_points, unary_union
 from pyproj import CRS, exceptions as pyproj_exceptions
 from scipy.ndimage import distance_transform_edt
@@ -401,9 +432,14 @@ def analyze_raster_overlap(
     resampling_method1: Annotated[str, "Resampling method for first raster (max/min/sum)"] = "max",
     resampling_method2: Annotated[str, "Resampling method for second raster (max/min/sum)"] = "sum",    
     plot_result: Annotated[bool, "Whether to display the result"] = True,
+    save_overlap_raster: Annotated[bool, "Save the masked overlap raster to SCRATCHPATH"] = True,
+    compute_difference: Annotated[bool, "Also compute raster differences within the overlap"] = False,
+    difference_mode: Annotated[Literal["r2_minus_r1", "r1_minus_r2"], "Order of subtraction when computing the difference raster"] = "r2_minus_r1",
+    difference_nodata_value: Annotated[float, "NoData value for the difference raster"] = -9999.0,
 ) -> str:
     """
-    Analyze overlap between two rasters (raster 1 and raster 2) and calculate statistics for overlapping pixels from raster 2.
+    Analyze overlap between two rasters (raster 1 and raster 2), calculate statistics for overlapping pixels from raster 2,
+    optionally write the masked overlap raster to SCRATCHPATH, and (when requested) compute and store a difference raster.
     
     Args:
         raster1_path: Path to the first raster file (e.g., flood extent)
@@ -421,7 +457,9 @@ def analyze_raster_overlap(
         'overlap_exists': False,
         'total_value': 0,
         'statistics': {},
-        'error': None
+        'error': None,
+        'overlap_raster_path': None,
+        'difference_raster_path': None
     }
     
     try:
@@ -509,13 +547,41 @@ def analyze_raster_overlap(
             masked_output = data_2.copy()
             masked_output[~mask] = src2.nodata
             
-            # Save output
+            scratch_root = SCRATCH_PATH or os.path.join(os.getcwd(), "scratch")
+            Path(scratch_root).mkdir(parents=True, exist_ok=True)
+
             output_profile = src2.profile.copy()
             output_profile.update({
                 'height': masked_output.shape[0],
                 'width': masked_output.shape[1],
                 'transform': target_transform
             })
+            if output_profile.get("nodata") is None:
+                output_profile["nodata"] = src2.nodata if src2.nodata is not None else 0
+
+            timestamp_utc = datetime.utcnow().strftime("%Y%m%dT%H%M%S")
+            overlap_filename = f"overlap_{Path(raster1_path).stem}_{Path(raster2_path).stem}_{timestamp_utc}.tif"
+            overlap_path = Path(scratch_root) / overlap_filename
+            if save_overlap_raster:
+                with rasterio.open(overlap_path.as_posix(), "w", **output_profile) as dst:
+                    dst.write(masked_output, 1)
+                result['overlap_raster_path'] = overlap_path.as_posix()
+
+            if compute_difference:
+                diff_array = np.full(masked_output.shape, difference_nodata_value, dtype=np.float32)
+                valid_mask = mask
+                if difference_mode == "r1_minus_r2":
+                    diff_array[valid_mask] = (data_1[valid_mask].astype(np.float64) - data_2[valid_mask].astype(np.float64))
+                else:
+                    diff_array[valid_mask] = (data_2[valid_mask].astype(np.float64) - data_1[valid_mask].astype(np.float64))
+
+                diff_profile = output_profile.copy()
+                diff_profile.update(dtype="float32", nodata=difference_nodata_value)
+                diff_filename = f"difference_{Path(raster1_path).stem}_{Path(raster2_path).stem}_{timestamp_utc}.tif"
+                diff_path = Path(scratch_root) / diff_filename
+                with rasterio.open(diff_path.as_posix(), "w", **diff_profile) as dst:
+                    dst.write(diff_array.astype(np.float32), 1)
+                result['difference_raster_path'] = diff_path.as_posix()
                        
             # Plotting the resulting raster if needed 
             if plot_result:
@@ -569,6 +635,11 @@ def analyze_raster_overlap(
                 f"- Standard deviation: {stats['std']:,.2f}\n"
                 f"Results have been stored in variable '{output_variable_name}'"
             )
+            if result['overlap_raster_path']:
+                result_description += f"\nOverlap raster saved to: {result['overlap_raster_path']}"
+            if result['difference_raster_path']:
+                diff_mode_desc = "Raster2 - Raster1" if difference_mode == "r2_minus_r1" else "Raster1 - Raster2"
+                result_description += f"\nDifference raster ({diff_mode_desc}) saved to: {result['difference_raster_path']}"
             
             return result_description
             
@@ -1820,6 +1891,184 @@ def generate_profile_curvature_map(
 
     except Exception as e:
         return f"Error generating profile curvature raster: {type(e).__name__} : {str(e)}"
+
+
+def rasterize_vector_to_match_raster(
+    geodataframe_name: Annotated[str, "Name of the GeoDataFrame (usually a buffer result) stored in the data_store"],
+    reference_raster_path: Annotated[str, "Path to the raster whose extent, CRS, and pixel size should be matched"],
+    output_variable_name: Annotated[str, "Name used to store metadata about the rasterization result"],
+    state: Annotated[dict, InjectedState],
+    value_field: Annotated[str | None, "Optional column providing burn values for each feature"] = None,
+    burn_value: Annotated[float, "Fallback value used when value_field is not provided"] = 1.0,
+    background_value: Annotated[float, "Value assigned to pixels outside the vector geometries"] = 0.0,
+    output_raster_path: Annotated[str | None, "Optional destination path for the rasterized GeoTIFF (defaults to SCRATCHPATH)"] = None,
+    overwrite_existing: Annotated[bool, "Allow overwriting an existing file at the target path"] = True,
+    append_timestamp_to_output: Annotated[bool, "Append a UTC timestamp to the filename for uniqueness"] = True,
+    all_touched: Annotated[bool, "Match rasterio's all_touched flag (include pixels that touch the geometry)"] = False,
+    output_dtype: Annotated[Literal["uint8", "uint16", "int16", "int32", "float32", "float64"], "Output raster data type"] = "uint8",
+    nodata_value: Annotated[float | None, "Optional NoData value (defaults to background_value)"] = None,
+) -> str:
+    """
+    Rasterize a GeoDataFrame so that it matches the extent, CRS, resolution, and transform of an existing raster.
+    Useful for workflows where vector buffers need to be combined with rasters without expensive vector processing.
+    """
+
+    try:
+        if "data_store" not in state:
+            state["data_store"] = {}
+
+        geodataframe = state["data_store"].get(geodataframe_name)
+        if geodataframe is None:
+            return f"Error: GeoDataFrame '{geodataframe_name}' not found in data_store."
+
+        if not isinstance(geodataframe, gpd.GeoDataFrame):
+            return f"Error: '{geodataframe_name}' is not a GeoDataFrame (found {type(geodataframe).__name__})."
+
+        if geodataframe.empty:
+            return f"Error: GeoDataFrame '{geodataframe_name}' has no rows to rasterize."
+
+        if geodataframe.geometry.is_empty.all():
+            return f"Error: GeoDataFrame '{geodataframe_name}' contains only empty geometries."
+
+        if geodataframe.crs is None:
+            return f"Error: GeoDataFrame '{geodataframe_name}' has no CRS; cannot align with the reference raster."
+
+        if not reference_raster_path:
+            return "Error: reference_raster_path must be provided."
+        if not os.path.exists(reference_raster_path):
+            return f"Error: Reference raster '{reference_raster_path}' not found."
+
+        dtype_lookup = {
+            "uint8": np.uint8,
+            "uint16": np.uint16,
+            "int16": np.int16,
+            "int32": np.int32,
+            "float32": np.float32,
+            "float64": np.float64,
+        }
+        if output_dtype not in dtype_lookup:
+            return f"Error: Unsupported output_dtype '{output_dtype}'."
+        dtype_cls = dtype_lookup[output_dtype]
+
+        with rasterio.open(reference_raster_path) as ref:
+            ref_profile = ref.profile
+            ref_transform = ref.transform
+            ref_crs = ref.crs
+            ref_width = ref.width
+            ref_height = ref.height
+            ref_bounds = ref.bounds
+
+        if ref_crs is None:
+            return "Error: Reference raster has no CRS information."
+
+        geodataframe_aligned = geodataframe.to_crs(ref_crs)
+        valid_geoms = geodataframe_aligned.geometry[
+            geodataframe_aligned.geometry.notnull() & (~geodataframe_aligned.geometry.is_empty)
+        ]
+        if valid_geoms.empty:
+            return f"Error: GeoDataFrame '{geodataframe_name}' has no valid geometries after CRS alignment."
+
+        shapes_to_rasterize: List[tuple] = []
+
+        if value_field:
+            if value_field not in geodataframe_aligned.columns:
+                return f"Error: Column '{value_field}' not found in GeoDataFrame '{geodataframe_name}'."
+            for geom, value in zip(valid_geoms, geodataframe_aligned.loc[valid_geoms.index, value_field]):
+                if pd.isna(value):
+                    continue
+                try:
+                    numeric_value = dtype_cls(value)
+                except Exception:
+                    return f"Error: Value '{value}' in column '{value_field}' cannot be converted to {output_dtype}."
+                shapes_to_rasterize.append((mapping(geom), numeric_value))
+        else:
+            default_value = dtype_cls(burn_value)
+            for geom in valid_geoms:
+                shapes_to_rasterize.append((mapping(geom), default_value))
+
+        if not shapes_to_rasterize:
+            return f"Error: No geometries with valid burn values were found in '{geodataframe_name}'."
+
+        fill_value = dtype_cls(background_value)
+        nodata_used = dtype_cls(background_value if nodata_value is None else nodata_value)
+
+        rasterized = rasterize(
+            shapes=shapes_to_rasterize,
+            out_shape=(ref_height, ref_width),
+            transform=ref_transform,
+            fill=fill_value,
+            all_touched=all_touched,
+            dtype=dtype_cls,
+        )
+
+        timestamp_utc = datetime.utcnow().strftime("%Y%m%dT%H%M%S")
+        if output_raster_path is None:
+            if not SCRATCH_PATH:
+                return "Error: SCRATCHPATH environment variable is not set. Provide output_raster_path explicitly."
+            Path(SCRATCH_PATH).mkdir(parents=True, exist_ok=True)
+            safe_name = re.sub(r"[^A-Za-z0-9]+", "_", geodataframe_name).strip("_") or "vector"
+            output_path_obj = Path(SCRATCH_PATH) / f"{safe_name}_rasterized.tif"
+        else:
+            output_path_obj = Path(output_raster_path)
+            output_path_obj.parent.mkdir(parents=True, exist_ok=True)
+
+        if append_timestamp_to_output:
+            suffix = output_path_obj.suffix or ".tif"
+            output_path_obj = output_path_obj.with_name(f"{output_path_obj.stem}_{timestamp_utc}{suffix}")
+
+        if output_path_obj.exists():
+            if overwrite_existing:
+                output_path_obj.unlink()
+                aux_file = output_path_obj.with_suffix(output_path_obj.suffix + ".aux.xml")
+                if aux_file.exists():
+                    aux_file.unlink()
+            else:
+                return f"Error: Output raster '{output_path_obj.as_posix()}' already exists. Allow overwrite or supply a new path."
+
+        ref_profile.update(dtype=output_dtype, count=1, nodata=float(nodata_used))
+        with rasterio.open(output_path_obj.as_posix(), "w", **ref_profile) as dst:
+            dst.write(rasterized.astype(dtype_cls), 1)
+
+        non_background_pixels = int((rasterized != fill_value).sum())
+        metadata = {
+            "path": output_path_obj.as_posix(),
+            "reference_raster": reference_raster_path,
+            "source_vector": geodataframe_name,
+            "value_field": value_field,
+            "burn_value": float(burn_value),
+            "background_value": float(background_value),
+            "nodata_value": float(nodata_used),
+            "all_touched": all_touched,
+            "dtype": output_dtype,
+            "width": ref_width,
+            "height": ref_height,
+            "bounds": {
+                "left": ref_bounds.left,
+                "bottom": ref_bounds.bottom,
+                "right": ref_bounds.right,
+                "top": ref_bounds.top,
+            },
+            "transform": list(ref_transform),
+            "crs": ref_crs.to_string(),
+            "created_utc": datetime.utcnow().isoformat() + "Z",
+            "active_pixel_count": non_background_pixels,
+        }
+        state["data_store"][output_variable_name] = metadata
+
+        summary = (
+            f"Rasterized GeoDataFrame '{geodataframe_name}' to match '{reference_raster_path}'.\n"
+            f"- Output path: {output_path_obj.as_posix()}\n"
+            f"- Dimensions: {ref_width} x {ref_height} pixels\n"
+            f"- Output dtype: {output_dtype}\n"
+            f"- Active (non-background) pixels: {non_background_pixels}\n"
+            f"- Metadata stored as '{output_variable_name}'."
+        )
+        if all_touched:
+            summary += "\n(all_touched=True was applied, so pixels touching geometries were also set.)"
+        return summary
+
+    except Exception as e:
+        return f"Error rasterizing vector data: {type(e).__name__} : {str(e)}"
 
 # Create tool function to merge 2 dataframes, or a dataframe and a geodataframe
 def merge_dataframes(
@@ -4759,7 +5008,7 @@ def reject_task(
     return "The task is not solvable with the tools and datasets available."
 
 load_data_tool = StructuredTool.from_function(
-    func=load_data, 
+    func=_wrap_tool_function(load_data), 
     name='load_data',
     description='Loads statistical data from the DATA_CATALOG into a Pandas DataFrame. \
         Returns the DataFrame and its description, inlcuding \
@@ -4767,7 +5016,7 @@ load_data_tool = StructuredTool.from_function(
 )
 
 load_geodata_tool = StructuredTool.from_function(
-    func=load_geodata, 
+    func=_wrap_tool_function(load_geodata), 
     name='load_geodata',
     description='Loads vector geospatial data from the GEO_CATALOG into a GeoPandas GeoDataFrame. \
         Returns the GeoDataFrame and its description, inlcuding \
@@ -4775,14 +5024,14 @@ load_geodata_tool = StructuredTool.from_function(
 )
 
 get_raster_path_tool = StructuredTool.from_function(
-    func=get_raster_path, 
+    func=_wrap_tool_function(get_raster_path), 
     name='get_raster_path',
     description='Constructs path to raster data from the catalog, handling both regular GeoTIFF and zipped files. \
         Return path to the raster file in GEO_CATALOG, formatted for either direct GeoTIFF access or zip archive access'
 )
 
 get_raster_description_tool = StructuredTool.from_function(
-    func=get_raster_description, 
+    func=_wrap_tool_function(get_raster_description), 
     name='get_raster_description',
     description='Get description of a raster dataset including metadata (driver, width, height, number of bands, coordinate reference system, transform, nodata, data type) and \
         basic statistics (valid pixels, min, max, mean, standard deviation, NaN count by band). \
@@ -4790,7 +5039,7 @@ get_raster_description_tool = StructuredTool.from_function(
 )
 
 analyze_raster_overlap_tool = StructuredTool.from_function(
-    func=analyze_raster_overlap, 
+    func=_wrap_tool_function(analyze_raster_overlap), 
     name='analyze_raster_overlap',
     description='Analyze overlap between two rasters (raster 1 and raster 2) and \
         calculate statistics (total value, min, max, mean, standard deviation, count) for overlapping pixels from raster 2. \
@@ -4799,7 +5048,7 @@ analyze_raster_overlap_tool = StructuredTool.from_function(
 )
 
 get_values_from_raster_with_geometries_tool = StructuredTool.from_function(
-    func=get_values_from_raster_with_geometries, 
+    func=_wrap_tool_function(get_values_from_raster_with_geometries), 
     name='get_values_from_raster_with_geometries',
     description='Mask a raster using vector geometries from a GeoDataFrame and calculate statistics for the masked area of the raster.\
     The tool returns statistics (total value in masked areas, min, max, mean, standard deviation, count) and stores the cropped raster data in the specified variable. \
@@ -4807,44 +5056,51 @@ get_values_from_raster_with_geometries_tool = StructuredTool.from_function(
 )
 
 classify_raster_zones_tool = StructuredTool.from_function(
-    func=classify_raster_zones,
+    func=_wrap_tool_function(classify_raster_zones),
     name='classify_raster_zones',
     description='Classify or reclassify raster values based on range definitions (min <= value <= max), similar to QGIS Reclassify by Table. \
         Produces a new raster with specified dtype, stores class statistics, and visualizes the resulting zones with optional custom colors/labels.'
 )
 extract_raster_boundary_tool = StructuredTool.from_function(
-    func=extract_raster_boundary,
+    func=_wrap_tool_function(extract_raster_boundary),
     name='extract_raster_boundary',
     description='Convert the valid pixels of a raster into a simplified polygon boundary, optionally saving a lightweight vector file for further spatial analysis.'
 )
 
 erode_raster_regions_tool = StructuredTool.from_function(
-    func=erode_raster_regions,
+    func=_wrap_tool_function(erode_raster_regions),
     name='erode_raster_regions',
     description='Apply morphological erosion to a raster mask using a metric distance, produce a timestamped GeoTIFF, and store a before/after preview in the HTML store.'
 )
 
 convert_dem_to_slope_tool = StructuredTool.from_function(
-    func=convert_dem_to_slope,
+    func=_wrap_tool_function(convert_dem_to_slope),
     name='convert_dem_to_slope',
     description='Converts a DEM raster into a slope raster in degrees (similar to QGIS Slope), saves a timestamped GeoTIFF into the scratch folder, stores summary statistics, and adds a preview image.'
 )
 
 generate_aspect_map_tool = StructuredTool.from_function(
-    func=generate_aspect_map,
+    func=_wrap_tool_function(generate_aspect_map),
     name='generate_aspect_map',
     description='Creates an aspect raster (0-360 degrees) from a DEM using GDAL, saves a timestamped GeoTIFF, and renders a Spectral singleband pseudocolor preview with summary statistics.'
 )
 
 generate_profile_curvature_map_tool = StructuredTool.from_function(
-    func=generate_profile_curvature_map,
+    func=_wrap_tool_function(generate_profile_curvature_map),
     name='generate_profile_curvature_map',
     description='Creates a profile curvature raster from a DEM (QGIS Profile Curvature equivalent), \
         saves a timestamped GeoTIFF in scratch, captures a diverging preview map, and stores summary statistics.'
 )
 
+rasterize_vector_to_match_raster_tool = StructuredTool.from_function(
+    func=_wrap_tool_function(rasterize_vector_to_match_raster),
+    name='rasterize_vector_to_match_raster',
+    description='Rasterizes a GeoDataFrame (such as buffered geometries) so it matches the extent, CRS, and resolution of an existing raster, \
+        producing a GeoTIFF suitable for subsequent raster algebra operations.'
+)
+
 merge_dataframes_tool = StructuredTool.from_function(
-    func=merge_dataframes, 
+    func=_wrap_tool_function(merge_dataframes), 
     name='merge_dataframes',
     description='Merge statistical and geospatial dataframes using specified key columns. \
         The resulting merged dataframe will preserve all rows from geodataset, matching with dataset where possible and filling with NaN where no match exists. \
@@ -4854,7 +5110,7 @@ merge_dataframes_tool = StructuredTool.from_function(
 )
 
 get_unique_values_tool = StructuredTool.from_function(
-    func=get_unique_values, 
+    func=_wrap_tool_function(get_unique_values), 
     name='get_unique_values',
     description='Gets unique values from a specified column in a DataFrame/GeoDataFrame. Should be used to clarify the spelling of names of ojects like countries, \
         regions, subregions, continents, etc. before using the filtering tools to avoid missing objects due to using differeing spelling or convention. \
@@ -4862,7 +5118,7 @@ get_unique_values_tool = StructuredTool.from_function(
 )
 
 filter_categorical_tool = StructuredTool.from_function(
-    func=filter_categorical, 
+    func=_wrap_tool_function(filter_categorical), 
     name='filter_categorical',
     description='Filters DataFrame/GeoDataFrame by categorical values in specified columns. Can be used to select specific countries, subregions, continents from respective columns. \
     To get better results, can be used after the values for filtering are compared with spellings in the selected column using get_unique_values_tool. \
@@ -4870,7 +5126,7 @@ filter_categorical_tool = StructuredTool.from_function(
 )
 
 filter_numerical_tool = StructuredTool.from_function(
-    func=filter_numerical, 
+    func=_wrap_tool_function(filter_numerical), 
     name='filter_numerical',
     description='Filters DataFrame/GeoDataFrame using numerical conditions via query method (e.g. "col1 > 25 and col2 < 100").\
     To identify most suitable values for the filter, calculate_column_statistics_tool can be used before filtering.\
@@ -4878,7 +5134,7 @@ filter_numerical_tool = StructuredTool.from_function(
 )
 
 calculate_column_statistics_tool = StructuredTool.from_function(
-    func=calculate_column_statistics, 
+    func=_wrap_tool_function(calculate_column_statistics), 
     name='calculate_column_statistics',
     description='Calculate summary statistics (count (total, valid, and missing values), min/max range, mean, standard deviation) for a numerical column in a DataFrame/GeoDataFrame.\
         Optionally calculates quantiles (25th, 50th/median, 75th percentiles). Can calculate additional custom quantiles if specified. \
@@ -4886,31 +5142,31 @@ calculate_column_statistics_tool = StructuredTool.from_function(
 )
 
 calculate_column_total_tool = StructuredTool.from_function(
-    func=calculate_column_total,
+    func=_wrap_tool_function(calculate_column_total),
     name='calculate_column_total',
     description='Calculate the total (sum) of numeric values stored in a DataFrame/GeoDataFrame column and report how many rows contributed to the sum versus missing/non-numeric values.'
 )
 
 create_buffer_tool = StructuredTool.from_function(
-    func=create_buffer,
+    func=_wrap_tool_function(create_buffer),
     name='create_buffer',
     description='Create fixed-distance buffers around vector features and store the buffered GeoDataFrame for downstream analysis.'
 )
 
 create_dissolved_buffer_tool = StructuredTool.from_function(
-    func=create_dissolved_buffer,
+    func=_wrap_tool_function(create_dissolved_buffer),
     name='create_dissolved_buffer',
     description='Create metric buffers around vector features, dissolve overlaps globally or by attribute, save the result to a vector file, and capture a preview map for quick review.'
 )
 
 make_choropleth_map_tool = StructuredTool.from_function(
-    func=make_choropleth_map, 
+    func=_wrap_tool_function(make_choropleth_map), 
     name='make_choropleth_map',
     description='Creates a choropleth map visualization from a specified column in a GeoDataFrame.'
 )
 
 filter_points_by_raster_values_tool = StructuredTool.from_function(
-    func=filter_points_by_raster_values, 
+    func=_wrap_tool_function(filter_points_by_raster_values), 
     name='filter_points_by_raster_values',
     description='Sample raster values at point locations and filter points based on threshold conditions. \
         Adds these values to a specified column in the GeoDataFrame. Returns filtered GeoDataFrame. Optionally, visualizes the filtered points overlaid on the raster. \
@@ -4918,7 +5174,7 @@ filter_points_by_raster_values_tool = StructuredTool.from_function(
 )
 
 select_features_by_spatial_relationship_tool = StructuredTool.from_function(
-    func=select_features_by_spatial_relationship, 
+    func=_wrap_tool_function(select_features_by_spatial_relationship), 
     name='select_features_by_spatial_relationship',
     description='Select features from one GeoDataFrame based on multiple spatial relationships with another.\
     Cannot process GeoDataFrame with over 150,000 features. Features that satisfy ANY of the specified predicates will be selected (OR logic).\
@@ -4927,63 +5183,63 @@ select_features_by_spatial_relationship_tool = StructuredTool.from_function(
 )
 
 calculate_line_lengths_tool = StructuredTool.from_function(
-    func=calculate_line_lengths, 
+    func=_wrap_tool_function(calculate_line_lengths), 
     name='calculate_line_lengths',
     description='Calculates the lengths of line features in a GeoDataFrame in kilometers, using appropriate UTM projections for accurate distance measurements. \
         Returns total lengh of line features in km, GeoDataFrame in UTM projection with column storing features length in m, and a descritive message of the results.'
 )
 
 calculate_polygon_areas_tool = StructuredTool.from_function(
-    func=calculate_polygon_areas,
+    func=_wrap_tool_function(calculate_polygon_areas),
     name='calculate_polygon_areas',
     description='Calculates areas of polygon features in a GeoDataFrame in square kilometers using an appropriate UTM projection. \
         Returns total area, projected GeoDataFrame with a per-feature area column, and UTM metadata.'
 )
 analyze_vector_overlap_tool = StructuredTool.from_function(
-    func=analyze_vector_overlap,
+    func=_wrap_tool_function(analyze_vector_overlap),
     name='analyze_vector_overlap',
     description='Intersect two GeoDataFrames and store the resulting overlap layer for downstream measurements or visualization.'
 )
 
 calculate_nearest_distances_tool = StructuredTool.from_function(
-    func=calculate_nearest_distances,
+    func=_wrap_tool_function(calculate_nearest_distances),
     name='calculate_nearest_distances',
     description='Calculates the distance from each point feature to the nearest geometry in another GeoDataFrame, storing the results in kilometers and reporting the projection used.'
 )
 
 calculate_directional_ellipse_tool = StructuredTool.from_function(
-    func=calculate_standard_directional_ellipse,
+    func=_wrap_tool_function(calculate_standard_directional_ellipse),
     name='calculate_standard_directional_ellipse',
     description='Computes the Standard Deviational Ellipse (directional distribution) for a set of points, summarizing major/minor axes, orientation, and providing an ellipse GeoDataFrame plus visualization.'
 )
 
 calculate_line_direction_rose_tool = StructuredTool.from_function(
-    func=calculate_line_direction_rose,
+    func=_wrap_tool_function(calculate_line_direction_rose),
     name='calculate_line_direction_rose',
     description='Analyzes the orientations of line features (roads, rivers, etc.) by computing a rose diagram with length-weighted bins, returning a summary table, metadata, and an illustrative plot.'
 )
 
 calculate_columns_tool = StructuredTool.from_function(
-    func=calculate_columns, 
+    func=_wrap_tool_function(calculate_columns), 
     name='calculate_columns',
     description='Performs mathematical operations ("multiply", "divide", "add", "subtract") between columns of two DataFrames/GeoDataFrames or columns of the same DataFrame/GeoDataFrame. \
         Returns DataFrame/GeoDataFrame with a column containing the operation result and message about operation, resulting dataframe and column.'
 )
 
 scale_column_by_value_tool = StructuredTool.from_function(
-    func=scale_column_by_value, 
+    func=_wrap_tool_function(scale_column_by_value), 
     name='scale_column_by_value',
     description='Performs a basic mathematical operation (multiply, divide, add, or subtract) between a column\'s values and a specified numeric value. \
         It returns a new DataFrame/GeoDataFrame with the original data plus a new column containing the calculation results as well as and message about operation, resulting dataframe and column.'
 )
 perform_arithmetic_operation_tool = StructuredTool.from_function(
-    func=perform_arithmetic_operation,
+    func=_wrap_tool_function(perform_arithmetic_operation),
     name='perform_arithmetic_operation',
     description='General-purpose calculator that applies add/subtract/multiply/divide to numeric values, with optional references to stored results using the "state:<key>.<field>" syntax.'
 )
 
 make_heatmap_tool = StructuredTool.from_function(
-    func=make_heatmap, 
+    func=_wrap_tool_function(make_heatmap), 
     name='make_heatmap',
     description='The make_heatmap tool creates an interactive heatmap visualization from point data in a GeoDataFrame, with intensity based on values from a specified column. \
         It returns a visualization where color intensity represents data density or magnitude, and can optionally store the HTML output. \
@@ -4991,14 +5247,14 @@ make_heatmap_tool = StructuredTool.from_function(
 )
 
 create_point_kernel_density_map_tool = StructuredTool.from_function(
-    func=create_point_kernel_density_map,
+    func=_wrap_tool_function(create_point_kernel_density_map),
     name='create_point_kernel_density_map',
     description='Generates a kernel density surface from point data, auto-selecting a sensible bandwidth when not provided, \
         storing the grid metadata, and returning a basemap-backed visualization that highlights hotspot areas.'
 )
 
 visualize_geographies_tool = StructuredTool.from_function(
-    func=visualize_geographies, 
+    func=_wrap_tool_function(visualize_geographies), 
     name='visualize_geographies',
     description='Displays multiple GeoDataFrames as map layers with custom styling. \
         It returns a visualization with different geometries (points, lines, polygons) rendered in distinct colors over a basemap, with optional legends and titles. \
@@ -5006,7 +5262,7 @@ visualize_geographies_tool = StructuredTool.from_function(
 )
 
 get_centroids_tool = StructuredTool.from_function(
-    func=get_centroids, 
+    func=_wrap_tool_function(get_centroids), 
     name='get_centroids',
     description='QGIS-style centroid generator that creates centroid points for polygon features, \
         optionally handles multipart geometries per part, writes the centroids to a scratch shapefile, \
@@ -5014,7 +5270,7 @@ get_centroids_tool = StructuredTool.from_function(
 )
 
 plot_contour_lines_tool = StructuredTool.from_function(
-    func=plot_contour_lines, 
+    func=_wrap_tool_function(plot_contour_lines), 
     name='plot_contour_lines',
     description='creates topographic-style contour lines from raster data at specified intervals. \
         It returns a GeoDataFrame containing line geometries representing areas of equal value (e.g., elevation, temperature), \
@@ -5023,7 +5279,7 @@ plot_contour_lines_tool = StructuredTool.from_function(
 )
 
 generate_contours_display_tool = StructuredTool.from_function(
-    func=generate_contours_display, 
+    func=_wrap_tool_function(generate_contours_display), 
     name='generate_contours_display',
     description='Creates contour lines from raster data using GDAL\'s ContourGenerate algorithm. \
         It returns a GeoDataFrame containing line geometries that represent areas of equal value with associated attributes. \
@@ -5033,13 +5289,13 @@ generate_contours_display_tool = StructuredTool.from_function(
 )
 
 make_bivariate_map_tool = StructuredTool.from_function(
-    func=make_bivariate_map, 
+    func=_wrap_tool_function(make_bivariate_map), 
     name='make_bivariate_map',
     description='Create and displays a bivariate choropleth map showing relationship between two variables.'
 )
 
 reject_task_tool = StructuredTool.from_function(
-    func=reject_task, 
+    func=_wrap_tool_function(reject_task), 
     name='reject_task',
     description='This tool should be called when the task cannot be solved to return \
         a standardized message indicating that the current task cannot be solved with the available tools and datasets.'

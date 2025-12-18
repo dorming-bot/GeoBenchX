@@ -6,7 +6,7 @@
     "tasks": [
         {
             "task_ID": "TASK_251212_101700_901003",
-            "task_text": "Identify all areas within the Weihe River Basin where the slope is greater than icon 5 and the distance to the nearest traditional village exceeds 20 kilometers. (You can first load the Wei River Basin Topographic Slope Classification Dataset and extract the boundary of the Wei River Basin Topographic Slope Classification Dataset as a vector polygon, then use select_features_by_spatial_relationship​ to extract all scattered points within the region, and create a 20,000‑meter dissolved buffer only for these points. Next, reload the Wei River Basin Topographic Slope Classification Dataset raster data and reclassify it to filter out values greater than 5. Then, use the rasterize_vector_tool​ to convert the resulting buffer into raster data with the same specifications. Finally, perform an overlay operation on these two raster datasets—using the reclassified Weihe raster data to subtract the rasterized buffer data—to obtain the final result.)",
+            "task_text": "In the Wei River region, identify all areas where the slope is greater than class value five and the distance to the nearest traditional village exceeds 20 kilometers.",
             "task_labels": [
                 "Spatial operations",
                 "Task Set 03",

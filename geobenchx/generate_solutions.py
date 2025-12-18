@@ -12,8 +12,18 @@ from geobenchx.save_chats import save_conversation_to_html
 
 
 wait_time = 120
-REQUEST_DELAY_SECONDS = 30.0  # 控制连续调用之间的最小间隔
-POST_TASK_DELAY_SECONDS = 60.0  # 每个任务结束后额外等待
+TOOL_CALL_DELAY_SECONDS = 20.0  # 工具调用之间的最小冷却时间（秒）
+POST_TASK_DELAY_SECONDS = 60.0  # 每个任务完成后的等待
+
+def _wait_for_tool_cooldown(last_call_ts: float | None, min_interval: float) -> None:
+    """确保连续工具调用之间至少间隔指定的秒数。"""
+    if last_call_ts is None:
+        return
+    elapsed = time.time() - last_call_ts
+    remaining = min_interval - elapsed
+    if remaining > 0:
+        time.sleep(remaining)
+
 
 def generate_solutions(tasks: TaskSet, model: str, temperature: float, output_filename: str = None, max_steps: int =25, skip_solved = True, capture_history = False) -> tuple[TaskSet, int]:
     """
@@ -45,7 +55,7 @@ def generate_solutions(tasks: TaskSet, model: str, temperature: float, output_fi
     tasks.metadata['temperature'] = temperature
     total_input = 0
     total_output = 0
-    last_request_ts = 0.0
+    last_tool_call_ts: float | None = None
     for task in tqdm(tasks):
         print(f"Task ID: {task.task_ID}")
         print(f"Task text: {task.task_text}")
@@ -56,10 +66,7 @@ def generate_solutions(tasks: TaskSet, model: str, temperature: float, output_fi
         try_count = 0
         while(not success):
             try:
-                elapsed = time.time() - last_request_ts
-                if elapsed < REQUEST_DELAY_SECONDS:
-                    time.sleep(REQUEST_DELAY_SECONDS - elapsed)
-                last_request_ts = time.time()
+                _wait_for_tool_cooldown(last_tool_call_ts, TOOL_CALL_DELAY_SECONDS)
                 solution, input_tokens, output_tokens, conversation_history = execute_task(task.task_text, temperature = temperature, model=model, max_steps=max_steps, capture_history=capture_history)
                 print('='*30)
                 print(get_solution_code(solution))
@@ -83,6 +90,8 @@ def generate_solutions(tasks: TaskSet, model: str, temperature: float, output_fi
             except Exception as e:
                 try_count += 1
                 print(repr(e))
+            finally:
+                last_tool_call_ts = time.time()
 
     print(f"TOTAL tokens used: total input tokens {total_input}, total output_tokens {total_output}")
     tasks.metadata['total_input_tokens_for_generation'] = total_input

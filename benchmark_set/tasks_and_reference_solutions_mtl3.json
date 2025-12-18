@@ -6,7 +6,7 @@
     "tasks": [
         {
             "task_ID": "TASK_251212_101700_901003",
-            "task_text": "Identify the centroid of the Loess Plateau, and use this point as the center to create a buffer zone (use tool create_dissolved_buffer to create 100000 meter) with a radius of 100 kilometers; then calculate the area of China's forest water conservation zones within this region.",
+            "task_text": "Identify the centroid of the Loess Plateau, and use this point as the center to create a buffer zone (use tool create_dissolved_buffer to create 100000 meter) with a radius of 100 kilometers; then calculate the area of China's forest water conservation zones within this region and plot for visualization.",
             "task_labels": [
                 "Spatial operations",
                 "Task Set 03",
