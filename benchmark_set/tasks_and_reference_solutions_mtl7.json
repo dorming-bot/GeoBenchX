@@ -1,0 +1,84 @@
+{
+    "metadata": {
+        "author": "mtl",
+        "notes": "Guangming DEM slope filtering and area computation task exercising the raster area tool"
+    },
+    "tasks": [
+        {
+            "task_ID": "TASK_251212_141500_007001",
+            "task_text": "Based on the Guangming District DEM (Shenzhen), identify all areas with a slope less than 5 degrees, and calculate the total area of these flat regions.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": "Resolve the Guangming DEM path, convert it to a slope raster, reclassify it so slopes below 5 degrees become a binary mask, then feed that mask into the raster-area tool to measure the flat terrain.",
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "get_raster_path",
+                            "arguments": {
+                                "rasterdataset": "Guangming District DEM (Shenzhen)"
+                            },
+                            "comment": "Resolve the catalog path to data/Data/GeoData/guangming.tif so downstream tools read the correct DEM."
+                        },
+                        {
+                            "function_name": "convert_dem_to_slope",
+                            "arguments": {
+                                "dem_raster_path": "d:/code/GeoBenchX/GeoBenchX/data/Data/GeoData/guangming.tif",
+                                "output_variable_name": "guangming_slope_metadata",
+                                "band_number": 1,
+                                "output_raster_path": "d:/code/GeoBenchX/GeoBenchX/scratch/guangming_slope.tif",
+                                "overwrite_existing": true,
+                                "append_timestamp_to_output": false,
+                                "plot_title": "Guangming DEM Slope (degrees)",
+                                "colormap": "terrain"
+                            },
+                            "comment": "Convert the Guangming DEM into a slope raster so slope thresholds can be evaluated in degrees."
+                        },
+                        {
+                            "function_name": "classify_raster_zones",
+                            "arguments": {
+                                "raster_path": "d:/code/GeoBenchX/GeoBenchX/scratch/guangming_slope.tif",
+                                "reclassification_table": "[{\"min_value\": 0.0, \"max_value\": 4.9999, \"new_value\": 1, \"label\": \"Slope < 5 deg\", \"color\": \"#2ca25f\"}, {\"min_value\": 5.0, \"max_value\": 90.0, \"new_value\": 0, \"label\": \"Slope >= 5 deg\", \"color\": \"#de2d26\"}]",
+                                "output_variable_name": "guangming_flat_mask_summary",
+                                "output_raster_path": "d:/code/GeoBenchX/GeoBenchX/scratch/guangming_flat_mask.tif",
+                                "output_dtype": "uint8",
+                                "classification_model_name": "guangming_flat_mask",
+                                "append_timestamp_to_output": false,
+                                "plot_title": "Guangming Slope < 5 degrees",
+                                "legend_location": "lower left"
+                            },
+                            "comment": "Reclassify the slope raster so cells below 5 degrees become value 1 and all other slopes become 0."
+                        },
+                        {
+                            "function_name": "calculate_raster_selection_area",
+                            "arguments": {
+                                "raster_path": "d:/code/GeoBenchX/GeoBenchX/scratch/guangming_flat_mask.tif",
+                                "output_variable_name": "guangming_flat_area",
+                                "band_number": 1,
+                                "target_equal_area_epsg": 6933,
+                                "selected_values": [
+                                    1
+                                ],
+                                "treat_nonzero_as_selected": false,
+                                "report_units": "square_kilometers"
+                            },
+                            "comment": "Measure the cumulative area of all pixels coded as 1 (slope < 5 degrees), reporting the flat terrain in square kilometers."
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        }
+    ]
+}

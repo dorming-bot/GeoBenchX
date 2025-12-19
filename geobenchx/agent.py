@@ -74,7 +74,8 @@ from geobenchx.tools import (
     create_point_kernel_density_map_tool,
     perform_arithmetic_operation_tool,
     analyze_vector_overlap_tool,
-    extract_raster_boundary_tool
+    extract_raster_boundary_tool,
+    calculate_raster_selection_area_tool
 )
 from geobenchx.utils import get_solution_code
 
@@ -139,7 +140,8 @@ tools = [
     create_point_kernel_density_map_tool,
     perform_arithmetic_operation_tool,
     analyze_vector_overlap_tool,
-    extract_raster_boundary_tool
+    extract_raster_boundary_tool,
+    calculate_raster_selection_area_tool
 ]
 
 def execute_task(task_text: str, temperature: float = 0, model: str = MODEL_GPT_4o, max_steps: int = 25, capture_history=False):

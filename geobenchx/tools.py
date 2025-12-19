@@ -31,10 +31,12 @@ from typing_extensions import TypedDict
 
 import geopandas as gpd
 import rasterio
-from rasterio.warp import reproject, Resampling
+from rasterio.crs import CRS as RasterioCRS
+from rasterio.warp import reproject, Resampling, calculate_default_transform
 from rasterio.mask import mask
 from rasterio.transform import array_bounds
 from rasterio.features import shapes, rasterize
+from affine import Affine
 import plotly.express as px
 import contextily as ctx
 from osgeo import gdal, gdal_array, ogr, osr
@@ -1553,6 +1555,197 @@ def convert_dem_to_slope(
 
     except Exception as e:
         return f"Error generating slope raster: {type(e).__name__} : {str(e)}"
+
+
+def calculate_raster_selection_area(
+    raster_path: Annotated[str, "Path to the raster file whose selected pixels will be measured"],
+    output_variable_name: Annotated[str, "Name used to store the area summary in the agent state"],
+    state: Annotated[dict, InjectedState],
+    band_number: Annotated[int, "1-based raster band index used for analysis"] = 1,
+    selected_values: Annotated[List[float] | None, "Specific pixel values that count toward the area (optional)"] = None,
+    treat_nonzero_as_selected: Annotated[bool, "When true and selected_values is empty, all non-zero pixels count toward the area"] = True,
+    target_equal_area_epsg: Annotated[int | None, "Equal-area EPSG code for reprojection when needed"] = 6933,
+    report_units: Annotated[Literal["square_meters", "square_kilometers"], "Units reported in the summary"] = "square_kilometers"
+) -> str:
+    """
+    Compute the surface area represented by selected pixels in a raster band.
+    This tool assumes upstream processing (e.g., classify_raster_zones) already created
+    the selection mask; it simply counts the qualifying pixels and reports their area.
+    """
+    try:
+        if not raster_path:
+            return "Error: raster_path must be provided."
+        if not output_variable_name:
+            return "Error: output_variable_name must be provided."
+
+        if "data_store" not in state:
+            state["data_store"] = {}
+
+        def _translate_zip_path(path: str) -> str:
+            if path.startswith("zip://"):
+                inner = path[len("zip://"):]
+                if "!/" in inner:
+                    zip_part, inner_file = inner.split("!/", 1)
+                else:
+                    zip_part, inner_file = inner, ""
+                return f"/vsizip/{zip_part}/{inner_file}"
+            return path
+
+        translated_path = _translate_zip_path(raster_path)
+        if not raster_path.startswith("zip://") and not os.path.exists(raster_path):
+            return f"Error: Raster '{raster_path}' not found."
+
+        src_ds = gdal.OpenEx(translated_path, gdal.OF_RASTER)
+        if src_ds is None:
+            return f"Error: Unable to open raster '{raster_path}'."
+
+        raster_count = src_ds.RasterCount
+        if band_number < 1 or band_number > raster_count:
+            src_ds = None
+            return f"Error: band_number {band_number} is outside available bands (1-{raster_count})."
+
+        band = src_ds.GetRasterBand(band_number)
+        raster_data = band.ReadAsArray()
+        if raster_data is None:
+            src_ds = None
+            return f"Error: Unable to read band {band_number} from raster '{raster_path}'."
+
+        nodata_value = band.GetNoDataValue()
+        valid_mask = np.isfinite(raster_data)
+        if nodata_value is not None:
+            valid_mask &= raster_data != nodata_value
+
+        total_valid_pixels = int(valid_mask.sum())
+        if total_valid_pixels == 0:
+            src_ds = None
+            return "Error: Raster band does not contain any valid pixels for analysis."
+
+        if selected_values:
+            selected_array = np.isin(raster_data, np.array(selected_values))
+        elif treat_nonzero_as_selected:
+            selected_array = raster_data != 0
+        else:
+            selected_array = np.ones_like(raster_data, dtype=bool)
+
+        selection_mask = np.logical_and(selected_array, valid_mask)
+        selected_pixels = int(selection_mask.sum())
+
+        geotransform = src_ds.GetGeoTransform()
+        transform_affine = Affine.from_gdal(*geotransform)
+        pixel_area_src = abs(transform_affine.a * transform_affine.e - transform_affine.b * transform_affine.d)
+
+        src_wkt = src_ds.GetProjection()
+        src_ds = None
+
+        def _format_crs_label(crs_obj: CRS | None) -> str:
+            if crs_obj is None:
+                return "Unknown"
+            authority = crs_obj.to_authority()
+            if authority:
+                return f"{authority[0]}:{authority[1]}"
+            return crs_obj.to_string()
+
+        src_crs_pyproj: CRS | None = None
+        rasterio_crs: RasterioCRS | None = None
+        if src_wkt:
+            try:
+                src_crs_pyproj = CRS.from_wkt(src_wkt)
+            except pyproj_exceptions.CRSError:
+                src_crs_pyproj = None
+            try:
+                rasterio_crs = RasterioCRS.from_wkt(src_wkt)
+            except Exception:
+                rasterio_crs = None
+
+        total_area_sq_m = 0.0
+        area_method = "source_pixel_dimensions"
+        area_reference_crs = _format_crs_label(src_crs_pyproj)
+        reprojected_pixel_count: int | None = None
+
+        if src_crs_pyproj and not src_crs_pyproj.is_geographic:
+            total_area_sq_m = selected_pixels * pixel_area_src
+            area_method = "source_projected_crs"
+        elif src_crs_pyproj and src_crs_pyproj.is_geographic and target_equal_area_epsg and rasterio_crs:
+            try:
+                target_crs = RasterioCRS.from_epsg(target_equal_area_epsg)
+                minx, miny, maxx, maxy = array_bounds(raster_data.shape[0], raster_data.shape[1], transform_affine)
+                dst_transform, dst_width, dst_height = calculate_default_transform(
+                    rasterio_crs,
+                    target_crs,
+                    raster_data.shape[1],
+                    raster_data.shape[0],
+                    minx,
+                    miny,
+                    maxx,
+                    maxy,
+                )
+                destination = np.zeros((dst_height, dst_width), dtype=np.uint8)
+                reproject(
+                    source=selection_mask.astype(np.uint8),
+                    destination=destination,
+                    src_transform=transform_affine,
+                    src_crs=rasterio_crs,
+                    dst_transform=dst_transform,
+                    dst_crs=target_crs,
+                    resampling=Resampling.nearest,
+                )
+                reprojected_pixel_count = int(np.count_nonzero(destination))
+                reprojected_pixel_area = abs(dst_transform.a * dst_transform.e - dst_transform.b * dst_transform.d)
+                total_area_sq_m = reprojected_pixel_count * reprojected_pixel_area
+                area_method = "reprojected_equal_area"
+                area_reference_crs = f"EPSG:{target_equal_area_epsg}"
+            except Exception:
+                total_area_sq_m = selected_pixels * pixel_area_src
+                area_method = "geographic_fallback_using_pixel_dimensions"
+        else:
+            total_area_sq_m = selected_pixels * pixel_area_src
+            if src_crs_pyproj is None:
+                area_reference_crs = "Unknown"
+
+        total_area_sq_km = total_area_sq_m / 1_000_000
+        selected_pct = (selected_pixels / total_valid_pixels * 100) if total_valid_pixels else 0.0
+        reported_value = total_area_sq_km if report_units == "square_kilometers" else total_area_sq_m
+        unit_label = "square kilometers" if report_units == "square_kilometers" else "square meters"
+
+        state["data_store"][output_variable_name] = {
+            "source_raster_path": raster_path,
+            "band_number": band_number,
+            "selected_values": selected_values,
+            "treat_nonzero_as_selected": treat_nonzero_as_selected,
+            "selected_pixel_count": selected_pixels,
+            "valid_pixel_count": total_valid_pixels,
+            "selected_percent": selected_pct,
+            "total_area_sq_m": total_area_sq_m,
+            "total_area_sq_km": total_area_sq_km,
+            "area_computation_method": area_method,
+            "area_reference_crs": area_reference_crs,
+            "reprojected_pixel_count": reprojected_pixel_count,
+            "report_units": report_units,
+            "reported_area_value": reported_value,
+        }
+
+        summary_lines = [
+            f"Raster evaluated: {Path(raster_path).name} (band {band_number})",
+            "Selection rule: "
+            + (
+                f"pixel values in {selected_values}"
+                if selected_values
+                else ("non-zero pixels" if treat_nonzero_as_selected else "all valid pixels")
+            ),
+            f"Selected pixels: {selected_pixels:,} of {total_valid_pixels:,} valid ({selected_pct:.2f}%)",
+            f"Area meeting the criterion: {reported_value:,.2f} {unit_label}",
+            f"Area computation: {area_method} (reference CRS: {area_reference_crs})",
+        ]
+        if reprojected_pixel_count is not None:
+            summary_lines.append(
+                f"Equal-area grid pixel count: {reprojected_pixel_count:,} (target EPSG:{target_equal_area_epsg})"
+            )
+
+        return "\n".join(summary_lines)
+
+    except Exception as e:
+        return f"Error calculating raster selection area: {type(e).__name__}: {str(e)}"
+
 
 def generate_aspect_map(
     dem_raster_path: Annotated[str, "Path to the DEM raster used for aspect calculation"],
@@ -5077,6 +5270,12 @@ convert_dem_to_slope_tool = StructuredTool.from_function(
     func=_wrap_tool_function(convert_dem_to_slope),
     name='convert_dem_to_slope',
     description='Converts a DEM raster into a slope raster in degrees (similar to QGIS Slope), saves a timestamped GeoTIFF into the scratch folder, stores summary statistics, and adds a preview image.'
+)
+
+calculate_raster_selection_area_tool = StructuredTool.from_function(
+    func=_wrap_tool_function(calculate_raster_selection_area),
+    name='calculate_raster_selection_area',
+    description='Counts selected pixels (e.g., a binary mask) within a raster band, converts them into square meters/kilometers—reprojecting to an equal-area CRS if needed—and stores the area summary in the agent state.'
 )
 
 generate_aspect_map_tool = StructuredTool.from_function(
