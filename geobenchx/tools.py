@@ -139,7 +139,8 @@ GEO_CATALOG = {
     "Wuhan Urban Parks": "park_in_wuhan.shp",
     "Beijing-Tianjin-Hebei boundary": "2020jjj.shp",
     "Traditional Villages of China": "VillagesChina.shp",
-    "The source region of the Yellow River": "YellowRiver_SourceRegion.shp"
+    "The source region of the Yellow River": "YellowRiver_SourceRegion.shp",
+    "2021 Taihu Lake scientific experiment submerged crab pond data":"2021 Taihu Lake scientific experiment submerged crab pond data.shp"
     }
 
 RASTER_CATALOG = {
@@ -158,6 +159,8 @@ RASTER_CATALOG = {
     "XinxiangCity Rainstorm and Flooding Dataset": "Xinxiang City Rainstorm and Flooding Dataset.tif",
     "Guangming District DEM (Shenzhen)": "guangming.tif",
     "Guangming District Slope (Shenzhen)": "guangmingSlope.tif",
+    "DEM data of the Tangxun Lake Experimental Area in Hubei":"Tangxun_lake_DEM.tif",
+    "Piura region of Peru":"piura_dem.tif"
 }
 
 COLORMAPS = {

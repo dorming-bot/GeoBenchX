@@ -18,6 +18,20 @@ _ = load_dotenv(find_dotenv())
 openai.api_key  = os.getenv('OPENAI_API_KEY')
 google_api_key = os.getenv("GOOGLE_API_KEY")
 anthropic_api_key = os.getenv("ANTHROPIC_API_KEY")
+_sher_locker_api_key = os.getenv("SHER_LOCKER_API_KEY")
+_DEFAULT_SHER_OPENAI_BASE_URL = "https://sher.locker/openai/v1/"
+_DEFAULT_SHER_GOOGLE_BASE_URL = "https://sher.locker/google/v1beta/"
+_sher_locker_openai_base_url = os.getenv("SHER_LOCKER_OPENAI_BASE_URL", _DEFAULT_SHER_OPENAI_BASE_URL)
+_sher_locker_google_base_url = os.getenv("SHER_LOCKER_GOOGLE_BASE_URL", _DEFAULT_SHER_GOOGLE_BASE_URL)
+_sher_locker_base_url = os.getenv("SHER_LOCKER_BASE_URL")
+
+
+def _resolve_sher_locker_base_url(model: str) -> str:
+    """Return vendor-specific Sher Locker base URL based on model name."""
+    model_lower = model.lower()
+    if "gemini" in model_lower:
+        return _sher_locker_google_base_url or _sher_locker_base_url or _DEFAULT_SHER_GOOGLE_BASE_URL
+    return _sher_locker_openai_base_url or _sher_locker_base_url or _DEFAULT_SHER_OPENAI_BASE_URL
 
 from geobenchx.constants import ROLE_USER
 from geobenchx.tools import(
@@ -37,8 +51,15 @@ from geobenchx.tools import(
     get_raster_description_tool,
     get_values_from_raster_with_geometries_tool,
     classify_raster_zones_tool,
+    erode_raster_regions_tool,
+    convert_dem_to_slope_tool,
+    generate_aspect_map_tool,
     analyze_raster_overlap_tool,
     calculate_line_lengths_tool,
+    calculate_polygon_areas_tool,
+    calculate_nearest_distances_tool,
+    calculate_directional_ellipse_tool,
+    calculate_line_direction_rose_tool,
     calculate_columns_tool,
     calculate_column_total_tool,
     scale_column_by_value_tool,
@@ -46,20 +67,34 @@ from geobenchx.tools import(
     visualize_geographies_tool,
     get_centroids_tool,
     generate_contours_display_tool,
+    generate_profile_curvature_map_tool,
+    rasterize_vector_to_match_raster_tool,
     reject_task_tool,
-    calculate_column_statistics_tool)
+    calculate_column_statistics_tool,
+    create_point_kernel_density_map_tool,
+    perform_arithmetic_operation_tool,
+    analyze_vector_overlap_tool,
+    extract_raster_boundary_tool,
+    calculate_raster_selection_area_tool)
 from geobenchx.utils import get_solution_code, compute_confusion_stats
 from geobenchx.dataclasses import Task, Solution, Step, TaskSet, select_tasks_with_labels
 from geobenchx.constants import (
     MODEL_CLAUDE,
+    MODEL_CLAUDE_mini,
     MODEL_CLAUDE_ADV4,
     MODEL_CLAUDE_ADV3,
     MODEL_GPT_41,
     MODEL_GPT_4o,
     MODEL_GPT_mini,
+    MODEL_O3,
+    MODEL_O4,
     MODEL_GEMINI,
     MODEL_GEMINI_ADV,
     MODEL_GEMINI_ADV2,
+    MODEL_SHER_LOCKER,
+    MODEL_SHER_LOCKER_4o,
+    MODEL_SHER_LOCKER_GEMINI_FLASH,
+    MODEL_SHER_LOCKER_4mini,
     RESULTS_FOLDER,
     ScoreValues
 )
@@ -82,8 +117,15 @@ tools = [
     get_raster_description_tool,
     get_values_from_raster_with_geometries_tool,
     classify_raster_zones_tool,
+    erode_raster_regions_tool,
+    convert_dem_to_slope_tool,
+    generate_aspect_map_tool,
     analyze_raster_overlap_tool,
     calculate_line_lengths_tool,
+    calculate_polygon_areas_tool,
+    calculate_nearest_distances_tool,
+    calculate_directional_ellipse_tool,
+    calculate_line_direction_rose_tool,
     calculate_columns_tool,
     calculate_column_total_tool,
     scale_column_by_value_tool,
@@ -91,8 +133,15 @@ tools = [
     visualize_geographies_tool,
     get_centroids_tool,
     generate_contours_display_tool,
+    generate_profile_curvature_map_tool,
+    rasterize_vector_to_match_raster_tool,
     reject_task_tool,
-    calculate_column_statistics_tool
+    calculate_column_statistics_tool,
+    create_point_kernel_density_map_tool,
+    perform_arithmetic_operation_tool,
+    analyze_vector_overlap_tool,
+    extract_raster_boundary_tool,
+    calculate_raster_selection_area_tool
 ]
 
 EXAMPLE_0 = """
@@ -308,12 +357,24 @@ def score_task_solution(task: Task, model: str = MODEL_CLAUDE, temperature: floa
 
     Uses ... to compare solutions and extract evaluation metrics from structured response tags.
     """
-    if model in [MODEL_CLAUDE, MODEL_CLAUDE_ADV3,MODEL_CLAUDE_ADV4]:
+    if model in [MODEL_CLAUDE, MODEL_CLAUDE_mini, MODEL_CLAUDE_ADV3, MODEL_CLAUDE_ADV4]:
         llm = ChatAnthropic(model=model, temperature=temperature)
     elif model in [MODEL_GPT_41, MODEL_GPT_mini, MODEL_GPT_4o]:
         llm = ChatOpenAI(model=model, temperature=temperature)
+    elif model in [MODEL_O3, MODEL_O4]:
+        llm = ChatOpenAI(model=model, temperature=None)
     elif model in [MODEL_GEMINI, MODEL_GEMINI_ADV, MODEL_GEMINI_ADV2]:
         llm = ChatGoogleGenerativeAI(model=model, temperature=temperature)
+    elif model in [MODEL_SHER_LOCKER, MODEL_SHER_LOCKER_4o, MODEL_SHER_LOCKER_GEMINI_FLASH, MODEL_SHER_LOCKER_4mini]:
+        if not _sher_locker_api_key:
+            raise ValueError("SHER_LOCKER_API_KEY is not set in the environment.")
+        base_url = _resolve_sher_locker_base_url(model)
+        llm = ChatOpenAI(
+            model=model,
+            temperature=temperature,
+            api_key=_sher_locker_api_key,
+            base_url=base_url,
+        )
     else:
         raise ValueError("Model is outside the predetermined list")
 

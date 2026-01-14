@@ -1,11 +1,7 @@
 {
-    "metadata": {
-        "author": "zsx",
-        "notes": "Aggregated custom tasks from zsx to zsx6"
-    },
     "tasks": [
         {
-            "task_ID": "TASK_251113_142843_001001",
+            "task_ID": "TASK_1_3_041",
             "task_text": "Count the total number of POI points in the 2014 China POI data that fall within Chengdu City.",
             "task_labels": [
                 "Spatial operations",
@@ -46,17 +42,6 @@
                                 "plot_result": false
                             },
                             "comment": "Filter POI points that fall inside Chengdu's polygon; the returned message reports how many features satisfy the 'within' predicate and stores them in 'poi_within_chengdu'."
-                        },
-                        {
-                            "function_name": "calculate_column_statistics",
-                            "arguments": {
-                                "dataframe_name": "poi_within_chengdu",
-                                "column_name": "OBJECTID",
-                                "output_variable_name": "poi_within_chengdu_stats",
-                                "include_quantiles": false,
-                                "additional_quantiles": null
-                            },
-                            "comment": "Use any stable numeric identifier column (e.g., OBJECTID or FID) to get the exact record count for POIs inside Chengdu; adjust column_name if the shapefile uses a different field."
                         }
                     ]
                 }
@@ -70,88 +55,8 @@
             "match_score_Human": null
         },
         {
-            "task_ID": "TASK_251113_170215_002002",
-            "task_text": "Select the areas located within the Jiuzhaigou earthquake zone and classified as forest water conservation zones to be designated as ecological core restoration areas.",
-            "task_labels": [
-                "Spatial operations",
-                "Task Set 03",
-                "Process, Merge, Visualize",
-                "Merge, Visualize"
-            ],
-            "reference_solution_description": "Use the national forest water retention layer and the Jiuzhaigou earthquake zone polygon to isolate the conservation areas that fall inside the seismic boundary, then output/visualize the candidate ecological core restoration areas.",
-            "reference_solutions": [
-                {
-                    "steps": [
-                        {
-                            "function_name": "load_geodata",
-                            "arguments": {
-                                "geodataset": "Forest Water Conservation China",
-                                "output_geodataframe_name": "forest_water_retention"
-                            },
-                            "comment": "Register 'Forest Water Conservation China': 'data/Data/GeoData/ForestWaterRetentionChina.shp' in GEO_CATALOG so this call loads the forest water conservation polygons."
-                        },
-                        {
-                            "function_name": "load_geodata",
-                            "arguments": {
-                                "geodataset": "Jiuzhaigou Earthquake Zone",
-                                "output_geodataframe_name": "jiuzhai_quake_zone"
-                            },
-                            "comment": "Register 'Jiuzhaigou Earthquake Zone': 'data/Data/GeoData/jiuzhai.shp' in GEO_CATALOG to bring the earthquake-affected boundary into memory."
-                        },
-                        {
-                            "function_name": "select_features_by_spatial_relationship",
-                            "arguments": {
-                                "features_geodataframe_name": "forest_water_retention",
-                                "reference_geodataframe_name": "jiuzhai_quake_zone",
-                                "spatial_predicates": [
-                                    "within",
-                                    "intersects"
-                                ],
-                                "output_geodataframe_name": "core_restoration_candidates",
-                                "plot_result": false
-                            },
-                            "comment": "Clip the forest water retention polygons to the earthquake zone; using both 'within' and 'intersects' ensures partial overlaps are retained for restoration design."
-                        },
-                        {
-                            "function_name": "visualize_geographies",
-                            "arguments": {
-                                "geodataframe_names": [
-                                    "jiuzhai_quake_zone",
-                                    "core_restoration_candidates"
-                                ],
-                                "layer_styles": [
-                                    {
-                                        "color": "#8c510a",
-                                        "alpha": 0.4,
-                                        "linewidth": 0.8,
-                                        "label": "Jiuzhaigou earthquake zone"
-                                    },
-                                    {
-                                        "color": "#01665e",
-                                        "alpha": 0.7,
-                                        "linewidth": 0.5,
-                                        "label": "Forest water conservation areas inside zone"
-                                    }
-                                ],
-                                "basemap_style": "OpenStreetMap",
-                                "title": "Ecological Core Restoration Candidates in Jiuzhaigou"
-                            },
-                            "comment": "Map the resulting candidate polygons against the earthquake footprint to communicate where ecological core restoration should occur."
-                        }
-                    ]
-                }
-            ],
-            "generated_solution": null,
-            "generated_solution_input_tokens": null,
-            "generated_solution_output_tokens": null,
-            "match_reasoning_LLM": null,
-            "match_score_LLM": null,
-            "match_reasoning_Human": null,
-            "match_score_Human": null
-        },
-        {
-            "task_ID": "TASK_251113_173012_003003",
-            "task_text": "Calculate the total area of all urban parks in Wuhan. Please follow this exact tool sequence: 1) load_geodata(geodataset='Wuhan Urban Parks', output_geodataframe_name='wuhan_parks'); 2) calculate_column_total(dataframe_name='wuhan_parks', column_name='Area_sqm', output_variable_name='wuhan_parks_total_area'); 3) report the total from wuhan_parks_total_area['total'] (if 'Area_sqm' is missing, try 'Area').",
+            "task_ID": "TASK_1_3_042",
+            "task_text": "Calculate the total area of all urban parks in Wuhan. ",
             "task_labels": [
                 "Spatial operations",
                 "Process, Merge, Visualize",
@@ -168,14 +73,6 @@
                                 "output_geodataframe_name": "wuhan_parks"
                             },
                             "comment": "Register 'Wuhan Urban Parks': 'data/Data/GeoData/park_in_wuhan.shp' in GEO_CATALOG so the shapefile with every park polygon can be loaded."
-                        },
-                        {
-                            "function_name": "get_unique_values",
-                            "arguments": {
-                                "dataframe_name": "wuhan_parks",
-                                "column": "Area_sqm"
-                            },
-                            "comment": "Any inspection tool works; alternatively call get_dataframe_info. The key is to confirm that the attribute table already contains the 'Area_sqm' numeric field with each park's area in square metres so we can sum it without recomputing geometry."
                         },
                         {
                             "function_name": "calculate_column_total",
@@ -198,7 +95,7 @@
             "match_score_Human": null
         },
         {
-            "task_ID": "TASK_251113_181735_004004",
+            "task_ID": "TASK_1_3_043",
             "task_text": "Count the total number of POI points in the 2014 China POI data that are located within the Beijing-Tianjin-Hebei region.",
             "task_labels": [
                 "Spatial operations",
@@ -239,17 +136,6 @@
                                 "plot_result": false
                             },
                             "comment": "Filter the POIs to those inside the Beijing-Tianjin-Hebei boundary and store them in 'poi_within_bth' for counting or visualization."
-                        },
-                        {
-                            "function_name": "calculate_column_statistics",
-                            "arguments": {
-                                "dataframe_name": "poi_within_bth",
-                                "column_name": "OBJECTID",
-                                "output_variable_name": "poi_within_bth_stats",
-                                "include_quantiles": false,
-                                "additional_quantiles": null
-                            },
-                            "comment": "Use a stable numeric identifier column (OBJECTID/FID) so the 'valid_count' in the statistics output equals the total number of POIs inside Jing-Jin-Ji."
                         }
                     ]
                 }
@@ -263,8 +149,8 @@
             "match_score_Human": null
         },
         {
-            "task_ID": "TASK_251118_120501_005005",
-            "task_text": "Load the Loess Plateau Region shapefile and use the calculate_polygon_areas tool to report the total area in square kilometers.",
+            "task_ID": "TASK_1_3_044",
+            "task_text": "Load the Loess Plateau Region shapefile and calculate the total area in square kilometers.",
             "task_labels": [
                 "Spatial operations",
                 "Task Set 03",
@@ -305,7 +191,7 @@
             "match_score_Human": null
         },
         {
-            "task_ID": "TASK_251118_153200_006006",
+            "task_ID": "TASK_1_3_045",
             "task_text": "Identify and count the number of traditional villages within the Loess Plateau region, and calculate their spatial density in the area (villages per 10,000 square kilometers).",
             "task_labels": [
                 "Spatial operations",
@@ -347,17 +233,6 @@
                             "comment": "Select the traditional villages that fall within the Loess Plateau boundary and store them in 'villages_in_loess' for counting."
                         },
                         {
-                            "function_name": "calculate_column_statistics",
-                            "arguments": {
-                                "dataframe_name": "villages_in_loess",
-                                "column_name": "OBJECTID",
-                                "output_variable_name": "villages_in_loess_stats",
-                                "include_quantiles": false,
-                                "additional_quantiles": null
-                            },
-                            "comment": "Use the statistics tool to obtain 'valid_count', which equals the number of traditional villages within the plateau."
-                        },
-                        {
                             "function_name": "calculate_polygon_areas",
                             "arguments": {
                                 "geodataframe_name": "loess_plateau_region",
@@ -378,8 +253,8 @@
             "match_score_Human": null
         },
         {
-            "task_ID": "TASK_251118_174500_007007",
-            "task_text": "Calculate the distances from the three points of interest in Wuhan to their nearest parks using the 3_places_in_wuhan.shp dataset for the POIs.",
+            "task_ID": "TASK_1_3_046",
+            "task_text": "Calculate the distances from the three points of interest in Wuhan to their nearest parks using the Wuhan POIs (3 locations) dataset for the POIs.",
             "task_labels": [
                 "Spatial operations",
                 "Task Set 04",
@@ -429,7 +304,7 @@
             "match_score_Human": null
         },
         {
-            "task_ID": "TASK_251118_191500_008008",
+            "task_ID": "TASK_1_3_047",
             "task_text": "Analyze the spatial distribution of villages in China and identify their primary geographic extension directions.",
             "task_labels": [
                 "Spatial operations",
@@ -471,7 +346,7 @@
             "match_score_Human": null
         },
         {
-            "task_ID": "TASK_251118_210000_001001",
+            "task_ID": "TASK_1_3_048",
             "task_text": "Please conduct a directional analysis of the road network in the Inner Mongolia Autonomous Region.",
             "task_labels": [
                 "Spatial operations",
@@ -514,7 +389,7 @@
             "match_score_Human": null
         },
         {
-            "task_ID": "TASK_251119_160500_002002",
+            "task_ID": "TASK_1_3_049",
             "task_text": "Using the \"Wei River Basin Topographic Slope Classification Dataset,\" reclassify the slope into three levels: gentle (icons 6-7), moderate (icons 4-5), and steep (icons 1-3), and create a graph to visualize the results.",
             "task_labels": [
                 "Spatial operations",
@@ -534,36 +409,15 @@
                             "comment": "Resolve the catalog path for data/Data/GeoData/WeiheBasin.tif before downstream processing."
                         },
                         {
-                            "function_name": "reclassify_raster_by_table",
+                            "function_name": "classify_raster_zones",
                             "arguments": {
-                                "raster_path": "data/Data/GeoData/WeiheBasin.tif",
-                                "reclassification_table": [
-                                    {
-                                        "min_value": 6,
-                                        "max_value": 7,
-                                        "new_value": 3,
-                                        "label": "Gentle (icons 6–7)",
-                                        "color": "#2ca25f"
-                                    },
-                                    {
-                                        "min_value": 4,
-                                        "max_value": 5,
-                                        "new_value": 2,
-                                        "label": "Moderate (icons 4–5)",
-                                        "color": "#feb24c"
-                                    },
-                                    {
-                                        "min_value": 1,
-                                        "max_value": 3,
-                                        "new_value": 1,
-                                        "label": "Steep (icons 1–3)",
-                                        "color": "#de2d26"
-                                    }
-                                ],
-                                "output_variable_name": "weihe_slope_reclass",
-                                "plot_title": "Wei River Basin Slope Classes"
+                                "raster_path": "d:/code/GeoBenchX/GeoBenchX/data/Data/GeoData/WeiheBasin.tif",
+                                "reclassification_table": "[{\"min_value\":6, \"max_value\":7, \"new_value\":1, \"label\":\"Gentle\", \"color\":\"green\"}, {\"min_value\":4, \"max_value\":5, \"new_value\":2, \"label\":\"Moderate\", \"color\":\"yellow\"}, {\"min_value\":1, \"max_value\":3, \"new_value\":3, \"label\":\"Steep\", \"color\":\"red\"}]",
+                                "output_variable_name": "reclassified_slope",
+                                "plot_title": "Reclassified Slope Levels",
+                                "legend_location": "upper right"
                             },
-                            "comment": "Use the reclassify_raster_by_table tool to group icon ranges into the three requested slope levels and visualize the resulting raster."
+                            "comment": null
                         }
                     ]
                 }
@@ -577,7 +431,7 @@
             "match_score_Human": null
         },
         {
-            "task_ID": "TASK_251126_160950_004001",
+            "task_ID": "TASK_1_3_050",
             "task_text": "Create a 1000-meter merged buffer zone for all major urban parks in Wuhan.",
             "task_labels": [
                 "Spatial operations",
@@ -620,7 +474,7 @@
             "match_score_Human": null
         },
         {
-            "task_ID": "TASK_251128_101650_001001",
+            "task_ID": "TASK_1_3_051",
             "task_text": "Based on the Xinxiang City Rainstorm and Flooding Dataset, use the erosion operation to simulate an inward contraction of 1000 meters and review the generated outputs.",
             "task_labels": [
                 "Spatial operations",
@@ -665,8 +519,8 @@
             "match_score_Human": null
         },
         {
-            "task_ID": "TASK_251128_120000_001001",
-            "task_text": "Calculate the basic statistics (mean and standard deviation) of the Wei River Basin topographic slope raster dataset.",
+            "task_ID": "TASK_1_3_052",
+            "task_text": "Using the 2014 China POI data, generate a heatmap of the 2014 China POI data to identify hotspot areas of point-of-interest distribution in China.",
             "task_labels": [
                 "Spatial operations",
                 "Task Set 03",
@@ -674,24 +528,29 @@
                 "Merge, Visualize",
                 "Heatmaps, Contour Lines"
             ],
-            "reference_solution_description": "Retrieve the raster path for the Wei River Basin slope dataset and use the raster-description tool to list the mean and standard deviation for the slope band.",
+            "reference_solution_description": "Load the nationwide 2014 China POI point layer and run the kernel density tool to automatically estimate an appropriate bandwidth, generate the hotspot surface, and visualize the density map.",
             "reference_solutions": [
                 {
                     "steps": [
                         {
-                            "function_name": "get_raster_path",
+                            "function_name": "load_geodata",
                             "arguments": {
-                                "rasterdataset": "Wei River Basin Topographic Slope Classification Dataset"
+                                "geodataset": "2014 China POI",
+                                "output_geodataframe_name": "china_poi_2014"
                             },
-                            "comment": "Confirm the on-disk path to WeiheBasin.tif before computing statistics."
+                            "comment": "Bring the OSM-based 2014 China POI shapefile into memory as 'china_poi_2014' for downstream analysis."
                         },
                         {
-                            "function_name": "get_raster_description",
+                            "function_name": "create_point_kernel_density_map",
                             "arguments": {
-                                "raster_path": "d:/code/GeoBenchX/GeoBenchX/data/Data/GeoData/WeiheBasin.tif",
-                                "output_variable_name": "weihe_slope_stats"
+                                "geodataframe_name": "china_poi_2014",
+                                "output_variable_name": "china_poi_2014_kde",
+                                "grid_resolution": 360,
+                                "basemap_style": "Carto Positron",
+                                "cmap": "inferno",
+                                "include_points": true
                             },
-                            "comment": "Read the slope raster metadata and record mean/stddev for the band in weiher_slope_stats."
+                            "comment": "Let the kernel density tool auto-select the search radius, render the hotspot map over a basemap, and store the resulting density grid in 'china_poi_2014_kde'."
                         }
                     ]
                 }
@@ -705,8 +564,8 @@
             "match_score_Human": null
         },
         {
-            "task_ID": "TASK_251128_120000_002002",
-            "task_text": "Determine the mean center of the spatial distribution of all Chinese traditional villages that fall within the Loess Plateau Region.",
+            "task_ID": "TASK_1_3_053",
+            "task_text": "Based on the DEM data of Guangming District, Shenzhen, convert this DEM data into slope data (unit in \"degrees\").",
             "task_labels": [
                 "Spatial operations",
                 "Task Set 03",
@@ -714,96 +573,317 @@
                 "Merge, Visualize",
                 "Heatmaps, Contour Lines"
             ],
-            "reference_solution_description": "Load the Loess Plateau boundary and the national traditional village points, select the villages lying within the plateau, and run the standard directional ellipse tool to extract the centroid coordinates representing the mean center.",
+            "reference_solution_description": "Use the Guangming District DEM raster and run the DEM-to-slope tool so a timestamped slope GeoTIFF (degrees) is saved in scratch along with summary statistics.",
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "get_raster_path",
+                            "arguments": {
+                                "rasterdataset": "Guangming District DEM (Shenzhen)"
+                            },
+                            "comment": "Retrieve the absolute path for data/Data/GeoData/guangming.tif before converting it to slope values."
+                        },
+                        {
+                            "function_name": "convert_dem_to_slope",
+                            "arguments": {
+                                "dem_raster_path": "d:/code/GeoBenchX/GeoBenchX/data/Data/GeoData/guangming.tif",
+                                "output_variable_name": "guangming_slope_summary",
+                                "output_raster_path": "d:/code/GeoBenchX/GeoBenchX/scratch/guangming_slope.tif",
+                                "band_number": 1,
+                                "append_timestamp_to_output": true,
+                                "plot_title": "Guangming District Slope (degrees)",
+                                "colormap": "viridis"
+                            },
+                            "comment": "Convert the Guangming DEM into a slope raster stored in scratch with a timestamped filename; keep metadata in 'guangming_slope_summary'."
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_1_3_054",
+            "task_text": "Generate an aspect map of the region based on the Guangming District DEM (Shenzhen).",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": "Use the Guangming DEM with the aspect-generation tool to derive 0-360 degree orientations, saving a timestamped pseudocolor GeoTIFF plus summary stats.",
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "get_raster_path",
+                            "arguments": {
+                                "rasterdataset": "Guangming District DEM (Shenzhen)"
+                            },
+                            "comment": "Resolve the absolute path to data/Data/GeoData/guangming.tif before sending it to the aspect conversion tool."
+                        },
+                        {
+                            "function_name": "generate_aspect_map",
+                            "arguments": {
+                                "dem_raster_path": "d:/code/GeoBenchX/GeoBenchX/data/Data/GeoData/guangming.tif",
+                                "output_variable_name": "guangming_aspect_summary",
+                                "output_raster_path": "d:/code/GeoBenchX/GeoBenchX/scratch/guangming_aspect.tif",
+                                "band_number": 1,
+                                "append_timestamp_to_output": true,
+                                "plot_title": "Guangming District Aspect (degrees)",
+                                "colormap": "Spectral"
+                            },
+                            "comment": "Generate the aspect map (QGIS Aspect equivalent) with a Spectral singleband pseudocolor render and store metadata in 'guangming_aspect_summary'."
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_1_3_055",
+            "task_text": "Please mark the centroid of Chengdu City.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": "Load the Chengdu municipal boundary and run the centroid-generation tool (single centroid) to export the timestamped TIFF map and point layer.",
             "reference_solutions": [
                 {
                     "steps": [
                         {
                             "function_name": "load_geodata",
                             "arguments": {
-                                "geodataset": "Loess Plateau Region",
-                                "output_geodataframe_name": "loess_plateau_region"
+                                "geodataset": "Chengdu Surface",
+                                "output_geodataframe_name": "chengdu_boundary"
                             },
-                            "comment": "Load the Loess Plateau polygon boundary for spatial filtering."
+                            "comment": "Load the Chengdu city polygon from data/Data/GeoData/Chengdu_Surface.shp."
                         },
+                        {
+                            "function_name": "generate_centroids_map",
+                            "arguments": {
+                                "geodataframe_name": "chengdu_boundary",
+                                "output_geodataframe_name": "chengdu_centroid",
+                                "output_variable_name": "chengdu_centroid_summary",
+                                "output_tif_path": "d:/code/GeoBenchX/GeoBenchX/scratch/chengdu_centroid.tif",
+                                "title": "Centroid of Chengdu City"
+                            },
+                            "comment": "Create the centroid point for the Chengdu polygon, save the TIFF visualization in scratch, and keep metadata in 'chengdu_centroid_summary'."
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_1_3_056",
+            "task_text": "Mark the centroid for each Wuhan Urban Parks.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": "Load the Wuhan park polygons and run the centroid tool with the per-part option enabled so every park is labeled by its own centroid point.",
+            "reference_solutions": [
+                {
+                    "steps": [
                         {
                             "function_name": "load_geodata",
                             "arguments": {
-                                "geodataset": "Traditional Villages of China",
-                                "output_geodataframe_name": "villages_china"
+                                "geodataset": "Wuhan Urban Parks",
+                                "output_geodataframe_name": "wuhan_parks"
                             },
-                            "comment": "Bring all Chinese traditional village points into memory."
+                            "comment": "Bring the Wuhan park polygons (data/Data/GeoData/park_in_wuhan.shp) into memory."
                         },
                         {
-                            "function_name": "select_features_by_spatial_relationship",
+                            "function_name": "generate_centroids_map",
                             "arguments": {
-                                "features_geodataframe_name": "villages_china",
-                                "reference_geodataframe_name": "loess_plateau_region",
-                                "spatial_predicates": [
-                                    "within"
+                                "geodataframe_name": "wuhan_parks",
+                                "output_geodataframe_name": "wuhan_parks_centroids",
+                                "output_variable_name": "wuhan_parks_centroid_summary",
+                                "create_centroid_for_each_part": true,
+                                "output_tif_path": "d:/code/GeoBenchX/GeoBenchX/scratch/wuhan_parks_centroids.tif",
+                                "title": "Centroids of Wuhan Urban Parks"
+                            },
+                            "comment": "Create centroid points for each park polygon, save the timestamped TIFF visualization, and store the summary dictionary."
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_1_3_057",
+            "task_text": "Calculate the profile curvature of Guangming District DEM (Shenzhen).",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": "Use the Guangming DEM with the profile curvature tool to derive the QGIS-style curvature raster, storing the GeoTIFF in scratch along with summary statistics.",
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "get_raster_path",
+                            "arguments": {
+                                "rasterdataset": "Guangming District DEM (Shenzhen)"
+                            },
+                            "comment": "Resolve the absolute path to data/Data/GeoData/guangming.tif before invoking the curvature processor."
+                        },
+                        {
+                            "function_name": "generate_profile_curvature_map",
+                            "arguments": {
+                                "dem_raster_path": "d:/code/GeoBenchX/GeoBenchX/data/Data/GeoData/guangming.tif",
+                                "output_variable_name": "guangming_profile_curvature_summary",
+                                "output_raster_path": "d:/code/GeoBenchX/GeoBenchX/scratch/guangming_profile_curvature.tif",
+                                "append_timestamp_to_output": true,
+                                "plot_title": "Guangming DEM Profile Curvature",
+                                "colormap": "RdBu"
+                            },
+                            "comment": "Generate the DEM profile curvature (QGIS Profile Curvature equivalent), save the timestamped GeoTIFF in scratch, and retain metadata in 'guangming_profile_curvature_summary'."
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_1_3_058",
+            "task_text": "Based on the DEM data of Guangming District, Shenzhen, convert this DEM data into slope data (unit in \"degrees\").And reclassify the data into seven levels as follows: Level 1 (0–1 degrees), Level 2 (1–3 degrees), Level 3 (3–7 degrees), Level 4 (7–15 degrees), Level 5 (15–25 degrees), Level 6 (25–35 degrees), and Level 7 (above 35 degrees).",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": "Load the Guangming slope raster, feed it to classify_raster_zones with seven degree-based ranges, and save the timestamped output GeoTIFF plus summary stats for each slope level.",
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "get_raster_path",
+                            "arguments": {
+                                "rasterdataset": "Guangming District Slope (Shenzhen)"
+                            },
+                            "comment": "Resolve the absolute path to data/Data/GeoData/guangmingSlope.tif before reclassification."
+                        },
+                        {
+                            "function_name": "convert_dem_to_slope",
+                            "arguments": {
+                                "dem_raster_path": "d:/code/GeoBenchX/GeoBenchX/data/Data/GeoData/guangming.tif",
+                                "output_variable_name": "guangming_slope_summary",
+                                "output_raster_path": "d:/code/GeoBenchX/GeoBenchX/scratch/guangming_slope.tif",
+                                "band_number": 1,
+                                "append_timestamp_to_output": true,
+                                "plot_title": "Guangming District Slope (degrees)",
+                                "colormap": "viridis"
+                            },
+                            "comment": "Convert the Guangming DEM into a slope raster stored in scratch with a timestamped filename; keep metadata in 'guangming_slope_summary'."
+                        },
+                        {
+                            "function_name": "classify_raster_zones",
+                            "arguments": {
+                                "raster_path": "d:/code/GeoBenchX/GeoBenchX/data/Data/GeoData/guangmingSlope.tif",
+                                "reclassification_table": [
+                                    {
+                                        "min_value": 0.0,
+                                        "max_value": 1.0,
+                                        "new_value": 1,
+                                        "label": "Level 1: 0–1°",
+                                        "color": "#f7fcfd"
+                                    },
+                                    {
+                                        "min_value": 1.0,
+                                        "max_value": 3.0,
+                                        "new_value": 2,
+                                        "label": "Level 2: 1–3°",
+                                        "color": "#e0ecf4"
+                                    },
+                                    {
+                                        "min_value": 3.0,
+                                        "max_value": 7.0,
+                                        "new_value": 3,
+                                        "label": "Level 3: 3–7°",
+                                        "color": "#bfd3e6"
+                                    },
+                                    {
+                                        "min_value": 7.0,
+                                        "max_value": 15.0,
+                                        "new_value": 4,
+                                        "label": "Level 4: 7–15°",
+                                        "color": "#9ebcda"
+                                    },
+                                    {
+                                        "min_value": 15.0,
+                                        "max_value": 25.0,
+                                        "new_value": 5,
+                                        "label": "Level 5: 15–25°",
+                                        "color": "#8c96c6"
+                                    },
+                                    {
+                                        "min_value": 25.0,
+                                        "max_value": 35.0,
+                                        "new_value": 6,
+                                        "label": "Level 6: 25–35°",
+                                        "color": "#8856a7"
+                                    },
+                                    {
+                                        "min_value": 35.0,
+                                        "max_value": 90.0,
+                                        "new_value": 7,
+                                        "label": "Level 7: >35°",
+                                        "color": "#810f7c"
+                                    }
                                 ],
-                                "output_geodataframe_name": "villages_in_loess",
-                                "plot_result": false
+                                "output_variable_name": "guangming_slope_levels",
+                                "output_raster_path": "d:/code/GeoBenchX/GeoBenchX/scratch/guangming_slope_levels.tif",
+                                "output_dtype": "uint8",
+                                "classification_model_name": "slope_levels_7",
+                                "append_timestamp_to_output": true,
+                                "plot_title": "Guangming Slope Levels (degrees)",
+                                "legend_location": "upper right"
                             },
-                            "comment": "Select only the village points located inside the Loess Plateau boundary."
-                        },
-                        {
-                            "function_name": "calculate_standard_directional_ellipse",
-                            "arguments": {
-                                "geodataframe_name": "villages_in_loess",
-                                "output_geodataframe_name": "villages_in_loess_ellipse",
-                                "output_variable_name": "villages_in_loess_center",
-                                "num_standard_deviations": 1.0,
-                                "ellipse_points": 120
-                            },
-                            "comment": "Use the ellipse tool to report the mean center (center_x/center_y) of the filtered villages."
-                        }
-                    ]
-                }
-            ],
-            "generated_solution": null,
-            "generated_solution_input_tokens": null,
-            "generated_solution_output_tokens": null,
-            "match_reasoning_LLM": null,
-            "match_score_LLM": null,
-            "match_reasoning_Human": null,
-            "match_score_Human": null
-        },
-        {
-            "task_ID": "TASK_251128_120000_003003",
-            "task_text": "Generate contour lines from the Wei River Basin topographic slope raster to visualize slope intervals across the basin.",
-            "task_labels": [
-                "Spatial operations",
-                "Task Set 03",
-                "Process, Merge, Visualize",
-                "Merge, Visualize",
-                "Heatmaps, Contour Lines"
-            ],
-            "reference_solution_description": "Locate the Wei River Basin slope raster and run the contour-generation tool with an appropriate interval to export slope contour lines for inspection.",
-            "reference_solutions": [
-                {
-                    "steps": [
-                        {
-                            "function_name": "get_raster_path",
-                            "arguments": {
-                                "rasterdataset": "Wei River Basin Topographic Slope Classification Dataset"
-                            },
-                            "comment": "Obtain the full path to the slope raster before generating contours."
-                        },
-                        {
-                            "function_name": "generate_contours_display",
-                            "arguments": {
-                                "raster_path": "d:/code/GeoBenchX/GeoBenchX/data/Data/GeoData/WeiheBasin.tif",
-                                "output_filename": "weihe_slope_contours",
-                                "contour_interval": 5.0,
-                                "column_title": "slope_val",
-                                "nodataval": -9999,
-                                "output_geodataframe_name": "weihe_slope_contours_gdf",
-                                "output_folder": "d:/code/GeoBenchX/GeoBenchX/scratch",
-                                "plot_result": true,
-                                "plot_title": "Wei River Basin Slope Contours"
-                            },
-                            "comment": "Create slope contour lines at 5-unit intervals and store them in weihe_slope_contours_gdf for review."
+                            "comment": "Apply the seven-level reclassification so each slope range is assigned a numeric level and exported as a timestamped GeoTIFF with custom legend colors."
                         }
                     ]
                 }

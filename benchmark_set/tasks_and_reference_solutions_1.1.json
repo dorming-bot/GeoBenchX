@@ -1,0 +1,2211 @@
+{
+    "metadata": {
+        "author": "ZSX",
+        "notes": "Version 1.1 task definitions without solutions"
+    },
+    "tasks": [
+        {
+            "task_ID": "TASK_1_1_001",
+            "task_text": "Identify and select areas located within the Jiuzhaigou earthquake zone that belong to forest water conservation zones(use tool analyze_vector_overlap and visualize the photo), designate them as ecological core restoration areas, and calculate their area.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": "Load the national forest water conservation polygons together with the Jiuzhaigou earthquake boundary, intersect them with analyze_vector_overlap to isolate the ecological core restoration candidates, visualize the overlap, and measure its total area in square kilometers.",
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "load_geodata",
+                            "arguments": {
+                                "geodataset": "Forest Water Conservation China",
+                                "output_geodataframe_name": "forest_water_retention"
+                            },
+                            "comment": "Load the national forest water conservation layer (data/Data/GeoData/ForestWaterRetentionChina.shp) so each conservation polygon is available for overlap tests."
+                        },
+                        {
+                            "function_name": "load_geodata",
+                            "arguments": {
+                                "geodataset": "Jiuzhaigou earthquake zone",
+                                "output_geodataframe_name": "jiuzhai_quake_zone"
+                            },
+                            "comment": "Bring the Jiuzhaigou earthquake boundary (data/Data/GeoData/Jiuzhai.shp) into memory; it defines where restoration areas must fall."
+                        },
+                        {
+                            "function_name": "analyze_vector_overlap",
+                            "arguments": {
+                                "geodataframe_a_name": "jiuzhai_quake_zone",
+                                "geodataframe_b_name": "forest_water_retention",
+                                "output_geodataframe_name": "jiuzhai_restoration_overlap"
+                            },
+                            "comment": "Intersect the quake boundary with the conservation polygons so only shared geography remains for ecological core restoration planning."
+                        },
+                        {
+                            "function_name": "calculate_polygon_areas",
+                            "arguments": {
+                                "geodataframe_name": "jiuzhai_restoration_overlap",
+                                "output_variable_name": "jiuzhai_restoration_area_stats",
+                                "area_column_name": "restoration_area_sq_km"
+                            },
+                            "comment": "Project the overlap into an equal-area CRS to capture per-feature area plus the total area of the designated restoration zone in square kilometers."
+                        },
+                        {
+                            "function_name": "visualize_geographies",
+                            "arguments": {
+                                "geodataframe_names": [
+                                    "jiuzhai_quake_zone",
+                                    "jiuzhai_restoration_overlap"
+                                ],
+                                "layer_styles": [
+                                    {
+                                        "color": "#b35806",
+                                        "alpha": 0.35,
+                                        "linewidth": 0.9,
+                                        "label": "Jiuzhaigou earthquake zone"
+                                    },
+                                    {
+                                        "color": "#1b7837",
+                                        "alpha": 0.65,
+                                        "linewidth": 0.6,
+                                        "label": "Forest water conservation overlap"
+                                    }
+                                ],
+                                "basemap_style": "OpenStreetMap",
+                                "title": "Ecological Core Restoration Areas in Jiuzhaigou",
+                                "add_legend": true
+                            },
+                            "comment": "Produce a quick map showing the earthquake zone outline with the qualifying conservation areas highlighted for reporting and photo capture."
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_1_1_002",
+            "task_text": "Find all urban parks in Wuhan with an area greater than 2 square kilometers.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": "Load the Wuhan urban park polygons, convert their stored area values from square meters to square kilometers, filter for parks at least 2 sq km, and visualize the resulting subset.",
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "load_geodata",
+                            "arguments": {
+                                "geodataset": "Wuhan Urban Parks",
+                                "output_geodataframe_name": "wuhan_parks"
+                            },
+                            "comment": "Load the park polygons from data/Data/GeoData/park_in_wuhan.shp so each park geometry and its attributes are available."
+                        },
+                        {
+                            "function_name": "filter_numerical",
+                            "arguments": {
+                                "dataframe_name": "wuhan_parks_with_sqkm",
+                                "conditions": "area_sq_km >= 2",
+                                "output_dataframe_name": "wuhan_parks_over_2sqkm"
+                            },
+                            "comment": "Select only those parks whose converted area is at least 2 square kilometers; the filtered GeoDataFrame represents the requested set."
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_1_1_003",
+            "task_text": "Identify all Chinese forest water conservation zones that intersect with the Jiuzhaigou earthquake area and visualize the photo.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": "Bring the Jiuzhaigou earthquake polygon and national forest water conservation dataset into memory, intersect them to keep only the overlapping conservation zones, and map the result.",
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "load_geodata",
+                            "arguments": {
+                                "geodataset": "Forest Water Conservation China",
+                                "output_geodataframe_name": "china_forest_water_conservation"
+                            },
+                            "comment": "Load the national forest water conservation layer so subsequent filtering and spatial intersections start from the full dataset."
+                        },
+                        {
+                            "function_name": "load_geodata",
+                            "arguments": {
+                                "geodataset": "Jiuzhaigou earthquake zone",
+                                "output_geodataframe_name": "jiuzhaigou_earthquake_zone"
+                            },
+                            "comment": "Bring the Jiuzhaigou earthquake boundary into memory; this polygon defines the spatial constraint for every later step."
+                        },
+                        {
+                            "function_name": "analyze_vector_overlap",
+                            "arguments": {
+                                "geodataframe_a_name": "china_forest_water_conservation",
+                                "geodataframe_b_name": "jiuzhaigou_earthquake_zone",
+                                "output_geodataframe_name": "intersected_zones"
+                            },
+                            "comment": "Compute the overlap between the nationwide conservation layer and the earthquake boundary to verify the spatial relationship and produce an initial intersection."
+                        },
+                        {
+                            "function_name": "filter_categorical",
+                            "arguments": {
+                                "dataframe_name": "china_forest_water_conservation",
+                                "filters": {
+                                    "Prov_EN": [
+                                        "Sichuan"
+                                    ]
+                                },
+                                "output_dataframe_name": "sichuan_forest_water_conservation"
+                            },
+                            "comment": "Filter the conservation polygons by the Prov_EN attribute so that only the Sichuan features (covering the Jiuzhaigou area) remain."
+                        },
+                        {
+                            "function_name": "select_features_by_spatial_relationship",
+                            "arguments": {
+                                "features_geodataframe_name": "sichuan_forest_water_conservation",
+                                "reference_geodataframe_name": "jiuzhaigou_earthquake_zone",
+                                "spatial_predicates": [
+                                    "intersects"
+                                ],
+                                "output_geodataframe_name": "forest_water_in_jiuzhaigou",
+                                "plot_result": true
+                            },
+                            "comment": "Keep only the Sichuan conservation areas that intersect the Jiuzhaigou earthquake zone and produce a visualization of the qualified polygons."
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_1_1_004",
+            "task_text": "Identify 2014 China POI that were completely submerged during the flood in Xinxiang City and visualize the photo.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": "Load the nationwide 2014 POI points, sample the Xinxiang flood raster to keep only points where the inundation value equals 1, and output a visualization highlighting the submerged POIs.",
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "load_geodata",
+                            "arguments": {
+                                "geodataset": "2014 China POI",
+                                "output_geodataframe_name": "china_poi_2014"
+                            },
+                            "comment": "Load data/Data/GeoData/2014_China_POI.shp so every POI feature is available for flood-status sampling."
+                        },
+                        {
+                            "function_name": "get_raster_path",
+                            "arguments": {
+                                "rasterdataset": "XinxiangCity Rainstorm and Flooding Dataset"
+                            },
+                            "comment": "Resolve the on-disk path for the Xinxiang flood raster to be reused by the sampling tool."
+                        },
+                        {
+                            "function_name": "filter_points_by_raster_values",
+                            "arguments": {
+                                "raster_path": "d:/code/GeoBenchX/GeoBenchX/data/Data/GeoData/Xinxiang City Rainstorm and Flooding Dataset.tif",
+                                "points_geodataframe_name": "china_poi_2014",
+                                "value_column": "flood_value",
+                                "output_geodataframe_name": "xinxiang_submerged_poi",
+                                "filter_type": "between",
+                                "threshold1": 0.9,
+                                "threshold2": 1.1,
+                                "plot_result": true
+                            },
+                            "comment": "Sample the flood raster at each POI location and keep only those whose flood_value is effectively 1 (the inundated class), producing a map for quick visual confirmation."
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_1_1_005",
+            "task_text": "Filter out traditional Chinese villages that are entirely located within the Wei River Basin terrain and within areas where the slope is greater than or equal to the value labeled \"3.\"",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": "Clip the national traditional village points to the Wei River Basin footprint derived from the slope raster, then sample the slope classification grid to keep only villages whose slope value is at least class 3.",
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "load_geodata",
+                            "arguments": {
+                                "geodataset": "Traditional Villages of China",
+                                "output_geodataframe_name": "villages_china"
+                            },
+                            "comment": "Load all traditional village points (data/Data/GeoData/VillagesChina.shp) so they can be filtered spatially."
+                        },
+                        {
+                            "function_name": "get_raster_path",
+                            "arguments": {
+                                "rasterdataset": "Wei River Basin Topographic Slope Classification Dataset"
+                            },
+                            "comment": "Retrieve the location of data/Data/GeoData/WeiheBasin.tif for both boundary extraction and slope sampling."
+                        },
+                        {
+                            "function_name": "extract_raster_boundary",
+                            "arguments": {
+                                "raster_path": "d:/code/GeoBenchX/GeoBenchX/data/Data/GeoData/WeiheBasin.tif",
+                                "output_geodataframe_name": "weihe_basin_boundary",
+                                "band_number": 1,
+                                "maximum_vertices": 8000,
+                                "dissolve_polygons": true,
+                                "simplify_tolerance_meters": null,
+                                "output_file_path": null,
+                                "overwrite_existing": true
+                            },
+                            "comment": "Vectorize the valid extent of the slope raster so it can serve as the spatial filter for villages located entirely inside the basin dataset."
+                        },
+                        {
+                            "function_name": "select_features_by_spatial_relationship",
+                            "arguments": {
+                                "features_geodataframe_name": "villages_china",
+                                "reference_geodataframe_name": "weihe_basin_boundary",
+                                "spatial_predicates": [
+                                    "within"
+                                ],
+                                "output_geodataframe_name": "villages_within_weihe",
+                                "plot_result": false
+                            },
+                            "comment": "Limit the analysis to villages whose geometries fall completely inside the Wei River Basin terrain coverage."
+                        },
+                        {
+                            "function_name": "filter_points_by_raster_values",
+                            "arguments": {
+                                "raster_path": "d:/code/GeoBenchX/GeoBenchX/data/Data/GeoData/WeiheBasin.tif",
+                                "points_geodataframe_name": "villages_within_weihe",
+                                "value_column": "slope_class",
+                                "output_geodataframe_name": "weihe_high_slope_villages",
+                                "filter_type": "greater",
+                                "threshold1": 2.9,
+                                "plot_result": false
+                            },
+                            "comment": "Sample the slope classification value at each village and keep only those whose class is 3 or higher, satisfying the slope criterion."
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_1_1_006",
+            "task_text": "Calculate the area (in square meters) of each urban park in Wuhan",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": "Load the Wuhan urban park polygons, compute their areas via the polygon-area tool, and convert those results from square kilometers to square meters for per-park reporting.",
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "load_geodata",
+                            "arguments": {
+                                "geodataset": "Wuhan Urban Parks",
+                                "output_geodataframe_name": "wuhan_parks"
+                            },
+                            "comment": "Load data/Data/GeoData/park_in_wuhan.shp so every park polygon can be measured."
+                        },
+                        {
+                            "function_name": "calculate_polygon_areas",
+                            "arguments": {
+                                "geodataframe_name": "wuhan_parks",
+                                "output_variable_name": "wuhan_parks_area_stats",
+                                "area_column_name": "area_sq_km"
+                            },
+                            "comment": "Project the parks to an appropriate UTM CRS and add an area_sq_km column capturing each park's area in square kilometers."
+                        },
+                        {
+                            "function_name": "scale_column_by_value",
+                            "arguments": {
+                                "dataframe_name": "wuhan_parks_area_stats.gdf_with_areas",
+                                "column_name": "area_sq_km",
+                                "operation": "multiply",
+                                "value": 1000000,
+                                "output_column_name": "area_sq_m",
+                                "output_dataframe_name": "wuhan_parks_with_area_m2"
+                            },
+                            "comment": "Translate the per-park areas to square meters by multiplying the square-kilometer values by one million."
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_1_1_007",
+            "task_text": "Calculate the average area of major urban parks in Wuhan.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": "Measure each Wuhan park's area, convert it to square meters, and run a statistics summary to report the mean area representing the major urban parks dataset.",
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "load_geodata",
+                            "arguments": {
+                                "geodataset": "Wuhan Urban Parks",
+                                "output_geodataframe_name": "wuhan_parks"
+                            },
+                            "comment": "Load the park polygons from data/Data/GeoData/park_in_wuhan.shp."
+                        },
+                        {
+                            "function_name": "calculate_column_total",
+                            "arguments": {
+                                "dataframe_name": "wuhan_parks",
+                                "column_name": "Area",
+                                "output_variable_name": "total_area"
+                            },
+                            "comment": null
+                        },
+                        {
+                            "function_name": "perform_arithmetic_operation",
+                            "arguments": {
+                                "values": [
+                                    "state:total_area.total",
+                                    "145"
+                                ],
+                                "operation": "divide",
+                                "output_variable_name": "average_area"
+                            },
+                            "comment": null
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_1_1_008",
+            "task_text": "Based on DEM data, extract all areas in Guangming District, Shenzhen, with an elevation higher than 80 meters.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": "Use the Guangming DEM to build a binary raster mask of elevations above 80 meters and compute the total area covered by those high-elevation zones.",
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "get_raster_path",
+                            "arguments": {
+                                "rasterdataset": "Guangming District DEM (Shenzhen)"
+                            },
+                            "comment": "Resolve the path to data/Data/GeoData/guangming.tif so downstream raster tools can access the DEM."
+                        },
+                        {
+                            "function_name": "classify_raster_zones",
+                            "arguments": {
+                                "raster_path": "d:/code/GeoBenchX/GeoBenchX/data/Data/GeoData/guangming.tif",
+                                "reclassification_table": "[{\"min_value\": 80.0001, \"max_value\": 10000, \"new_value\": 1, \"label\": \"Elevation > 80 m\", \"color\": \"#542788\"}]",
+                                "output_variable_name": "guangming_high_elevation_mask",
+                                "output_raster_path": "d:/code/GeoBenchX/GeoBenchX/scratch/guangming_gt80_mask.tif",
+                                "output_dtype": "uint8",
+                                "classification_model_name": "guangming_gt80",
+                                "append_timestamp_to_output": false,
+                                "plot_title": "Guangming DEM > 80 m",
+                                "legend_location": "lower right"
+                            },
+                            "comment": "Generate a mask raster where cells above 80 meters are assigned value 1 and a visualization captures the extracted elevation zones."
+                        },
+                        {
+                            "function_name": "calculate_raster_selection_area",
+                            "arguments": {
+                                "raster_path": "d:/code/GeoBenchX/GeoBenchX/scratch/guangming_gt80_mask.tif",
+                                "output_variable_name": "guangming_gt80_area",
+                                "band_number": 1,
+                                "selected_values": [
+                                    1
+                                ],
+                                "treat_nonzero_as_selected": false,
+                                "report_units": "square_kilometers"
+                            },
+                            "comment": "Quantify the total area where elevation exceeds 80 meters to accompany the extracted mask."
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_1_1_009",
+            "task_text": "Identify all 'Traditional Villages of China' located within the flooded areas of Xinxiang City, Henan Province.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": "Select the traditional villages that fall inside the Xinxiang flood raster footprint and retain only those with flood values indicating inundation.",
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "load_geodata",
+                            "arguments": {
+                                "geodataset": "Traditional Villages of China",
+                                "output_geodataframe_name": "villages_china"
+                            },
+                            "comment": "Load the national village point dataset so it can be filtered spatially."
+                        },
+                        {
+                            "function_name": "get_raster_path",
+                            "arguments": {
+                                "rasterdataset": "XinxiangCity Rainstorm and Flooding Dataset"
+                            },
+                            "comment": "Record the path to the Xinxiang flood raster for subsequent boundary extraction and sampling."
+                        },
+                        {
+                            "function_name": "extract_raster_boundary",
+                            "arguments": {
+                                "raster_path": "d:/code/GeoBenchX/GeoBenchX/data/Data/GeoData/Xinxiang City Rainstorm and Flooding Dataset.tif",
+                                "output_geodataframe_name": "xinxiang_flood_boundary",
+                                "band_number": 1,
+                                "maximum_vertices": 8000,
+                                "dissolve_polygons": true,
+                                "simplify_tolerance_meters": null,
+                                "output_file_path": null,
+                                "overwrite_existing": true
+                            },
+                            "comment": "Vectorize the flood raster footprint so only villages that actually fall inside the raster coverage will be sampled."
+                        },
+                        {
+                            "function_name": "select_features_by_spatial_relationship",
+                            "arguments": {
+                                "features_geodataframe_name": "villages_china",
+                                "reference_geodataframe_name": "xinxiang_flood_boundary",
+                                "spatial_predicates": [
+                                    "within"
+                                ],
+                                "output_geodataframe_name": "villages_in_xinxiang",
+                                "plot_result": false
+                            },
+                            "comment": "Restrict the candidate villages to those located inside the Xinxiang flood dataset extent."
+                        },
+                        {
+                            "function_name": "filter_points_by_raster_values",
+                            "arguments": {
+                                "raster_path": "d:/code/GeoBenchX/GeoBenchX/data/Data/GeoData/Xinxiang City Rainstorm and Flooding Dataset.tif",
+                                "points_geodataframe_name": "villages_in_xinxiang",
+                                "value_column": "flood_value",
+                                "output_geodataframe_name": "villages_flooded_xinxiang",
+                                "filter_type": "between",
+                                "threshold1": 0.9,
+                                "threshold2": 1.1,
+                                "plot_result": true
+                            },
+                            "comment": "Sample the flood raster and keep only villages where the inundation value equals 1, returning a map of flooded traditional villages."
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_1_1_010",
+            "task_text": "Assuming the flood inundation data for Xinxiang uses a value of 1 to indicate inundation, calculate the total area of the inundated regions (in square kilometers).",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": "Read the Xinxiang flood raster and run the raster-area calculator counting only pixels whose value equals 1 so the inundated surface can be reported in square kilometers.",
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "get_raster_path",
+                            "arguments": {
+                                "rasterdataset": "XinxiangCity Rainstorm and Flooding Dataset"
+                            },
+                            "comment": "Resolve the flood raster path before running any area measurement."
+                        },
+                        {
+                            "function_name": "calculate_raster_selection_area",
+                            "arguments": {
+                                "raster_path": "d:/code/GeoBenchX/GeoBenchX/data/Data/GeoData/Xinxiang City Rainstorm and Flooding Dataset.tif",
+                                "output_variable_name": "xinxiang_inundation_area_stats",
+                                "band_number": 1,
+                                "selected_values": [
+                                    1
+                                ],
+                                "treat_nonzero_as_selected": false,
+                                "report_units": "square_kilometers"
+                            },
+                            "comment": "Count only flood-class (value=1) pixels and convert their coverage into square kilometers, storing the reported area for downstream analysis."
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_1_1_011",
+            "task_text": "In Wuhan, filter out all urban parks with an area smaller than 10,000 square meters.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": "Load the Wuhan park layer, inspect the built-in area attribute, filter the polygons whose recorded area is below 10,000 square meters, and map the result to highlight the smallest parks.",
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "load_geodata",
+                            "arguments": {
+                                "geodataset": "Wuhan Urban Parks",
+                                "output_geodataframe_name": "wuhan_parks"
+                            },
+                            "comment": "Load data/Data/GeoData/park_in_wuhan.shp so every park polygon and its attributes (including Area_sqm) are available."
+                        },
+                        {
+                            "function_name": "calculate_column_statistics",
+                            "arguments": {
+                                "dataframe_name": "wuhan_parks",
+                                "column_name": "Area_sqm",
+                                "output_variable_name": "wuhan_parks_area_field_stats",
+                                "include_quantiles": true,
+                                "additional_quantiles": null
+                            },
+                            "comment": "Review the summary for Area_sqm to confirm units and typical values before running the numerical filter."
+                        },
+                        {
+                            "function_name": "filter_numerical",
+                            "arguments": {
+                                "dataframe_name": "wuhan_parks",
+                                "conditions": "Area_sqm < 10000",
+                                "output_dataframe_name": "wuhan_parks_under_10k"
+                            },
+                            "comment": "Select only the parks whose recorded area is smaller than 10,000 square meters so that they can be examined separately."
+                        },
+                        {
+                            "function_name": "visualize_geographies",
+                            "arguments": {
+                                "geodataframe_names": [
+                                    "wuhan_parks",
+                                    "wuhan_parks_under_10k"
+                                ],
+                                "layer_styles": [
+                                    {
+                                        "color": "#bdbdbd",
+                                        "alpha": 0.25,
+                                        "linewidth": 0.3,
+                                        "label": "All Wuhan parks"
+                                    },
+                                    {
+                                        "color": "#d7301f",
+                                        "alpha": 0.85,
+                                        "linewidth": 0.8,
+                                        "label": "Area < 10,000 m²"
+                                    }
+                                ],
+                                "basemap_style": "Carto Positron",
+                                "title": "Wuhan Parks Smaller Than 10,000 m²",
+                                "add_legend": true
+                            },
+                            "comment": "Create a quick map highlighting the filtered parks against the context of all park polygons."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "task_ID": "TASK_1_1_012",
+            "task_text": "Identify overlapping areas within the Loess Plateau Region that are both forest water conservation zones and newly added traditional village distribution zones, and designate them as priority areas for ecological and cultural protection.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": "Intersect the Loess Plateau boundary with both the national forest water conservation polygons and buffered traditional-village distribution zones to delineate ecological-cultural priority areas and measure their extent.",
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "load_geodata",
+                            "arguments": {
+                                "geodataset": "Loess Plateau Region",
+                                "output_geodataframe_name": "loess_plateau_region"
+                            },
+                            "comment": "Load the Loess Plateau polygon (data/Data/GeoData/LoessPlateauRegion.shp) which constrains all subsequent overlaps."
+                        },
+                        {
+                            "function_name": "load_geodata",
+                            "arguments": {
+                                "geodataset": "Forest Water Conservation China",
+                                "output_geodataframe_name": "forest_water_retention"
+                            },
+                            "comment": "Bring in the national forest water conservation dataset that represents the ecological baseline."
+                        },
+                        {
+                            "function_name": "load_geodata",
+                            "arguments": {
+                                "geodataset": "Traditional Villages of China",
+                                "output_geodataframe_name": "villages_china"
+                            },
+                            "comment": "Load the traditional village points so their spatial distribution can be converted into broader influence zones."
+                        },
+                        {
+                            "function_name": "select_features_by_spatial_relationship",
+                            "arguments": {
+                                "features_geodataframe_name": "villages_china",
+                                "reference_geodataframe_name": "loess_plateau_region",
+                                "spatial_predicates": [
+                                    "within"
+                                ],
+                                "output_geodataframe_name": "villages_in_loess",
+                                "plot_result": false
+                            },
+                            "comment": "Limit the traditional village dataset to those located inside the Loess Plateau boundary."
+                        },
+                        {
+                            "function_name": "create_buffer",
+                            "arguments": {
+                                "geodataframe_name": "villages_in_loess",
+                                "buffer_size": 5000,
+                                "output_geodataframe_name": "loess_village_distribution_zones"
+                            },
+                            "comment": "Generate 5 km influence buffers around the plateau villages to represent newly added traditional-village distribution zones."
+                        },
+                        {
+                            "function_name": "analyze_vector_overlap",
+                            "arguments": {
+                                "geodataframe_a_name": "loess_plateau_region",
+                                "geodataframe_b_name": "forest_water_retention",
+                                "output_geodataframe_name": "loess_forest_overlap"
+                            },
+                            "comment": "Clip the national forest water conservation polygons to the Loess Plateau extent."
+                        },
+                        {
+                            "function_name": "analyze_vector_overlap",
+                            "arguments": {
+                                "geodataframe_a_name": "loess_forest_overlap",
+                                "geodataframe_b_name": "loess_village_distribution_zones",
+                                "output_geodataframe_name": "loess_priority_zones"
+                            },
+                            "comment": "Keep only the areas that satisfy both criteria—forest water conservation and buffered village distribution zones—inside the plateau."
+                        },
+                        {
+                            "function_name": "calculate_polygon_areas",
+                            "arguments": {
+                                "geodataframe_name": "loess_priority_zones",
+                                "output_variable_name": "loess_priority_zone_area",
+                                "area_column_name": "area_sq_km"
+                            },
+                            "comment": "Measure the total square kilometers of the resulting ecological-cultural priority zones."
+                        },
+                        {
+                            "function_name": "visualize_geographies",
+                            "arguments": {
+                                "geodataframe_names": [
+                                    "loess_plateau_region",
+                                    "loess_priority_zones"
+                                ],
+                                "layer_styles": [
+                                    {
+                                        "color": "#fdbb84",
+                                        "alpha": 0.35,
+                                        "linewidth": 0.8,
+                                        "label": "Loess Plateau"
+                                    },
+                                    {
+                                        "color": "#238443",
+                                        "alpha": 0.7,
+                                        "linewidth": 0.6,
+                                        "label": "Priority overlap zones"
+                                    }
+                                ],
+                                "basemap_style": "OpenStreetMap",
+                                "title": "Loess Plateau Ecological-Cultural Priority Zones",
+                                "add_legend": true
+                            },
+                            "comment": "Map the identified overlap areas for reporting and further field validation."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "task_ID": "TASK_1_1_013",
+            "task_text": "Identify and count the number of traditional villages in the Loess Plateau region, and calculate their spatial density within this area expressed in units of “number per square kilometer.”",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": "Select the traditional villages inside the Loess Plateau, count them, measure the plateau area, and divide the totals to obtain a density expressed in villages per square kilometer.",
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "load_geodata",
+                            "arguments": {
+                                "geodataset": "Loess Plateau Region",
+                                "output_geodataframe_name": "loess_plateau_region"
+                            },
+                            "comment": "Load the Loess Plateau polygon from data/Data/GeoData/LoessPlateauRegion.shp."
+                        },
+                        {
+                            "function_name": "load_geodata",
+                            "arguments": {
+                                "geodataset": "Traditional Villages of China",
+                                "output_geodataframe_name": "villages_china"
+                            },
+                            "comment": "Bring in the national traditional village point dataset."
+                        },
+                        {
+                            "function_name": "select_features_by_spatial_relationship",
+                            "arguments": {
+                                "features_geodataframe_name": "villages_china",
+                                "reference_geodataframe_name": "loess_plateau_region",
+                                "spatial_predicates": [
+                                    "within"
+                                ],
+                                "output_geodataframe_name": "villages_in_loess",
+                                "plot_result": false
+                            },
+                            "comment": "Filter the village layer so only the features inside the Loess Plateau remain."
+                        },
+                        {
+                            "function_name": "calculate_column_statistics",
+                            "arguments": {
+                                "dataframe_name": "villages_in_loess",
+                                "column_name": "OBJECTID",
+                                "output_variable_name": "villages_in_loess_stats",
+                                "include_quantiles": false,
+                                "additional_quantiles": null
+                            },
+                            "comment": "Use the statistics tool to obtain 'valid_count', which equals the number of villages inside the plateau and will form the numerator of the density calculation."
+                        },
+                        {
+                            "function_name": "calculate_polygon_areas",
+                            "arguments": {
+                                "geodataframe_name": "loess_plateau_region",
+                                "output_variable_name": "loess_plateau_area",
+                                "area_column_name": "area_sq_km"
+                            },
+                            "comment": "Measure the Loess Plateau area so it can be used as the density denominator."
+                        },
+                        {
+                            "function_name": "perform_arithmetic_operation",
+                            "arguments": {
+                                "values": [
+                                    "state:villages_in_loess_stats.summary.valid_count",
+                                    "state:loess_plateau_area.total_area_sq_km"
+                                ],
+                                "operation": "divide",
+                                "output_variable_name": "villages_density_per_sqkm"
+                            },
+                            "comment": "Divide the village count by the total plateau area to report villages per square kilometer."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "task_ID": "TASK_1_1_014",
+            "task_text": "Calculate and visualize the density of China POIs (points of interest) within the Loess Plateau, expressed in units of “number per square kilometer.”",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": "Clip the 2014 national POI layer to the Loess Plateau, compute the POI density per square kilometer, and create a kernel-density visualization of the hotspot pattern.",
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "load_geodata",
+                            "arguments": {
+                                "geodataset": "Loess Plateau Region",
+                                "output_geodataframe_name": "loess_plateau_region"
+                            },
+                            "comment": "Load the Loess Plateau boundary to use as the clipping extent."
+                        },
+                        {
+                            "function_name": "load_geodata",
+                            "arguments": {
+                                "geodataset": "2014 China POI",
+                                "output_geodataframe_name": "china_poi_2014"
+                            },
+                            "comment": "Bring in the nationwide POI dataset containing all points of interest."
+                        },
+                        {
+                            "function_name": "select_features_by_spatial_relationship",
+                            "arguments": {
+                                "features_geodataframe_name": "china_poi_2014",
+                                "reference_geodataframe_name": "loess_plateau_region",
+                                "spatial_predicates": [
+                                    "within"
+                                ],
+                                "output_geodataframe_name": "loess_plateau_poi",
+                                "plot_result": false
+                            },
+                            "comment": "Keep only POIs that fall inside the Loess Plateau boundary."
+                        },
+                        {
+                            "function_name": "calculate_column_statistics",
+                            "arguments": {
+                                "dataframe_name": "loess_plateau_poi",
+                                "column_name": "OBJECTID",
+                                "output_variable_name": "loess_poi_stats",
+                                "include_quantiles": false,
+                                "additional_quantiles": null
+                            },
+                            "comment": "Extract the POI count (valid_count) to use in the density calculation."
+                        },
+                        {
+                            "function_name": "calculate_polygon_areas",
+                            "arguments": {
+                                "geodataframe_name": "loess_plateau_region",
+                                "output_variable_name": "loess_plateau_area",
+                                "area_column_name": "area_sq_km"
+                            },
+                            "comment": "Measure the total plateau area in square kilometers."
+                        },
+                        {
+                            "function_name": "perform_arithmetic_operation",
+                            "arguments": {
+                                "values": [
+                                    "state:loess_poi_stats.summary.valid_count",
+                                    "state:loess_plateau_area.total_area_sq_km"
+                                ],
+                                "operation": "divide",
+                                "output_variable_name": "loess_poi_density_per_sqkm"
+                            },
+                            "comment": "Divide the POI count by the plateau area to obtain the density (POIs per square kilometer)."
+                        },
+                        {
+                            "function_name": "create_point_kernel_density_map",
+                            "arguments": {
+                                "geodataframe_name": "loess_plateau_poi",
+                                "output_variable_name": "loess_poi_density_map",
+                                "grid_resolution": 250,
+                                "bandwidth": null,
+                                "basemap_style": "Carto Positron",
+                                "cmap": "inferno",
+                                "include_points": true
+                            },
+                            "comment": "Generate a kernel-density surface and visualization to show where POIs cluster most densely inside the plateau."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "task_ID": "TASK_1_1_015",
+            "task_text": "Calculate the total area of China’s forest water conservation zones within the Loess Plateau region, and determine its percentage of the total area of the Loess Plateau region.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": "Intersect China’s forest water conservation layer with the Loess Plateau, total the overlap area, and express it as a percentage of the entire plateau.",
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "load_geodata",
+                            "arguments": {
+                                "geodataset": "Loess Plateau Region",
+                                "output_geodataframe_name": "loess_plateau_region"
+                            },
+                            "comment": "Load the plateau boundary for area computations and clipping."
+                        },
+                        {
+                            "function_name": "load_geodata",
+                            "arguments": {
+                                "geodataset": "Forest Water Conservation China",
+                                "output_geodataframe_name": "forest_water_retention"
+                            },
+                            "comment": "Bring in the forest water conservation polygons."
+                        },
+                        {
+                            "function_name": "analyze_vector_overlap",
+                            "arguments": {
+                                "geodataframe_a_name": "loess_plateau_region",
+                                "geodataframe_b_name": "forest_water_retention",
+                                "output_geodataframe_name": "loess_forest_overlap"
+                            },
+                            "comment": "Clip the conservation areas to the Loess Plateau extent."
+                        },
+                        {
+                            "function_name": "calculate_polygon_areas",
+                            "arguments": {
+                                "geodataframe_name": "loess_plateau_region",
+                                "output_variable_name": "loess_region_area",
+                                "area_column_name": "area_sq_km"
+                            },
+                            "comment": "Measure the plateau area to serve as the denominator for the percentage calculation."
+                        },
+                        {
+                            "function_name": "calculate_polygon_areas",
+                            "arguments": {
+                                "geodataframe_name": "loess_forest_overlap",
+                                "output_variable_name": "loess_forest_overlap_area",
+                                "area_column_name": "area_sq_km"
+                            },
+                            "comment": "Measure the square kilometers of forest water conservation zones that lie inside the plateau."
+                        },
+                        {
+                            "function_name": "perform_arithmetic_operation",
+                            "arguments": {
+                                "values": [
+                                    "state:loess_forest_overlap_area.total_area_sq_km",
+                                    "state:loess_region_area.total_area_sq_km"
+                                ],
+                                "operation": "divide",
+                                "output_variable_name": "loess_forest_ratio"
+                            },
+                            "comment": "Compute the fraction of the plateau that is occupied by forest water conservation zones."
+                        },
+                        {
+                            "function_name": "perform_arithmetic_operation",
+                            "arguments": {
+                                "values": [
+                                    "state:loess_forest_ratio",
+                                    100
+                                ],
+                                "operation": "multiply",
+                                "output_variable_name": "loess_forest_percent"
+                            },
+                            "comment": "Convert the ratio into a percentage for easier reporting."
+                        },
+                        {
+                            "function_name": "visualize_geographies",
+                            "arguments": {
+                                "geodataframe_names": [
+                                    "loess_plateau_region",
+                                    "loess_forest_overlap"
+                                ],
+                                "layer_styles": [
+                                    {
+                                        "color": "#fee0b6",
+                                        "alpha": 0.35,
+                                        "linewidth": 0.8,
+                                        "label": "Loess Plateau"
+                                    },
+                                    {
+                                        "color": "#1a9850",
+                                        "alpha": 0.75,
+                                        "linewidth": 0.6,
+                                        "label": "Forest water zones inside plateau"
+                                    }
+                                ],
+                                "basemap_style": "OpenStreetMap",
+                                "title": "Forest Water Conservation Coverage in the Loess Plateau",
+                                "add_legend": true
+                            },
+                            "comment": "Create a map showing where the forest water areas coincide with the plateau."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "task_ID": "TASK_1_1_016",
+            "task_text": "Based on DEM data, calculate the average elevation of Guangming District, Shenzhen.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": "Inspect the Guangming District DEM to report its descriptive statistics, focusing on the mean elevation for the district.",
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "get_raster_path",
+                            "arguments": {
+                                "rasterdataset": "Guangming District DEM (Shenzhen)"
+                            },
+                            "comment": "Resolve the file path to data/Data/GeoData/guangming.tif so it can be passed to the inspection tool."
+                        },
+                        {
+                            "function_name": "get_raster_description",
+                            "arguments": {
+                                "raster_path": "d:/code/GeoBenchX/GeoBenchX/data/Data/GeoData/guangming.tif",
+                                "output_variable_name": "guangming_dem_stats"
+                            },
+                            "comment": "Use the raster-description tool to summarize min/max/mean elevation values; the reported mean equals the district’s average elevation."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "task_ID": "TASK_1_1_017",
+            "task_text": "Identify the flooded areas in Xinxiang City, Henan Province, and calculate the ratio of their area to the city’s total area.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": "Vectorize the Xinxiang flood raster footprint to approximate the city extent, compute the flooded area (value 1) and the total valid area, and express the inundated share as a ratio.",
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "get_raster_path",
+                            "arguments": {
+                                "rasterdataset": "XinxiangCity Rainstorm and Flooding Dataset"
+                            },
+                            "comment": "Record the path to the flood raster for reuse across the extraction and area tools."
+                        },
+                        {
+                            "function_name": "extract_raster_boundary",
+                            "arguments": {
+                                "raster_path": "d:/code/GeoBenchX/GeoBenchX/data/Data/GeoData/Xinxiang City Rainstorm and Flooding Dataset.tif",
+                                "output_geodataframe_name": "xinxiang_city_boundary",
+                                "band_number": 1,
+                                "maximum_vertices": 8000,
+                                "dissolve_polygons": true,
+                                "simplify_tolerance_meters": null,
+                                "output_file_path": null,
+                                "overwrite_existing": true
+                            },
+                            "comment": "Convert the raster footprint into a polygon that serves as an approximation of Xinxiang City’s study extent."
+                        },
+                        {
+                            "function_name": "calculate_polygon_areas",
+                            "arguments": {
+                                "geodataframe_name": "xinxiang_city_boundary",
+                                "output_variable_name": "xinxiang_city_area_stats",
+                                "area_column_name": "area_sq_km"
+                            },
+                            "comment": "Measure the total city area in square kilometers to use as the denominator."
+                        },
+                        {
+                            "function_name": "calculate_raster_selection_area",
+                            "arguments": {
+                                "raster_path": "d:/code/GeoBenchX/GeoBenchX/data/Data/GeoData/Xinxiang City Rainstorm and Flooding Dataset.tif",
+                                "output_variable_name": "xinxiang_inundated_area",
+                                "band_number": 1,
+                                "selected_values": [
+                                    1
+                                ],
+                                "treat_nonzero_as_selected": false,
+                                "report_units": "square_kilometers"
+                            },
+                            "comment": "Count pixels whose value equals 1 to get the inundated square kilometers."
+                        },
+                        {
+                            "function_name": "perform_arithmetic_operation",
+                            "arguments": {
+                                "values": [
+                                    "state:xinxiang_inundated_area.reported_area_value",
+                                    "state:xinxiang_city_area_stats.total_area_sq_km"
+                                ],
+                                "operation": "divide",
+                                "output_variable_name": "xinxiang_flood_ratio"
+                            },
+                            "comment": "Divide the flooded area by the total city area to report the inundated share of Xinxiang City."
+                        },
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "task_ID": "TASK_1_1_018",
+            "task_text": "Analyze the proportion of forest water conservation zones in terms of area coverage within the Loess Plateau region.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": "Quantify how much of the Loess Plateau is covered by forest water conservation zones and express that share as a percentage for area-coverage analysis.",
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "load_geodata",
+                            "arguments": {
+                                "geodataset": "Loess Plateau Region",
+                                "output_geodataframe_name": "loess_plateau_region"
+                            },
+                            "comment": "Load the plateau boundary for measurements."
+                        },
+                        {
+                            "function_name": "load_geodata",
+                            "arguments": {
+                                "geodataset": "Forest Water Conservation China",
+                                "output_geodataframe_name": "forest_water_retention"
+                            },
+                            "comment": "Bring in the conservation polygons to be compared with the plateau."
+                        },
+                        {
+                            "function_name": "analyze_vector_overlap",
+                            "arguments": {
+                                "geodataframe_a_name": "loess_plateau_region",
+                                "geodataframe_b_name": "forest_water_retention",
+                                "output_geodataframe_name": "loess_forest_overlap_task18"
+                            },
+                            "comment": "Clip the conservation layer to the plateau extent."
+                        },
+                        {
+                            "function_name": "calculate_polygon_areas",
+                            "arguments": {
+                                "geodataframe_name": "loess_plateau_region",
+                                "output_variable_name": "loess_region_area_task18",
+                                "area_column_name": "area_sq_km"
+                            },
+                            "comment": "Measure the plateau area."
+                        },
+                        {
+                            "function_name": "calculate_polygon_areas",
+                            "arguments": {
+                                "geodataframe_name": "loess_forest_overlap_task18",
+                                "output_variable_name": "loess_forest_overlap_area_task18",
+                                "area_column_name": "area_sq_km"
+                            },
+                            "comment": "Measure the overlapping forest water area."
+                        },
+                        {
+                            "function_name": "perform_arithmetic_operation",
+                            "arguments": {
+                                "values": [
+                                    "state:loess_forest_overlap_area_task18.total_area_sq_km",
+                                    "state:loess_region_area_task18.total_area_sq_km"
+                                ],
+                                "operation": "divide",
+                                "output_variable_name": "loess_forest_ratio_task18"
+                            },
+                            "comment": "Compute the fraction of the plateau covered by forest water zones."
+                        },
+                        {
+                            "function_name": "perform_arithmetic_operation",
+                            "arguments": {
+                                "values": [
+                                    "state:loess_forest_ratio_task18",
+                                    100
+                                ],
+                                "operation": "multiply",
+                                "output_variable_name": "loess_forest_percent_task18"
+                            },
+                            "comment": "Convert the ratio to a percentage to complete the area-coverage analysis."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "task_ID": "TASK_1_1_019",
+            "task_text": "Calculate the area proportion of high‑slope regions (slope classification value > 5) within the Wei River Basin.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": "Create a binary raster for slope classes greater than 5 in the Wei River Basin, quantify the square kilometers in that mask, and divide by the total basin area to obtain the proportion of high-slope terrain.",
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "get_raster_path",
+                            "arguments": {
+                                "rasterdataset": "Wei River Basin Topographic Slope Classification Dataset"
+                            },
+                            "comment": "Resolve the slope raster path for later reuse."
+                        },
+                        {
+                            "function_name": "classify_raster_zones",
+                            "arguments": {
+                                "raster_path": "d:/code/GeoBenchX/GeoBenchX/data/Data/GeoData/WeiheBasin.tif",
+                                "reclassification_table": "[{\"min_value\": 5.0001, \"max_value\": 7.0, \"new_value\": 1, \"label\": \"Slope > 5\", \"color\": \"#b30000\"}]",
+                                "output_variable_name": "weihe_high_slope_mask",
+                                "output_raster_path": "d:/code/GeoBenchX/GeoBenchX/scratch/weihe_high_slope_mask.tif",
+                                "output_dtype": "uint8",
+                                "classification_model_name": "weihe_gt5",
+                                "append_timestamp_to_output": false,
+                                "plot_title": "Wei River Basin Slope > 5",
+                                "legend_location": "lower right"
+                            },
+                            "comment": "Generate a binary raster (value=1) wherever the slope class exceeds 5."
+                        },
+                        {
+                            "function_name": "calculate_raster_selection_area",
+                            "arguments": {
+                                "raster_path": "d:/code/GeoBenchX/GeoBenchX/scratch/weihe_high_slope_mask.tif",
+                                "output_variable_name": "weihe_high_slope_area",
+                                "band_number": 1,
+                                "selected_values": [
+                                    1
+                                ],
+                                "treat_nonzero_as_selected": false,
+                                "report_units": "square_kilometers"
+                            },
+                            "comment": "Measure the square kilometers represented by slope classes greater than 5."
+                        },
+                        {
+                            "function_name": "calculate_raster_selection_area",
+                            "arguments": {
+                                "raster_path": "d:/code/GeoBenchX/GeoBenchX/data/Data/GeoData/WeiheBasin.tif",
+                                "output_variable_name": "weihe_total_area",
+                                "band_number": 1,
+                                "selected_values": null,
+                                "treat_nonzero_as_selected": true,
+                                "report_units": "square_kilometers"
+                            },
+                            "comment": "Measure the total valid area of the Wei River Basin slope dataset for use as the denominator."
+                        },
+                        {
+                            "function_name": "perform_arithmetic_operation",
+                            "arguments": {
+                                "values": [
+                                    "state:weihe_high_slope_area.reported_area_value",
+                                    "state:weihe_total_area.reported_area_value"
+                                ],
+                                "operation": "divide",
+                                "output_variable_name": "weihe_high_slope_ratio"
+                            },
+                            "comment": "Divide the high-slope area by the total basin area to get the required proportion."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "task_ID": "TASK_1_1_020",
+            "task_text": "Calculate the area proportion of high‑slope regions (slope classification value > 5) within the Wei River Basin.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": "Repeat the slope>5 analysis for the Wei River Basin, this time converting the fraction into a percentage and producing a visualization of the high-slope footprint.",
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "get_raster_path",
+                            "arguments": {
+                                "rasterdataset": "Wei River Basin Topographic Slope Classification Dataset"
+                            },
+                            "comment": "Confirm the slope raster path before processing."
+                        },
+                        {
+                            "function_name": "classify_raster_zones",
+                            "arguments": {
+                                "raster_path": "d:/code/GeoBenchX/GeoBenchX/data/Data/GeoData/WeiheBasin.tif",
+                                "reclassification_table": "[{\"min_value\": 5.0001, \"max_value\": 7.0, \"new_value\": 1, \"label\": \"Slope > 5\", \"color\": \"#d73027\"}]",
+                                "output_variable_name": "weihe_high_slope_mask_pct",
+                                "output_raster_path": "d:/code/GeoBenchX/GeoBenchX/scratch/weihe_high_slope_mask_pct.tif",
+                                "output_dtype": "uint8",
+                                "classification_model_name": "weihe_gt5_pct",
+                                "append_timestamp_to_output": false,
+                                "plot_title": "Wei River Basin High-Slope Cells",
+                                "legend_location": "lower right"
+                            },
+                            "comment": "Create a binary raster identical to Task 19 but saved separately for visualization."
+                        },
+                        {
+                            "function_name": "calculate_raster_selection_area",
+                            "arguments": {
+                                "raster_path": "d:/code/GeoBenchX/GeoBenchX/scratch/weihe_high_slope_mask_pct.tif",
+                                "output_variable_name": "weihe_high_slope_area_pct",
+                                "band_number": 1,
+                                "selected_values": [
+                                    1
+                                ],
+                                "treat_nonzero_as_selected": false,
+                                "report_units": "square_kilometers"
+                            },
+                            "comment": "Measure the square kilometers in the high-slope mask."
+                        },
+                        {
+                            "function_name": "calculate_raster_selection_area",
+                            "arguments": {
+                                "raster_path": "d:/code/GeoBenchX/GeoBenchX/data/Data/GeoData/WeiheBasin.tif",
+                                "output_variable_name": "weihe_total_area_pct",
+                                "band_number": 1,
+                                "selected_values": null,
+                                "treat_nonzero_as_selected": true,
+                                "report_units": "square_kilometers"
+                            },
+                            "comment": "Measure the total basin area once more for this task."
+                        },
+                        {
+                            "function_name": "perform_arithmetic_operation",
+                            "arguments": {
+                                "values": [
+                                    "state:weihe_high_slope_area_pct.reported_area_value",
+                                    "state:weihe_total_area_pct.reported_area_value"
+                                ],
+                                "operation": "divide",
+                                "output_variable_name": "weihe_high_slope_ratio_pct"
+                            },
+                            "comment": "Calculate the fraction of the basin occupied by high-slope terrain."
+                        },
+                        {
+                            "function_name": "perform_arithmetic_operation",
+                            "arguments": {
+                                "values": [
+                                    "state:weihe_high_slope_ratio_pct",
+                                    100
+                                ],
+                                "operation": "multiply",
+                                "output_variable_name": "weihe_high_slope_percent"
+                            },
+                            "comment": "Convert the ratio into a percentage for clearer communication."
+                        },
+                        {
+                            "function_name": "extract_raster_boundary",
+                            "arguments": {
+                                "raster_path": "d:/code/GeoBenchX/GeoBenchX/scratch/weihe_high_slope_mask_pct.tif",
+                                "output_geodataframe_name": "weihe_high_slope_boundary",
+                                "band_number": 1,
+                                "maximum_vertices": 8000,
+                                "dissolve_polygons": true,
+                                "simplify_tolerance_meters": null,
+                                "output_file_path": null,
+                                "overwrite_existing": true
+                            },
+                            "comment": "Convert the binary mask into polygons for easy mapping."
+                        },
+                        {
+                            "function_name": "visualize_geographies",
+                            "arguments": {
+                                "geodataframe_names": [
+                                    "weihe_high_slope_boundary"
+                                ],
+                                "layer_styles": [
+                                    {
+                                        "color": "#d73027",
+                                        "alpha": 0.65,
+                                        "linewidth": 0.8,
+                                        "label": "Slope class > 5"
+                                    }
+                                ],
+                                "basemap_style": "Carto Positron",
+                                "title": "Wei River Basin High-Slope Footprint",
+                                "add_legend": true
+                            },
+                            "comment": "Produce a quick visualization of where slope classes exceed the threshold."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "task_ID": "TASK_1_1_021",
+            "task_text": "Calculate the total area and perimeter of the Loess Plateau, and determine its centroid.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": "Load the Loess Plateau polygon, compute its total area, derive the perimeter length by treating the boundary as a line feature, and generate centroid points for reporting.",
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "load_geodata",
+                            "arguments": {
+                                "geodataset": "Loess Plateau Region",
+                                "output_geodataframe_name": "loess_plateau_region"
+                            },
+                            "comment": "Load data/Data/GeoData/LoessPlateauRegion.shp which stores the plateau boundary polygons."
+                        },
+                        {
+                            "function_name": "calculate_polygon_areas",
+                            "arguments": {
+                                "geodataframe_name": "loess_plateau_region",
+                                "output_variable_name": "loess_plateau_area_stats",
+                                "area_column_name": "area_sq_km"
+                            },
+                            "comment": "Project the polygons to an equal-area CRS and capture the total plateau area in square kilometers."
+                        },
+                        {
+                            "function_name": "calculate_line_lengths",
+                            "arguments": {
+                                "geodataframe_name": "loess_plateau_region",
+                                "output_variable_name": "loess_plateau_perimeter_stats"
+                            },
+                            "comment": "Use the polygon boundaries as line features to calculate the overall perimeter length (kilometers)."
+                        },
+                        {
+                            "function_name": "get_centroids",
+                            "arguments": {
+                                "geodataframe_name": "loess_plateau_region",
+                                "output_geodataframe_name": "loess_plateau_centroids",
+                                "create_centroid_for_each_part": false,
+                                "output_shapefile_path": null,
+                                "overwrite_existing": true,
+                                "title": "Loess Plateau Centroid"
+                            },
+                            "comment": "Generate centroid points summarizing the plateau’s geographic center."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "task_ID": "TASK_1_1_022",
+            "task_text": "Create 500‑meter and 1,000‑meter merged buffer zones for all major urban parks in Wuhan to assess their overall service coverage range.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": "Create dissolved service buffers of 500 m and 1,000 m around the Wuhan urban parks layer to evaluate major park coverage extents.",
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "load_geodata",
+                            "arguments": {
+                                "geodataset": "Wuhan Urban Parks",
+                                "output_geodataframe_name": "wuhan_parks"
+                            },
+                            "comment": "Load the park polygons from data/Data/GeoData/park_in_wuhan.shp."
+                        },
+                        {
+                            "function_name": "create_dissolved_buffer",
+                            "arguments": {
+                                "geodataframe_name": "wuhan_parks",
+                                "buffer_size_meters": 500,
+                                "output_geodataframe_name": "wuhan_parks_buffer_500m",
+                                "dissolve_by_attribute": null,
+                                "output_file_path": null,
+                                "overwrite_existing": true
+                            },
+                            "comment": "Produce a single dissolved 500 m buffer zone representing near-park catchments."
+                        },
+                        {
+                            "function_name": "create_dissolved_buffer",
+                            "arguments": {
+                                "geodataframe_name": "wuhan_parks",
+                                "buffer_size_meters": 1000,
+                                "output_geodataframe_name": "wuhan_parks_buffer_1000m",
+                                "dissolve_by_attribute": null,
+                                "output_file_path": null,
+                                "overwrite_existing": true
+                            },
+                            "comment": "Repeat the process for 1 km to capture broader coverage."
+                        },
+                        {
+                            "function_name": "visualize_geographies",
+                            "arguments": {
+                                "geodataframe_names": [
+                                    "wuhan_parks_buffer_1000m",
+                                    "wuhan_parks_buffer_500m",
+                                    "wuhan_parks"
+                                ],
+                                "layer_styles": [
+                                    {
+                                        "color": "#fee0b6",
+                                        "alpha": 0.35,
+                                        "linewidth": 0.4,
+                                        "label": "1,000 m buffer"
+                                    },
+                                    {
+                                        "color": "#fdae6b",
+                                        "alpha": 0.5,
+                                        "linewidth": 0.6,
+                                        "label": "500 m buffer"
+                                    },
+                                    {
+                                        "color": "#238b45",
+                                        "alpha": 0.9,
+                                        "linewidth": 0.8,
+                                        "label": "Park footprints"
+                                    }
+                                ],
+                                "basemap_style": "Carto Positron",
+                                "title": "Wuhan Urban Park Service Buffers",
+                                "add_legend": true
+                            },
+                            "comment": "Display both buffer bands together with the original parks."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "task_ID": "TASK_1_1_023",
+            "task_text": "Identify the ecological core protected area formed by contracting the boundary of the Loess Plateau inward by 20 kilometers.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": "Contract the Loess Plateau boundary inward by 20 km to delineate an ecological core protected area and document its size.",
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "load_geodata",
+                            "arguments": {
+                                "geodataset": "Loess Plateau Region",
+                                "output_geodataframe_name": "loess_plateau_region"
+                            },
+                            "comment": "Load the original plateau polygons as the input boundary."
+                        },
+                        {
+                            "function_name": "create_buffer",
+                            "arguments": {
+                                "geodataframe_name": "loess_plateau_region",
+                                "buffer_size": -20000,
+                                "output_geodataframe_name": "loess_plateau_core_area"
+                            },
+                            "comment": "Apply a negative 20 km buffer to shrink the boundary inward, yielding the ecological core extent (areas too small to support a 20 km contraction will disappear)."
+                        },
+                        {
+                            "function_name": "calculate_polygon_areas",
+                            "arguments": {
+                                "geodataframe_name": "loess_plateau_core_area",
+                                "output_variable_name": "loess_plateau_core_area_stats",
+                                "area_column_name": "area_sq_km"
+                            },
+                            "comment": "Measure the size of the contracted core area in square kilometers."
+                        },
+                        {
+                            "function_name": "visualize_geographies",
+                            "arguments": {
+                                "geodataframe_names": [
+                                    "loess_plateau_region",
+                                    "loess_plateau_core_area"
+                                ],
+                                "layer_styles": [
+                                    {
+                                        "color": "#fee8c8",
+                                        "alpha": 0.4,
+                                        "linewidth": 0.7,
+                                        "label": "Original boundary"
+                                    },
+                                    {
+                                        "color": "#7f0000",
+                                        "alpha": 0.6,
+                                        "linewidth": 0.8,
+                                        "label": "Contracted core"
+                                    }
+                                ],
+                                "basemap_style": "OpenStreetMap",
+                                "title": "Loess Plateau Ecological Core (20 km contraction)",
+                                "add_legend": true
+                            },
+                            "comment": "Compare the original boundary with the contracted core polygon."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "task_ID": "TASK_1_1_024",
+            "task_text": "Find all China POIs (points of interest) located within the 1‑kilometer buffer zone of parks in Wuhan.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": "Generate a 1 km dissolved buffer around all Wuhan parks and select the China POIs that fall inside this zone.",
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "load_geodata",
+                            "arguments": {
+                                "geodataset": "Wuhan Urban Parks",
+                                "output_geodataframe_name": "wuhan_parks"
+                            },
+                            "comment": "Load park polygons for buffering."
+                        },
+                        {
+                            "function_name": "load_geodata",
+                            "arguments": {
+                                "geodataset": "2014 China POI",
+                                "output_geodataframe_name": "china_poi_2014"
+                            },
+                            "comment": "Load the national POI points to be filtered."
+                        },
+                        {
+                            "function_name": "create_dissolved_buffer",
+                            "arguments": {
+                                "geodataframe_name": "wuhan_parks",
+                                "buffer_size_meters": 1000,
+                                "output_geodataframe_name": "wuhan_parks_buffer_1km",
+                                "dissolve_by_attribute": null,
+                                "output_file_path": null,
+                                "overwrite_existing": true
+                            },
+                            "comment": "Build a merged 1 km buffer representing the combined park influence area."
+                        },
+                        {
+                            "function_name": "select_features_by_spatial_relationship",
+                            "arguments": {
+                                "features_geodataframe_name": "china_poi_2014",
+                                "reference_geodataframe_name": "wuhan_parks_buffer_1km",
+                                "spatial_predicates": [
+                                    "within"
+                                ],
+                                "output_geodataframe_name": "poi_within_wuhan_parks_buffer",
+                                "plot_result": false
+                            },
+                            "comment": "Keep only POIs located inside the 1 km buffer."
+                        },
+                        {
+                            "function_name": "visualize_geographies",
+                            "arguments": {
+                                "geodataframe_names": [
+                                    "wuhan_parks_buffer_1km",
+                                    "poi_within_wuhan_parks_buffer"
+                                ],
+                                "layer_styles": [
+                                    {
+                                        "color": "#c7e9c0",
+                                        "alpha": 0.5,
+                                        "linewidth": 0.6,
+                                        "label": "1 km park buffer"
+                                    },
+                                    {
+                                        "color": "#08306b",
+                                        "alpha": 0.9,
+                                        "linewidth": 0.6,
+                                        "label": "POIs inside buffer"
+                                    }
+                                ],
+                                "basemap_style": "Carto Positron",
+                                "title": "China POIs within Wuhan Park Buffers",
+                                "add_legend": true
+                            },
+                            "comment": "Map the POIs located inside the buffered service zone."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "task_ID": "TASK_1_1_025",
+            "task_text": "Based on the DEM of Guangming District, Shenzhen, generate the aspect map of the area and calculate the area of the main orientations (e.g., east, south, west, north).",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": "Generate the Guangming District aspect raster and reclassify it into four main orientations (north, east, south, west) so their areas can be compared.",
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "get_raster_path",
+                            "arguments": {
+                                "rasterdataset": "Guangming District DEM (Shenzhen)"
+                            },
+                            "comment": "Resolve the DEM path for Guangming District."
+                        },
+                        {
+                            "function_name": "generate_aspect_map",
+                            "arguments": {
+                                "dem_raster_path": "d:/code/GeoBenchX/GeoBenchX/data/Data/GeoData/guangming.tif",
+                                "output_variable_name": "guangming_aspect_info",
+                                "output_raster_path": "d:/code/GeoBenchX/GeoBenchX/scratch/guangming_aspect.tif",
+                                "append_timestamp_to_output": false,
+                                "plot_title": "Guangming District Aspect"
+                            },
+                            "comment": "Create a 0–360° aspect raster along with its visualization."
+                        },
+                        {
+                            "function_name": "classify_raster_zones",
+                            "arguments": {
+                                "raster_path": "d:/code/GeoBenchX/GeoBenchX/scratch/guangming_aspect.tif",
+                                "reclassification_table": "[{\"min_value\": 315, \"max_value\": 360, \"new_value\": 1, \"label\": \"North\", \"color\": \"#2166ac\"}, {\"min_value\": 0, \"max_value\": 45, \"new_value\": 1, \"label\": \"North\", \"color\": \"#2166ac\"}, {\"min_value\": 45, \"max_value\": 135, \"new_value\": 2, \"label\": \"East\", \"color\": \"#1a9850\"}, {\"min_value\": 135, \"max_value\": 225, \"new_value\": 3, \"label\": \"South\", \"color\": \"#d73027\"}, {\"min_value\": 225, \"max_value\": 315, \"new_value\": 4, \"label\": \"West\", \"color\": \"#8c510a\"}]",
+                                "output_variable_name": "guangming_aspect_quadrants",
+                                "output_raster_path": "d:/code/GeoBenchX/GeoBenchX/scratch/guangming_aspect_quadrants.tif",
+                                "output_dtype": "uint8",
+                                "classification_model_name": "guangming_aspect_quadrants",
+                                "append_timestamp_to_output": false,
+                                "plot_title": "Guangming Aspect Reclassified",
+                                "legend_location": "lower right"
+                            },
+                            "comment": "Group the aspect values into north/east/south/west ranges for comparison."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "task_ID": "TASK_1_1_026",
+            "task_text": "Reclassify the two slope classes “1–3 degrees” and “4–5 degrees” from the Wei River Basin Terrain Slope Classification Datasetinto “gentle slope” and “steep slope,” respectively.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": "Reclassify the Wei River Basin slope raster so that classes 1–3 map to a 'gentle slope' category and classes 4–5 map to a 'steep slope' category.",
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "get_raster_path",
+                            "arguments": {
+                                "rasterdataset": "Wei River Basin Topographic Slope Classification Dataset"
+                            },
+                            "comment": "Confirm the path to data/Data/GeoData/WeiheBasin.tif."
+                        },
+                        {
+                            "function_name": "classify_raster_zones",
+                            "arguments": {
+                                "raster_path": "d:/code/GeoBenchX/GeoBenchX/data/Data/GeoData/WeiheBasin.tif",
+                                "reclassification_table": "[{\"min_value\": 1, \"max_value\": 3, \"new_value\": 1, \"label\": \"Gentle slope\", \"color\": \"#74add1\"}, {\"min_value\": 4, \"max_value\": 5, \"new_value\": 2, \"label\": \"Steep slope\", \"color\": \"#d73027\"}]",
+                                "output_variable_name": "weihe_gentle_steep_slope_mask",
+                                "output_raster_path": "d:/code/GeoBenchX/GeoBenchX/scratch/weihe_gentle_steep.tif",
+                                "output_dtype": "uint8",
+                                "classification_model_name": "weihe_gentle_vs_steep",
+                                "append_timestamp_to_output": false,
+                                "plot_title": "Wei River Basin Gentle vs Steep Slopes",
+                                "legend_location": "lower right"
+                            },
+                            "comment": "Produce a binary raster differentiating gentle and steep classes as requested."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "task_ID": "TASK_1_1_027",
+            "task_text": "Measure the average area and standard deviation of the area for all submerged crab ponds within the Changxing Taihu Lake Scientific Experimental Area in 2021.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": "Measure the per-feature areas of the 2021 submerged crab ponds and summarize their mean and standard deviation (in square meters).",
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "load_geodata",
+                            "arguments": {
+                                "geodataset": "2021 Taihu Lake scientific experiment submerged crab pond data",
+                                "output_geodataframe_name": "taihu_crab_ponds"
+                            },
+                            "comment": "Load data/Data/GeoData/2021 Taihu Lake scientific experiment submerged crab pond data.shp."
+                        },
+                        {
+                            "function_name": "calculate_polygon_areas",
+                            "arguments": {
+                                "geodataframe_name": "taihu_crab_ponds",
+                                "output_variable_name": "taihu_crab_pond_area_stats",
+                                "area_column_name": "area_sq_km"
+                            },
+                            "comment": "Compute each pond’s area in square kilometers."
+                        },
+                        {
+                            "function_name": "scale_column_by_value",
+                            "arguments": {
+                                "dataframe_name": "taihu_crab_pond_area_stats.gdf_with_areas",
+                                "column_name": "area_sq_km",
+                                "operation": "multiply",
+                                "value": 1000000,
+                                "output_column_name": "area_sq_m",
+                                "output_dataframe_name": "taihu_crab_ponds_with_area_m2"
+                            },
+                            "comment": "Convert areas to square meters for easier interpretation."
+                        },
+                        {
+                            "function_name": "calculate_column_statistics",
+                            "arguments": {
+                                "dataframe_name": "taihu_crab_ponds_with_area_m2",
+                                "column_name": "area_sq_m",
+                                "output_variable_name": "taihu_crab_pond_area_stats_m2",
+                                "include_quantiles": true,
+                                "additional_quantiles": null
+                            },
+                            "comment": "Retrieve the mean and standard deviation of the pond areas (the summary also includes min/max/median if needed)."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "task_ID": "TASK_1_1_028",
+            "task_text": "Perform descriptive statistics on the DEM data of Guangming District, Shenzhen, calculating the minimum, maximum, mean, and standard deviation of elevation.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": "Produce descriptive statistics (min, max, mean, standard deviation) for the Guangming District DEM elevations.",
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "get_raster_path",
+                            "arguments": {
+                                "rasterdataset": "Guangming District DEM (Shenzhen)"
+                            },
+                            "comment": "Determine the DEM path before analysis."
+                        },
+                        {
+                            "function_name": "get_raster_description",
+                            "arguments": {
+                                "raster_path": "d:/code/GeoBenchX/GeoBenchX/data/Data/GeoData/guangming.tif",
+                                "output_variable_name": "guangming_dem_full_stats"
+                            },
+                            "comment": "The raster-description output lists min, max, mean, and standard deviation for the DEM band, fulfilling the task’s requirements."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "task_ID": "TASK_1_1_029",
+            "task_text": "To assess economic losses from flooding, calculate the area statistics (sum, mean, median) of all submerged crab pond patches in Changxing, Zhejiang.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": "For the submerged crab ponds in Changxing (Taihu Lake scientific experiment), compute area summaries in square meters including the sum, mean, and median to support flood-loss estimates.",
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "load_geodata",
+                            "arguments": {
+                                "geodataset": "2021 Taihu Lake scientific experiment submerged crab pond data",
+                                "output_geodataframe_name": "taihu_crab_ponds"
+                            },
+                            "comment": "Load the crab pond polygons once more."
+                        },
+                        {
+                            "function_name": "calculate_polygon_areas",
+                            "arguments": {
+                                "geodataframe_name": "taihu_crab_ponds",
+                                "output_variable_name": "taihu_crab_pond_area_stats2",
+                                "area_column_name": "area_sq_km"
+                            },
+                            "comment": "Generate per-feature areas in square kilometers."
+                        },
+                        {
+                            "function_name": "scale_column_by_value",
+                            "arguments": {
+                                "dataframe_name": "taihu_crab_pond_area_stats2.gdf_with_areas",
+                                "column_name": "area_sq_km",
+                                "operation": "multiply",
+                                "value": 1000000,
+                                "output_column_name": "area_sq_m",
+                                "output_dataframe_name": "taihu_crab_ponds_area_m2"
+                            },
+                            "comment": "Convert to square meters for economic-loss calculations."
+                        },
+                        {
+                            "function_name": "calculate_column_total",
+                            "arguments": {
+                                "dataframe_name": "taihu_crab_ponds_area_m2",
+                                "column_name": "area_sq_m",
+                                "output_variable_name": "taihu_crab_pond_area_sum"
+                            },
+                            "comment": "Capture the total (sum) of submerged pond areas."
+                        },
+                        {
+                            "function_name": "calculate_column_statistics",
+                            "arguments": {
+                                "dataframe_name": "taihu_crab_ponds_area_m2",
+                                "column_name": "area_sq_m",
+                                "output_variable_name": "taihu_crab_pond_area_stats_summary",
+                                "include_quantiles": true,
+                                "additional_quantiles": null
+                            },
+                            "comment": "Obtain the mean and median (50th percentile) from the statistics output alongside other descriptive values."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "task_ID": "TASK_1_1_030",
+            "task_text": "Generate an aspect map of the Tangxun Lake experimental area in Hubei Province based on DEM data.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": "Use the Tangxun Lake DEM to generate an aspect raster and visualization of the experimental area in Hubei.",
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "get_raster_path",
+                            "arguments": {
+                                "rasterdataset": "DEM data of the Tangxun Lake Experimental Area in Hubei"
+                            },
+                            "comment": "Locate data/Data/GeoData/Tangxun_lake_DEM.tif."
+                        },
+                        {
+                            "function_name": "generate_aspect_map",
+                            "arguments": {
+                                "dem_raster_path": "d:/code/GeoBenchX/GeoBenchX/data/Data/GeoData/Tangxun_lake_DEM.tif",
+                                "output_variable_name": "tangxun_aspect_info",
+                                "output_raster_path": "d:/code/GeoBenchX/GeoBenchX/scratch/tangxun_aspect.tif",
+                                "append_timestamp_to_output": false,
+                                "plot_title": "Tangxun Lake Aspect"
+                            },
+                            "comment": "Produce the requested aspect map and preview."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "task_ID": "TASK_1_1_031",
+            "task_text": "Identify and extract all flat areas with a slope less than 2 degrees from the DEM of Tangxun Lake in Hubei.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": "Convert the Tangxun Lake DEM to slope (degrees), classify slopes below 2°, and extract their total area.",
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "get_raster_path",
+                            "arguments": {
+                                "rasterdataset": "DEM data of the Tangxun Lake Experimental Area in Hubei"
+                            },
+                            "comment": "Resolve the DEM path for slope conversion."
+                        },
+                        {
+                            "function_name": "convert_dem_to_slope",
+                            "arguments": {
+                                "dem_raster_path": "d:/code/GeoBenchX/GeoBenchX/data/Data/GeoData/Tangxun_lake_DEM.tif",
+                                "output_variable_name": "tangxun_slope_info",
+                                "output_raster_path": "d:/code/GeoBenchX/GeoBenchX/scratch/tangxun_slope.tif",
+                                "append_timestamp_to_output": false,
+                                "plot_title": "Tangxun Lake Slope (degrees)"
+                            },
+                            "comment": "Generate the slope raster for the study area."
+                        },
+                        {
+                            "function_name": "classify_raster_zones",
+                            "arguments": {
+                                "raster_path": "d:/code/GeoBenchX/GeoBenchX/scratch/tangxun_slope.tif",
+                                "reclassification_table": "[{\"min_value\": 0, \"max_value\": 1.9999, \"new_value\": 1, \"label\": \"Slope < 2°\", \"color\": \"#91bfdb\"}]",
+                                "output_variable_name": "tangxun_flat_slope_mask",
+                                "output_raster_path": "d:/code/GeoBenchX/GeoBenchX/scratch/tangxun_flat_slope.tif",
+                                "output_dtype": "uint8",
+                                "classification_model_name": "tangxun_flat_slope",
+                                "append_timestamp_to_output": false,
+                                "plot_title": "Tangxun Lake Flat Areas (<2°)",
+                                "legend_location": "lower right"
+                            },
+                            "comment": "Create a binary raster marking slopes below 2 degrees."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "task_ID": "TASK_1_1_032",
+            "task_text": "Extract all slope surfaces facing due south (within the range of 157.5°–202.5°) from the DEM of Tangxun Lake in Hubei.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": "Derive the Tangxun Lake aspect raster and isolate slopes facing due south (157.5°–202.5°).",
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "get_raster_path",
+                            "arguments": {
+                                "rasterdataset": "DEM data of the Tangxun Lake Experimental Area in Hubei"
+                            },
+                            "comment": "Locate the Tangxun Lake DEM."
+                        },
+                        {
+                            "function_name": "generate_aspect_map",
+                            "arguments": {
+                                "dem_raster_path": "d:/code/GeoBenchX/GeoBenchX/data/Data/GeoData/Tangxun_lake_DEM.tif",
+                                "output_variable_name": "tangxun_aspect_for_south",
+                                "output_raster_path": "d:/code/GeoBenchX/GeoBenchX/scratch/tangxun_aspect_for_south.tif",
+                                "append_timestamp_to_output": false,
+                                "plot_title": "Tangxun Lake Aspect (for south-facing extraction)"
+                            },
+                            "comment": "Regenerate the aspect surface for this specific query."
+                        },
+                        {
+                            "function_name": "classify_raster_zones",
+                            "arguments": {
+                                "raster_path": "d:/code/GeoBenchX/GeoBenchX/scratch/tangxun_aspect_for_south.tif",
+                                "reclassification_table": "[{\"min_value\": 157.5, \"max_value\": 202.5, \"new_value\": 1, \"label\": \"South-facing\", \"color\": \"#ef8a62\"}]",
+                                "output_variable_name": "tangxun_south_aspect_mask",
+                                "output_raster_path": "d:/code/GeoBenchX/GeoBenchX/scratch/tangxun_south_aspect.tif",
+                                "output_dtype": "uint8",
+                                "classification_model_name": "tangxun_south_aspect",
+                                "append_timestamp_to_output": false,
+                                "plot_title": "Tangxun Lake South-Facing Slopes",
+                                "legend_location": "lower right"
+                            },
+                            "comment": "Flag only those aspect values that fall within the 157.5°–202.5° range."
+                        },
+                        {
+                            "function_name": "calculate_raster_selection_area",
+                            "arguments": {
+                                "raster_path": "d:/code/GeoBenchX/GeoBenchX/scratch/tangxun_south_aspect.tif",
+                                "output_variable_name": "tangxun_south_aspect_area",
+                                "selected_values": [
+                                    1
+                                ],
+                                "treat_nonzero_as_selected": false,
+                                "report_units": "square_kilometers"
+                            },
+                            "comment": "Measure the total area of south-facing slopes for reporting."
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
