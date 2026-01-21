@@ -363,27 +363,6 @@
                                 "output_geodataframe_name": "wuhan_parks"
                             },
                             "comment": "Load data/Data/GeoData/park_in_wuhan.shp so every park polygon can be measured."
-                        },
-                        {
-                            "function_name": "calculate_polygon_areas",
-                            "arguments": {
-                                "geodataframe_name": "wuhan_parks",
-                                "output_variable_name": "wuhan_parks_area_stats",
-                                "area_column_name": "area_sq_km"
-                            },
-                            "comment": "Project the parks to an appropriate UTM CRS and add an area_sq_km column capturing each park's area in square kilometers."
-                        },
-                        {
-                            "function_name": "scale_column_by_value",
-                            "arguments": {
-                                "dataframe_name": "wuhan_parks_area_stats.gdf_with_areas",
-                                "column_name": "area_sq_km",
-                                "operation": "multiply",
-                                "value": 1000000,
-                                "output_column_name": "area_sq_m",
-                                "output_dataframe_name": "wuhan_parks_with_area_m2"
-                            },
-                            "comment": "Translate the per-park areas to square meters by multiplying the square-kilometer values by one million."
                         }
                     ]
                 }

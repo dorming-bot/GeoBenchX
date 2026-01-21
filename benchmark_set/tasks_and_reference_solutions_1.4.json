@@ -1,0 +1,248 @@
+{
+    "metadata": {
+        "author": "ZSX",
+        "notes": "Version 1.1 task definitions without solutions"
+    },
+    "tasks": [
+        {
+            "task_ID": "TASK_test1",
+            "task_text": "Identify the 'heat island' effect in extreme temperature data for China's coastal provinces. First, smooth the data using a median filter, then subtract the smoothed data from the original data. Regions with higher positive values are potential heat islands.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_test2",
+            "task_text": "Apply an 'Olympic' filter to the surface evapotranspiration data of Shanxi Province [21] to remove abnormally high or low data points while preserving the main trends.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_test3",
+            "task_text": "Make a heatmap of railway stations density in Netherlands,",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_test4",
+            "task_text": "Simulate the establishment of two new nature reserves of comparable size at Lake Baikal and Bali. Based on their shapes and geographical contexts, assess which reserve may be more efficient in terms of management and biodiversity conservation.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_test5",
+            "task_text": "Perform a correlation analysis between the 2010 Yushu earthquake validation points and the topographic slope data of the Weihe River Basin to examine potential patterns related to geological hazards.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_test6",
+            "task_text": "Plan an ecological corridor for the Loess Plateau aimed at connecting multiple isolated forest water conservation patches, with the requirement that the terrain slope within the corridor itself be as gentle as possible to facilitate species migration.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_test7",
+            "task_text": "Plan an ecological corridor for the Loess Plateau aimed at connecting multiple isolated forest water conservation patches, with the requirement that the terrain slope within the corridor itself be as gentle as possible to facilitate species migration.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_test8",
+            "task_text": "Calculate the difference between the original temperature raster and the smoothed temperature raster to generate a residual surface, and correlate it with urban POIs to explore localized heat island effects.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        }
+    ]
+}

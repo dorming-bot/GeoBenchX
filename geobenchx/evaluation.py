@@ -293,7 +293,10 @@ While checking if the candidate solution matches to one of the reference solutio
     - If the candidate solution stops with 'reject_task' tool call and one of the reference solutions is 'reject_task', the candidate solution fully matches the reference solution.
     - If the reference solution is not empty, then if candidate solution includes some incorrect steps but does include all the correct steps and produced correct results, the candidate solution is considered as matching the reference solution.
     - If the reference solution is empty, then the candidate solution should be empty to be considered a match.
+    - If the candidate solution uses the same tools and the same datasets as the reference solution, but the order in which the tools are executed differs from the reference solution — and this difference in execution sequence does not affect the overall logic — then it is considered a full match.
     - If correct data are passed between the tools, it does not matter if the names given to the dataframes, geodataframes and variables are different between the candidate and reference solution.
+    - If the candidate solution uses the same tools and the same datasets as the reference solution, but some parameters of the tools in the candidate solution are omitted or differ in non‑essential parameters, it is also considered a full match.
+    - The chosen color scheme and colormap are not very important; even if the color scheme or colormap used in the candidate solution is not exactly the same as in the reference solution, it is still considered a full match.
 - NO MATCH:
     - If the candidate solution and the reference solution use different set of tools, different set of datasets, the candidate solution does not match the reference solution.
     - If candidate solution and reference solution use data from different years and difference is 2 years and more, the solutions do not match.
@@ -302,12 +305,11 @@ While checking if the candidate solution matches to one of the reference solutio
     - If the reference solution is empty, this indicates the task should be solved without using provided tools. In this case, if a candidate solution contains any tool call (even a 'reject_task' tool call), it doesn't match the reference solution.
     - If reference solution is the 'reject_task' tool call and the candidate solution is empty, the candidate solution does not match the reference solution.
 - PARTIAL MATCH:
-    - Color scheme and colormap selected matter. If the reference solution and candidate solution use different color schemes or color maps, it is a partial match.
+    - If the candidate solution uses one or two more tools than the reference solution, or only completes most of the content of the reference solution, or completes all the content of the reference solution but adds a small amount of unnecessary extra steps, then it is considered a partial match.
     - If nodata values used as argument in some functions is different between reference and generated solution, it is a partial match.
     - If lists of spatial predicates used for spatial selection are different between reference and generated solution, it is a partial match.
     - If candidate solution and reference solution use data from different years and difference is 1 year, it is a partial match.
-- Candidate solution matches the reference solution only if all observations indicate a full match. If any observation shows no match, the candidate solution is not matching the reference solution. If no observation shows a no match but at least one shows a partial match, the candidate solution is classified as partially matching he reference solution. 
-</INSTRUCTIONS>
+- Candidate solution matches the reference solution only if all observations indicate a full match. If any observation shows no match, the candidate solution is not matching the reference solution. If no observation shows a no match but at least one shows a partial match, the candidate solution is classified as partially matching he reference solution.</INSTRUCTIONS>
 """
 
 RESULT_CHECKING_PROMPT = f""" 
@@ -393,7 +395,8 @@ def score_task_solution(task: Task, model: str = MODEL_CLAUDE, temperature: floa
     for reference_solution in task.reference_solutions:
         reference_solution_str = get_solution_code(reference_solution, add_num = False)
         reference_solutions_str += f"<REFERENCE SOLUTION>\n{reference_solution_str}\n</REFERENCE SOLUTION>"
-
+    # 构建提示词 (Prompt Construction)
+    # RESULT_CHECKING_PROMPT 是一个预定义的模板，填入题目、参考答案和待评测答案。
     PROMPT = RESULT_CHECKING_PROMPT.format(task_text = task.task_text, reference_solutions = reference_solutions_str, candidate_solution = generated_solution_str)
 
     if verbose:
