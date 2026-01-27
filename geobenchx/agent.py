@@ -190,6 +190,23 @@ def execute_task(task_text: str, temperature: float = 0, model: str = MODEL_GPT_
         "recursion_limit": max_steps
         }
     
+    final_message: Optional[str] = None
+
+    def _extract_text_from_message(message_content) -> Optional[str]:
+        if isinstance(message_content, str):
+            return message_content.strip()
+        if isinstance(message_content, list):
+            parts = []
+            for item in message_content:
+                if isinstance(item, str):
+                    parts.append(item)
+                elif isinstance(item, dict):
+                    if "text" in item and isinstance(item["text"], str):
+                        parts.append(item["text"])
+            text = "\n".join(parts).strip()
+            return text if text else None
+        return None
+
     try:
         for s in graph.stream(inputs, stream_mode="values", config=config):
 
@@ -209,6 +226,11 @@ def execute_task(task_text: str, temperature: float = 0, model: str = MODEL_GPT_
                     step = Step(function_name = tool_call['name'], arguments = tool_call['args']) # to keep compatibility with get_solution_code() and the previous agent
                     #save step to solution 
                     solution_steps.append(step)
+            else:
+                if getattr(message, "type", None) == "ai":
+                    text = _extract_text_from_message(message.content)
+                    if text:
+                        final_message = text
 
             if capture_history:
                 conversation_history.append({"type": message.type, "content": message.content})
@@ -238,5 +260,5 @@ def execute_task(task_text: str, temperature: float = 0, model: str = MODEL_GPT_
 
     solution = Solution(steps = solution_steps)
     
-    return solution, input_tokens, output_tokens, conversation_history
+    return solution, input_tokens, output_tokens, conversation_history, final_message
 

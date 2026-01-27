@@ -6,7 +6,7 @@
     "tasks": [
         {
             "task_ID": "TASK_1_2_034",
-            "task_text": "Compare the two vector extents of The source region of the Yellow River and the Jiuzhaigou earthquake zone, and calculate the percentage of their overlapping area relative to their respective total areas.",
+            "task_text": "Load the data for the source region of the Yellow River and the Jiuzhaigou earthquake zone, compare the two vector extents of these regions, and calculate the percentage of their overlapping area relative to their respective total areas.",
             "task_labels": [
                 "Spatial operations",
                 "Task Set 03",
@@ -69,34 +69,40 @@
                                 "area_column_name": "overlap_area_sq_km"
                             },
                             "comment": "Measure the overlap polygon so the shared area value is available for percentage calculations."
-                        },
-                        {
-                            "function_name": "perform_arithmetic_operation",
-                            "arguments": {
-                                "values": [
-                                    "state:overlap_area_stats.total_area_sq_km",
-                                    "state:yellow_river_area_stats.total_area_sq_km"
-                                ],
-                                "operation": "divide",
-                                "output_variable_name": "overlap_vs_yellow_ratio"
-                            },
-                            "comment": "Divide overlap area by the Yellow River total area to determine the proportional coverage (multiply by 100 later for percent formatting)."
-                        },
-                        {
-                            "function_name": "perform_arithmetic_operation",
-                            "arguments": {
-                                "values": [
-                                    "state:overlap_area_stats.total_area_sq_km",
-                                    "state:jiuzhaigou_area_stats.total_area_sq_km"
-                                ],
-                                "operation": "divide",
-                                "output_variable_name": "overlap_vs_jiuzhaigou_ratio"
-                            },
-                            "comment": "Divide overlap area by the Jiuzhaigou total area, giving the second percentage for comparison."
                         }
                     ]
                 }
             ]
+        },
+        {
+            "task_ID": "TASK_test2",
+            "task_text": "Apply an 'Olympic' filter to the surface evapotranspiration data of Shanxi Province [21] to remove abnormally high or low data points while preserving the main trends.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
         }
     ]
 }

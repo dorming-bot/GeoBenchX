@@ -67,7 +67,7 @@ def generate_solutions(tasks: TaskSet, model: str, temperature: float, output_fi
         while(not success):
             try:
                 _wait_for_tool_cooldown(last_tool_call_ts, TOOL_CALL_DELAY_SECONDS)
-                solution, input_tokens, output_tokens, conversation_history = execute_task(task.task_text, temperature = temperature, model=model, max_steps=max_steps, capture_history=capture_history)
+                solution, input_tokens, output_tokens, conversation_history, final_message = execute_task(task.task_text, temperature = temperature, model=model, max_steps=max_steps, capture_history=capture_history)
                 print('='*30)
                 print(get_solution_code(solution))
                 print(f"Tokens used: input tokens {sum(input_tokens)}, output_tokens {sum(output_tokens)}")
@@ -77,6 +77,7 @@ def generate_solutions(tasks: TaskSet, model: str, temperature: float, output_fi
                 task.generated_solution = solution
                 task.generated_solution_input_tokens = sum(input_tokens)
                 task.generated_solution_output_tokens = sum(output_tokens)
+                task.generated_solution_message = final_message
 
                 if output_filename:
                     tasks.save_to_file(output_filename, folder=RESULTS_FOLDER)

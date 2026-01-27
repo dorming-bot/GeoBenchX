@@ -49,7 +49,7 @@
         },
         {
             "task_ID": "TASK_1_2_034",
-            "task_text": "Compare the two vector extents of The source region of the Yellow River and the Jiuzhaigou earthquake zone, and calculate the percentage of their overlapping area relative to their respective total areas.",
+            "task_text": "Load the data for the source region of the Yellow River and the Jiuzhaigou earthquake zone, compare the two vector extents of these regions, and calculate the percentage of their overlapping area relative to their respective total areas.",
             "task_labels": [
                 "Spatial operations",
                 "Task Set 03",
@@ -112,30 +112,6 @@
                                 "area_column_name": "overlap_area_sq_km"
                             },
                             "comment": "Measure the overlap polygon so the shared area value is available for percentage calculations."
-                        },
-                        {
-                            "function_name": "perform_arithmetic_operation",
-                            "arguments": {
-                                "values": [
-                                    "state:overlap_area_stats.total_area_sq_km",
-                                    "state:yellow_river_area_stats.total_area_sq_km"
-                                ],
-                                "operation": "divide",
-                                "output_variable_name": "overlap_vs_yellow_ratio"
-                            },
-                            "comment": "Divide overlap area by the Yellow River total area to determine the proportional coverage (multiply by 100 later for percent formatting)."
-                        },
-                        {
-                            "function_name": "perform_arithmetic_operation",
-                            "arguments": {
-                                "values": [
-                                    "state:overlap_area_stats.total_area_sq_km",
-                                    "state:jiuzhaigou_area_stats.total_area_sq_km"
-                                ],
-                                "operation": "divide",
-                                "output_variable_name": "overlap_vs_jiuzhaigou_ratio"
-                            },
-                            "comment": "Divide overlap area by the Jiuzhaigou total area, giving the second percentage for comparison."
                         }
                     ]
                 }

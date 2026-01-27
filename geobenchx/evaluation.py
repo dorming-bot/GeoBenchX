@@ -290,20 +290,21 @@ While checking if the candidate solution matches to one of the reference solutio
 - Pay attention to comments in reference solutions, because they specify when multiple variations of correct tool arguments are acceptable.
 - FULL MATCH:
     - If the candidate solution uses the same tools and the same datasets to produce the same results as reference solution, the candidate solution fully matches the reference solution.
-    - If the candidate solution stops with 'reject_task' tool call and one of the reference solutions is 'reject_task', the candidate solution fully matches the reference solution.
+    - If the reference solution is a call to the reject_tasktool, and the candidate solution either ends with a call to the reject_tasktool, or is empty and its generated_solution_messagestates that the problem cannot be solved, then it is considered a full match.
     - If the reference solution is not empty, then if candidate solution includes some incorrect steps but does include all the correct steps and produced correct results, the candidate solution is considered as matching the reference solution.
     - If the reference solution is empty, then the candidate solution should be empty to be considered a match.
     - If the candidate solution uses the same tools and the same datasets as the reference solution, but the order in which the tools are executed differs from the reference solution — and this difference in execution sequence does not affect the overall logic — then it is considered a full match.
     - If correct data are passed between the tools, it does not matter if the names given to the dataframes, geodataframes and variables are different between the candidate and reference solution.
     - If the candidate solution uses the same tools and the same datasets as the reference solution, but some parameters of the tools in the candidate solution are omitted or differ in non‑essential parameters, it is also considered a full match.
     - The chosen color scheme and colormap are not very important; even if the color scheme or colormap used in the candidate solution is not exactly the same as in the reference solution, it is still considered a full match.
+    - Generated_solution_message are extremely important. If the candidate solution includes such messages, and these messages explicitly state the final result (e.g., simple calculations, categorization, etc.) without errors, and all other rules for a full match are satisfied, then it is considered a full match.
 - NO MATCH:
     - If the candidate solution and the reference solution use different set of tools, different set of datasets, the candidate solution does not match the reference solution.
     - If candidate solution and reference solution use data from different years and difference is 2 years and more, the solutions do not match.
     - It does matter which columns are selected from dataframes and geodataframes. If different columns are selected in the reference and candidate solution, the solutions do not match.
     - If categorical filter is used in both reference and candidate solutions and the filters in both do not match, the candidate solution does not match to the reference solution.
     - If the reference solution is empty, this indicates the task should be solved without using provided tools. In this case, if a candidate solution contains any tool call (even a 'reject_task' tool call), it doesn't match the reference solution.
-    - If reference solution is the 'reject_task' tool call and the candidate solution is empty, the candidate solution does not match the reference solution.
+    - Generated_solution_message are important. If the reference solution is a reject_tasktool call, the candidate solution is empty, and the AI message does not explicitly state that it should reject the task, then the candidate solution does not match the reference solution.
 - PARTIAL MATCH:
     - If the candidate solution uses one or two more tools than the reference solution, or only completes most of the content of the reference solution, or completes all the content of the reference solution but adds a small amount of unnecessary extra steps, then it is considered a partial match.
     - If nodata values used as argument in some functions is different between reference and generated solution, it is a partial match.
@@ -384,6 +385,11 @@ def score_task_solution(task: Task, model: str = MODEL_CLAUDE, temperature: floa
 
     if task.generated_solution is not None:
         generated_solution_str = get_solution_code(task.generated_solution, add_num = False)
+        if task.generated_solution_message:
+            safe_message = task.generated_solution_message.replace("{", "{{").replace("}", "}}")
+            generated_solution_str = (
+                f"{generated_solution_str}\n<AI MESSAGE>\n{safe_message}\n</AI MESSAGE>\n"
+            )
     else:
         raise ValueError('generated_solution is None')
 

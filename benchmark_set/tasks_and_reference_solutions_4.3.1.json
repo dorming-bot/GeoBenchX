@@ -1,0 +1,933 @@
+{
+    "metadata": {
+        "author": "ZSX",
+        "notes": "Version 1.1 task definitions without solutions"
+    },
+    "tasks": [
+        {
+            "task_ID": "TASK_4.3.1_1",
+            "task_text": "count the number of POIs (Points of Interest) in China classified as 'hospital' for the year 2014.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "load_geodata",
+                            "arguments": {
+                                "geodataset": "2014 China POI",
+                                "output_geodataframe_name": "china_poi_2014"
+                            },
+                            "comment": null
+                        },
+                        {
+                            "function_name": "filter_categorical",
+                            "arguments": {
+                                "dataframe_name": "china_poi_2014",
+                                "filters": {
+                                    "fclass": [
+                                        "hospital"
+                                    ]
+                                },
+                                "output_dataframe_name": "china_hospitals_2014"
+                            },
+                            "comment": null
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "task_ID": "TASK_4.3.1_2",
+            "task_text": "Identify all traditional Chinese villages located within the Yellow River Basin.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_4.3.1_3",
+            "task_text": "Extract all 'water system' features​ in Nanjing and calculate their total number.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "task_ID": "TASK_4.3.1_4",
+            "task_text": "Filter all sample points​ in Fujian Province whose land cover type is 'forest'.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "task_ID": "TASK_4.3.1_5",
+            "task_text": "Statistically analyze and visualize​ all traditional Chinese villages located in the Loess Plateau region.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "load_geodata",
+                            "arguments": {
+                                "geodataset": "Traditional Villages of China",
+                                "output_geodataframe_name": "traditional_villages"
+                            },
+                            "comment": null
+                        },
+                        {
+                            "function_name": "load_geodata",
+                            "arguments": {
+                                "geodataset": "Loess Plateau Region",
+                                "output_geodataframe_name": "loess_plateau"
+                            },
+                            "comment": null
+                        },
+                        {
+                            "function_name": "select_features_by_spatial_relationship",
+                            "arguments": {
+                                "features_geodataframe_name": "traditional_villages",
+                                "reference_geodataframe_name": "loess_plateau",
+                                "spatial_predicates": [
+                                    "within",
+                                    "intersects"
+                                ],
+                                "output_geodataframe_name": "villages_in_loess_plateau"
+                            },
+                            "comment": null
+                        },
+                        {
+                            "function_name": "visualize_geographies",
+                            "arguments": {
+                                "geodataframe_names": [
+                                    "loess_plateau",
+                                    "villages_in_loess_plateau"
+                                ],
+                                "layer_styles": [
+                                    {
+                                        "color": "lightgray",
+                                        "alpha": 0.5,
+                                        "label": "Loess Plateau"
+                                    },
+                                    {
+                                        "color": "blue",
+                                        "alpha": 0.7,
+                                        "label": "Traditional Villages"
+                                    }
+                                ],
+                                "basemap_style": "Carto Positron",
+                                "title": "Traditional Chinese Villages in the Loess Plateau",
+                                "add_legend": true
+                            },
+                            "comment": null
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "task_ID": "TASK_4.3.1_6",
+            "task_text": "Identify all areas​ with an intensity of “IX (9)” from the 2017 Jiuzhaigou earthquake.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "task_ID": "TASK_4.3.1_7",
+            "task_text": "Extract and display​ all “national highway” routes within the Inner Mongolia Autonomous Region.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "task_ID": "TASK_4.3.1_8",
+            "task_text": "Count all urban parks​ in Wuhan with an area greater than 0.5 square kilometers.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "load_geodata",
+                            "arguments": {
+                                "geodataset": "Wuhan Urban Parks",
+                                "output_geodataframe_name": "wuhan_parks"
+                            },
+                            "comment": null
+                        },
+                        {
+                            "function_name": "calculate_polygon_areas",
+                            "arguments": {
+                                "geodataframe_name": "wuhan_parks",
+                                "output_variable_name": "wuhan_parks_areas",
+                                "area_column_name": "Area"
+                            },
+                            "comment": null
+                        },
+                        {
+                            "function_name": "filter_numerical",
+                            "arguments": {
+                                "dataframe_name": "wuhan_parks",
+                                "conditions": "Area > 0.5",
+                                "output_dataframe_name": "large_parks"
+                            },
+                            "comment": null
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "task_ID": "TASK_4.3.1_9",
+            "task_text": "Identify all Chinese forest water conservation areas​ that are in direct contact (adjacent) with the boundary of Lake Baikal.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "task_ID": "TASK_4.3.1_10",
+            "task_text": "Count the total number​ of all verified points recorded after the 2010 Yushu, Qinghai earthquake.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "task_ID": "TASK_4.3.1_11",
+            "task_text": "Identify all Chinese forest water conservation areas​ that intersect with any intensity zone of the 2017 Jiuzhaigou earthquake.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "load_geodata",
+                            "arguments": {
+                                "geodataset": "Forest Water Conservation China",
+                                "output_geodataframe_name": "forest_water_conservation_areas"
+                            },
+                            "comment": null
+                        },
+                        {
+                            "function_name": "load_geodata",
+                            "arguments": {
+                                "geodataset": "Jiuzhaigou earthquake zone",
+                                "output_geodataframe_name": "jiuzhaigou_earthquake_zone"
+                            },
+                            "comment": null
+                        },
+                        {
+                            "function_name": "select_features_by_spatial_relationship",
+                            "arguments": {
+                                "features_geodataframe_name": "forest_water_conservation_areas",
+                                "reference_geodataframe_name": "jiuzhaigou_earthquake_zone",
+                                "spatial_predicates": [
+                                    "intersects"
+                                ],
+                                "output_geodataframe_name": "intersecting_conservation_areas",
+                                "plot_result": true
+                            },
+                            "comment": null
+                        },
+                        {
+                            "function_name": "filter_categorical",
+                            "arguments": {
+                                "dataframe_name": "forest_water_conservation_areas",
+                                "filters": {
+                                    "Prov_EN": [
+                                        "Sichuan"
+                                    ]
+                                },
+                                "output_dataframe_name": "sichuan_forest_water_conservation_areas"
+                            },
+                            "comment": null
+                        },
+                        {
+                            "function_name": "select_features_by_spatial_relationship",
+                            "arguments": {
+                                "features_geodataframe_name": "sichuan_forest_water_conservation_areas",
+                                "reference_geodataframe_name": "jiuzhaigou_earthquake_zone",
+                                "spatial_predicates": [
+                                    "intersects"
+                                ],
+                                "output_geodataframe_name": "intersecting_conservation_areas",
+                                "plot_result": true
+                            },
+                            "comment": null
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "task_ID": "TASK_4.3.1_12",
+            "task_text": "Find all POIs​ within 5 kilometers of any national highway in Inner Mongolia.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "task_ID": "TASK_4.3.1_13",
+            "task_text": "Identify all POIs​ that were completely submerged by the 2021 flood in Xinxiang City.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "task_ID": "TASK_4.3.1_14",
+            "task_text": "Find Wuhan POIs (3 locations)​ that intersect with the boundary lines of major urban parks in Wuhan.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "load_geodata",
+                            "arguments": {
+                                "geodataset": "Wuhan POIs (3 locations)",
+                                "output_geodataframe_name": "wuhan_pois"
+                            },
+                            "comment": null
+                        },
+                        {
+                            "function_name": "load_geodata",
+                            "arguments": {
+                                "geodataset": "Wuhan Urban Parks",
+                                "output_geodataframe_name": "wuhan_parks"
+                            },
+                            "comment": null
+                        },
+                        {
+                            "function_name": "select_features_by_spatial_relationship",
+                            "arguments": {
+                                "features_geodataframe_name": "wuhan_pois",
+                                "reference_geodataframe_name": "wuhan_parks",
+                                "spatial_predicates": [
+                                    "intersects"
+                                ],
+                                "output_geodataframe_name": "intersecting_pois"
+                            },
+                            "comment": null
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "task_ID": "TASK_4.3.1_15",
+            "task_text": "Select all traditional Chinese villages​ that are completely located within areas of the Wei River Basin where the terrain slope is greater than 25 degrees.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "task_ID": "TASK_4.3.1_16",
+            "task_text": "Find all un-flooded crab ponds​ that are adjacent (share a boundary) to the submerged crab ponds in Changxing, Zhejiang Province in 2021.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "task_ID": "TASK_4.3.1_17",
+            "task_text": "Identify all provincial roads​ in Inner Mongolia that cross (cross the outline of) the Yellow River Basin.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "load_geodata",
+                            "arguments": {
+                                "geodataset": "Inner Mongolia roads",
+                                "output_geodataframe_name": "inner_mongolia_roads"
+                            },
+                            "comment": null
+                        },
+                        {
+                            "function_name": "load_geodata",
+                            "arguments": {
+                                "geodataset": "The source region of the Yellow River",
+                                "output_geodataframe_name": "yellow_river_basin"
+                            },
+                            "comment": null
+                        },
+                        {
+                            "function_name": "select_features_by_spatial_relationship",
+                            "arguments": {
+                                "features_geodataframe_name": "inner_mongolia_roads",
+                                "reference_geodataframe_name": "yellow_river_basin",
+                                "spatial_predicates": [
+                                    "crosses"
+                                ],
+                                "output_geodataframe_name": "crossing_roads",
+                                "plot_result": true
+                            },
+                            "comment": null
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "task_ID": "TASK_4.3.1_18",
+            "task_text": "In Bali, find all POIs​ within 10 kilometers of major cities and ports.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "task_ID": "TASK_4.3.1_19",
+            "task_text": "Identify all “cultivated land” sample points​ within 1 kilometer of “water body” sample points in Fujian Province.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "task_ID": "TASK_4.3.1_20",
+            "task_text": "Determine which administrative divisions​ in Puerto Rico are closest to the 2010 Yushu earthquake verification points (if projected to the same area).",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "task_ID": "TASK_4.3.1_21",
+            "task_text": "Identify all traditional Chinese villages​ located in both the Loess Plateau and the source region of Yellow River Basin to assess their dual ecological pressures.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "load_geodata",
+                            "arguments": {
+                                "geodataset": "Traditional Villages of China",
+                                "output_geodataframe_name": "traditional_villages"
+                            },
+                            "comment": null
+                        },
+                        {
+                            "function_name": "load_geodata",
+                            "arguments": {
+                                "geodataset": "Loess Plateau Region",
+                                "output_geodataframe_name": "loess_plateau"
+                            },
+                            "comment": null
+                        },
+                        {
+                            "function_name": "load_geodata",
+                            "arguments": {
+                                "geodataset": "The source region of the Yellow River",
+                                "output_geodataframe_name": "yellow_river_basin"
+                            },
+                            "comment": null
+                        },
+                        {
+                            "function_name": "select_features_by_spatial_relationship",
+                            "arguments": {
+                                "features_geodataframe_name": "traditional_villages",
+                                "reference_geodataframe_name": "loess_plateau",
+                                "spatial_predicates": [
+                                    "within",
+                                    "intersects"
+                                ],
+                                "output_geodataframe_name": "villages_in_loess_plateau"
+                            },
+                            "comment": null
+                        },
+                        {
+                            "function_name": "select_features_by_spatial_relationship",
+                            "arguments": {
+                                "features_geodataframe_name": "traditional_villages",
+                                "reference_geodataframe_name": "yellow_river_basin",
+                                "spatial_predicates": [
+                                    "within",
+                                    "intersects"
+                                ],
+                                "output_geodataframe_name": "villages_in_yellow_river_basin"
+                            },
+                            "comment": null
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "task_ID": "TASK_4.3.1_22",
+            "task_text": "Select areas​ that are within the intensity VIII and above zones of the Jiuzhaigou earthquake and are also forest water conservation areas, to be designated as core ecological restoration zones.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "task_ID": "TASK_4.3.1_23",
+            "task_text": "For emergency response in Xinxiang City:​ Identify all hospitals that were not flooded but are within 1 kilometer of the flooded area boundary, to be treated as high-risk medical points.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "task_ID": "TASK_4.3.1_24",
+            "task_text": "In Inner Mongolia, find all roads​ within 700 kilometers of the Lake Baikal boundary line to assess potential unofficial cross-border passages.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "task_ID": "TASK_4.3.1_25",
+            "task_text": "Identify all areas​ in Fujian Province that are classified as “cultivated land” and where the nearest “water body” sample point is more than 2 kilometers away, to assess potential drought irrigation risks.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "task_ID": "TASK_4.3.1_26",
+            "task_text": "Simulate invasive species spread:​ In the United States, find all areas within the “sagebrush” distribution that currently have high habitat suitability for “collared lizards.”",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "task_ID": "TASK_4.3.1_27",
+            "task_text": "Urban emergency shelter site selection analysis:​ In Nanjing, select all areas classified as “park green space,” with an area greater than 1 hectare, and that do not intersect with “water systems,” as potential shelters.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "task_ID": "TASK_4.3.1_28",
+            "task_text": "Assess cultural heritage geological risk​ in the Wei River Basin: Find all traditional Chinese villages located in areas with a slope greater than 15 degrees and within 50 kilometers of the 2010 Yushu earthquake verification points (as a proxy indicator of tectonic activity).",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "task_ID": "TASK_4.3.1_29",
+            "task_text": "Coastal hotspot identification:​ Find all areas in China’s coastal provinces and regions where the annual extreme temperature (raster value) is above a specific threshold and where the POI density within 10 kilometers is higher than 100 per square kilometer.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "task_ID": "TASK_4.3.1_30",
+            "task_text": "Preliminary estimate of flood economic losses:​ In Changxing, Zhejiang, calculate the total area of all submerged crab ponds and compare it with the total area of all crab ponds in the region to derive the disaster proportion.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

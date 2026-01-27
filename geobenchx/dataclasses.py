@@ -48,6 +48,7 @@ class Task(BaseModel):
 
     generated_solution_input_tokens: Optional[int] = None
     generated_solution_output_tokens: Optional[int] = None
+    generated_solution_message: Optional[str] = None
 
     match_reasoning_LLM: Optional[str] = None
     match_score_LLM: Optional[ScoreValues] = None
