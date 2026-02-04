@@ -1,0 +1,159 @@
+{
+    "metadata": {
+        "author": "Codex-SKILL",
+        "notes": "Skill-oriented tasks leveraging GeoSpatialProcessingSkill wrappers.",
+        "model": "gpt-4o",
+        "temperature": 0.0,
+        "generated_at": "2026-02-02T06:28:00.162725Z",
+        "total_input_tokens_for_generation": 13972,
+        "total_output_tokens_for_generation": 389
+    },
+    "tasks": [
+        {
+            "task_ID": "SKILL_TASK_001",
+            "task_text": "Mark the centroid of Chengdu municipality.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize"
+            ],
+            "reference_solution_description": "Load the Chengdu boundary polygon and use the GeoSpatialProcessingSkill centroid method to export the centroid layer and preview map.",
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "load_geodata",
+                            "arguments": {
+                                "geodataset": "Chengdu Surface",
+                                "output_geodataframe_name": "chengdu_boundary"
+                            },
+                            "comment": "Load the Chengdu administrative polygon (data/Data/GeoData/Chengdu_Surface.shp) so its geometry is available to the SKILL wrapper."
+                        },
+                        {
+                            "function_name": "GeoSpatialProcessingSkill.get_centroids",
+                            "arguments": {
+                                "geodataframe_name": "chengdu_boundary",
+                                "output_geodataframe_name": "chengdu_centroid_points",
+                                "output_variable_name": "chengdu_centroid_summary",
+                                "output_shapefile_path": "d:/code/GeoBenchX/GeoBenchX/scratch/chengdu_centroid_skill.shp",
+                                "output_tif_path": "d:/code/GeoBenchX/GeoBenchX/scratch/chengdu_centroid_skill_map.tif",
+                                "title": "Centroid of Chengdu via SKILL",
+                                "basemap_style": "Carto Positron"
+                            },
+                            "comment": "Call the SKILL wrapper to compute the centroid, persist it as a shapefile, and capture the TIFF preview with metadata stored in 'chengdu_centroid_summary'."
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": {
+                "steps": [
+                    {
+                        "function_name": "load_geodata",
+                        "arguments": {
+                            "geodataset": "Chengdu_Surface.shp",
+                            "output_geodataframe_name": "chengdu_surface"
+                        }
+                    },
+                    {
+                        "function_name": "get_centroids",
+                        "arguments": {
+                            "geodataframe_name": "chengdu_surface",
+                            "output_geodataframe_name": "chengdu_centroid",
+                            "output_shapefile_path": "/mnt/data/Chengdu_Centroid.shp",
+                            "title": "Centroid of Chengdu Municipality",
+                            "basemap_style": "OpenStreetMap"
+                        }
+                    },
+                    {
+                        "function_name": "get_centroids",
+                        "arguments": {
+                            "geodataframe_name": "chengdu_surface",
+                            "output_geodataframe_name": "chengdu_centroid",
+                            "output_shapefile_path": "/mnt/data/Chengdu_Centroid.shp",
+                            "title": "Centroid of Chengdu Municipality",
+                            "basemap_style": "Carto Positron"
+                        }
+                    }
+                ]
+            },
+            "generated_solution_input_tokens": 9401,
+            "generated_solution_output_tokens": 225,
+            "generated_solution_message": "I encountered a connection issue while trying to access the basemap tiles. However, the centroid of the Chengdu municipality has been calculated and saved as a shapefile at `/mnt/data/Chengdu_Centroid.shp`. You can view this file using any GIS software."
+        },
+        {
+            "task_ID": "SKILL_TASK_002",
+            "task_text": "Create a 1,000-meter dissolved buffer for Wuhan urban parks and calculate its total area.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize"
+            ],
+            "reference_solution_description": "Load the Wuhan park polygons, run the SKILL buffer generator at 1 km, and feed the dissolved result into the polygon-area SKILL call to report the buffer coverage.",
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "load_geodata",
+                            "arguments": {
+                                "geodataset": "Wuhan Urban Parks",
+                                "output_geodataframe_name": "wuhan_parks"
+                            },
+                            "comment": "Bring the Wuhan park dataset (data/Data/GeoData/park_in_wuhan.shp) into the shared data store."
+                        },
+                        {
+                            "function_name": "GeoSpatialProcessingSkill.create_dissolved_buffer",
+                            "arguments": {
+                                "geodataframe_name": "wuhan_parks",
+                                "buffer_size_meters": 1000.0,
+                                "output_geodataframe_name": "wuhan_parks_buffer_1000m",
+                                "output_file_path": "d:/code/GeoBenchX/GeoBenchX/scratch/wuhan_parks_1000m_buffer.shp",
+                                "basemap_style": "Carto Positron",
+                                "plot_title": "Wuhan Urban Park 1000 m Buffer"
+                            },
+                            "comment": "Use the SKILL buffer method to dissolve the 1 km service area around all parks and save the resulting shapefile for reuse."
+                        },
+                        {
+                            "function_name": "GeoSpatialProcessingSkill.calculate_polygon_areas",
+                            "arguments": {
+                                "geodataframe_name": "wuhan_parks_buffer_1000m",
+                                "output_variable_name": "wuhan_buffer_area_stats",
+                                "area_column_name": "buffer_area_sq_km"
+                            },
+                            "comment": "Feed the dissolved buffer GeoDataFrame back into the SKILL area calculator to obtain the total coverage of the 1 km buffer zone."
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": {
+                "steps": [
+                    {
+                        "function_name": "load_geodata",
+                        "arguments": {
+                            "geodataset": "park_in_wuhan.shp",
+                            "output_geodataframe_name": "wuhan_parks"
+                        }
+                    },
+                    {
+                        "function_name": "create_dissolved_buffer",
+                        "arguments": {
+                            "geodataframe_name": "wuhan_parks",
+                            "buffer_size_meters": 1000,
+                            "output_geodataframe_name": "wuhan_parks_buffer",
+                            "dissolve_by_attribute": null
+                        }
+                    },
+                    {
+                        "function_name": "calculate_polygon_areas",
+                        "arguments": {
+                            "geodataframe_name": "wuhan_parks_buffer",
+                            "output_variable_name": "wuhan_parks_buffer_area"
+                        }
+                    }
+                ]
+            },
+            "generated_solution_input_tokens": 4571,
+            "generated_solution_output_tokens": 164,
+            "generated_solution_message": "The 1,000-meter dissolved buffer for Wuhan urban parks has been created, and its total area is approximately 693.07 square kilometers."
+        }
+    ]
+}
