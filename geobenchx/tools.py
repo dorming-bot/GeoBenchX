@@ -17,7 +17,8 @@ import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.ticker import FuncFormatter
 from matplotlib.colors import LinearSegmentedColormap, ListedColormap
-from matplotlib.patches import Rectangle
+from matplotlib.patches import Rectangle, Patch
+from matplotlib.lines import Line2D
 import numpy as np
 import pandas as pd
 
@@ -2777,11 +2778,26 @@ def create_dissolved_buffer(
             label="Original features"
         )
 
-        ctx.add_basemap(ax, source=provider, crs="EPSG:3857")
+        basemap_warning = None
+        try:
+            ctx.add_basemap(ax, source=provider, crs="EPSG:3857")
+        except Exception as exc:
+            basemap_warning = f"Basemap not added due to connection issue: {exc}"
+            ax.set_facecolor("#f7f7f7")
         ax.set_axis_off()
         map_title = plot_title or f"{buffer_size_meters:.0f} m Dissolved Buffer"
         ax.set_title(map_title)
-        ax.legend(loc="upper right")
+        legend_handles = [
+            Patch(
+                facecolor="#2ca25f",
+                edgecolor="#1b7837",
+                linewidth=1.2,
+                alpha=0.5,
+                label=f"{buffer_size_meters:.0f} m Buffer",
+            ),
+            Line2D([0], [0], color="#045a8d", linewidth=0.8, alpha=0.8, label="Original features"),
+        ]
+        ax.legend(handles=legend_handles, loc="upper right")
 
         buf = io.BytesIO()
         fig.savefig(buf, format="png", bbox_inches="tight", dpi=150)
@@ -2803,7 +2819,7 @@ def create_dissolved_buffer(
             else "All buffered features merged into a single geometry."
         )
 
-        return (
+        result_message = (
             f"Created {buffer_size_meters:.0f}m buffer from '{geodataframe_name}' "
             f"and stored dissolved result as '{output_geodataframe_name}'.\n"
             f"{dissolve_note}\n"
@@ -2811,6 +2827,9 @@ def create_dissolved_buffer(
             f"GeoDataFrame details:\n{info_string}\n"
             f"Vector file saved to: {saved_file_path}"
         )
+        if basemap_warning:
+            result_message = f"{result_message}\nBasemap warning: {basemap_warning}"
+        return result_message
 
     except Exception as e:
         return f"Error creating dissolved buffer: {type(e).__name__} : {str(e)}"
@@ -4506,8 +4525,16 @@ def get_centroids(
         else:
             centroids_source = geodataframe.copy()
 
-        centroids_gdf = centroids_source.copy()
-        centroids_gdf.geometry = centroids_source.geometry.centroid
+        try:
+            metric_crs = centroids_source.estimate_utm_crs()
+        except pyproj_exceptions.CRSError:
+            metric_crs = None
+
+        metric_crs_code = metric_crs.to_string() if metric_crs is not None else "EPSG:3857"
+        centroids_source_metric = centroids_source.to_crs(metric_crs_code)
+        centroids_metric = centroids_source_metric.copy()
+        centroids_metric.geometry = centroids_source_metric.geometry.centroid
+        centroids_gdf = centroids_metric.to_crs(geodataframe.crs)
 
         state["data_store"][output_geodataframe_name] = centroids_gdf
 
@@ -4581,7 +4608,12 @@ def get_centroids(
         ax.set_xlim(bounds[0], bounds[2])
         ax.set_ylim(bounds[1], bounds[3])
 
-        ctx.add_basemap(ax, source=provider, crs="EPSG:3857")
+        basemap_warning = None
+        try:
+            ctx.add_basemap(ax, source=provider, crs="EPSG:3857")
+        except Exception as exc:
+            basemap_warning = f"Basemap not added due to connection issue: {exc}"
+            ax.set_facecolor("#f7f7f7")
         ax.set_axis_off()
         map_title = title or "Feature centroids"
         ax.set_title(map_title)
@@ -4631,6 +4663,8 @@ def get_centroids(
             f"- Shapefile saved to: '{shapefile_path.as_posix()}'",
             f"- Map TIFF saved to: '{tif_path.as_posix()}'",
         ]
+        if basemap_warning:
+            summary_parts.append(f"- Basemap warning: {basemap_warning}")
         if output_variable_name:
             summary_parts.append(f"- Summary stored under: '{output_variable_name}'")
         summary_parts.append("GeoDataFrame details:")
