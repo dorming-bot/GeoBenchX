@@ -1,0 +1,128 @@
+{
+    "metadata": {
+        "author": "Codex-SKILL",
+        "notes": "Skill-oriented tasks leveraging GeoSpatialProcessingSkill wrappers.",
+        "model": "gpt-4o",
+        "temperature": 0.0,
+        "generated_at": "2026-03-05T12:08:46.387258Z",
+        "total_input_tokens_for_generation": 23992,
+        "total_output_tokens_for_generation": 481
+    },
+    "tasks": [
+        {
+            "task_ID": "SKILL_TASK_001",
+            "task_text": "Mark the centroid of Chengdu surface.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize"
+            ],
+            "reference_solutions": [],
+            "generated_solution": {
+                "steps": [
+                    {
+                        "function_name": "load_geodata",
+                        "arguments": {
+                            "geodataset": "Chengdu_Surface.shp",
+                            "output_geodataframe_name": "chengdu_surface"
+                        }
+                    },
+                    {
+                        "function_name": "get_centroids",
+                        "arguments": {
+                            "geodataframe_name": "chengdu_surface",
+                            "output_geodataframe_name": "chengdu_surface_centroid",
+                            "title": "Centroid of Chengdu Surface",
+                            "basemap_style": "Carto Positron"
+                        }
+                    }
+                ]
+            },
+            "generated_solution_input_tokens": 7119,
+            "generated_solution_output_tokens": 137,
+            "generated_solution_message": "The centroid of the Chengdu surface has been marked. You can view the map with the centroid in the TIFF file located at: `D:/code/GeoBenchX/GeoBenchX/skill_test/scratch/chengdu_surface_centroid_map.tif`."
+        },
+        {
+            "task_ID": "SKILL_TASK_002",
+            "task_text": "Create a 1,000-meter dissolved buffer for Wuhan urban parks and calculate its total area.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize"
+            ],
+            "reference_solutions": [],
+            "generated_solution": {
+                "steps": [
+                    {
+                        "function_name": "load_geodata",
+                        "arguments": {
+                            "geodataset": "park_in_wuhan.shp",
+                            "output_geodataframe_name": "wuhan_parks"
+                        }
+                    },
+                    {
+                        "function_name": "create_dissolved_buffer",
+                        "arguments": {
+                            "geodataframe_name": "wuhan_parks",
+                            "buffer_size_meters": 1000,
+                            "output_geodataframe_name": "wuhan_parks_buffer",
+                            "dissolve_by_attribute": null,
+                            "output_file_path": null,
+                            "overwrite_existing": true,
+                            "basemap_style": "Carto Positron",
+                            "plot_title": "Wuhan Urban Parks 1,000-meter Buffer"
+                        }
+                    },
+                    {
+                        "function_name": "calculate_polygon_areas",
+                        "arguments": {
+                            "geodataframe_name": "wuhan_parks_buffer",
+                            "output_variable_name": "wuhan_parks_buffer_area"
+                        }
+                    }
+                ]
+            },
+            "generated_solution_input_tokens": 7543,
+            "generated_solution_output_tokens": 207,
+            "generated_solution_message": "I have created a 1,000-meter dissolved buffer around the Wuhan urban parks and calculated its total area. The total area of the buffer is approximately 693.07 square kilometers."
+        },
+        {
+            "task_ID": "SKILL_TASK_003",
+            "task_text": "Use the DEM data of Guangming District and describe how high the highest point of this raster data is.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize"
+            ],
+            "reference_solutions": [],
+            "generated_solution": {
+                "steps": [
+                    {
+                        "function_name": "get_raster_path",
+                        "arguments": {
+                            "rasterdataset": "Guangming District DEM",
+                            "output_variable_name": "dem_raster_path"
+                        }
+                    },
+                    {
+                        "function_name": "get_raster_path",
+                        "arguments": {
+                            "rasterdataset": "Guangming District DEM (Shenzhen)",
+                            "output_variable_name": "dem_raster_path"
+                        }
+                    },
+                    {
+                        "function_name": "get_raster_description",
+                        "arguments": {
+                            "raster_path": "D:/code/GeoBenchX/GeoBenchX/data/Data/GeoData/guangming.tif",
+                            "output_variable_name": "dem_raster_description"
+                        }
+                    }
+                ]
+            },
+            "generated_solution_input_tokens": 9330,
+            "generated_solution_output_tokens": 137,
+            "generated_solution_message": "The highest point in the Guangming District DEM (Shenzhen) raster data is 345.28 meters."
+        }
+    ]
+}

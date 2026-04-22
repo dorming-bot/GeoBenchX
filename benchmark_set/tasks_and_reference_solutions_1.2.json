@@ -5,14 +5,11 @@
     },
     "tasks": [
         {
-            "task_ID": "TASK_1_2_033",
+            "task_ID": "TASK_1_2_175",
             "task_text": "To study the diffusion direction of parks in Wuhan, please extract the centroid of each park and conduct a directional analysis on these centroids.",
             "task_labels": [
-                "Spatial operations",
-                "Task Set 03",
-                "Process, Merge, Visualize",
-                "Merge, Visualize",
-                "Heatmaps, Contour Lines"
+                "Geo Task Set 03",
+                "Spatial Proximity and Direction"
             ],
             "reference_solution_description": "Load the Wuhan park polygons, derive a centroid for each feature, and run the standard deviational ellipse analysis on those centroids to summarize the primary diffusion direction.",
             "reference_solutions": [
@@ -48,14 +45,12 @@
             ]
         },
         {
-            "task_ID": "TASK_1_2_034",
+            "task_ID": "TASK_1_2_176",
             "task_text": "Load the data for the source region of the Yellow River and the Jiuzhaigou earthquake zone, compare the two vector extents of these regions, and calculate the percentage of their overlapping area relative to their respective total areas.",
             "task_labels": [
-                "Spatial operations",
-                "Task Set 03",
-                "Process, Merge, Visualize",
-                "Merge, Visualize",
-                "Heatmaps, Contour Lines"
+                "Geo Task Set 03",
+                "Geometric Calculation",
+                "Vector Overlay, Intersection, and Topological Relations"
             ],
             "reference_solution_description": "Load the Yellow River source-region and Jiuzhaigou earthquake-zone polygons, compute their areas, intersect the two extents, measure the overlap, and divide the overlap area by each region's total area to report the percentage coverage for both datasets.",
             "reference_solutions": [
@@ -118,14 +113,12 @@
             ]
         },
         {
-            "task_ID": "TASK_1_2_035",
+            "task_ID": "TASK_1_2_177",
             "task_text": "Calculate the total area of China's forest water conservation zones within a 10000 meter buffer zone of the Loess Plateau Region, and compute the percentage it represents of the entire buffer zone area.",
             "task_labels": [
-                "Spatial operations",
-                "Task Set 03",
-                "Process, Merge, Visualize",
-                "Merge, Visualize",
-                "Heatmaps, Contour Lines"
+                "Geo Task Set 03",
+                "Buffer Analysis",
+                "Geometric Calculation"
             ],
             "reference_solution_description": "Load the Loess Plateau Region and Forest Water Conservation China datasets, build a 10 km dissolved buffer around the plateau, intersect the buffer with the conservation polygons, measure both the buffer and the overlap areas, and divide the overlap by the full buffer area to report the percentage of conservation land inside the buffer.",
             "reference_solutions": [
@@ -200,14 +193,13 @@
             ]
         },
         {
-            "task_ID": "TASK_1_2_036",
+            "task_ID": "TASK_1_2_178",
             "task_text": "Identify the centroid of the Loess Plateau and use this point as the center to create a dissolved buffer zone with a radius of 100 kilometers; then analyze the overlap between this region and China's forest water conservation zones, calculate the overlapping area, and generate visualizations for plotting.",
             "task_labels": [
-                "Spatial operations",
-                "Task Set 03",
-                "Process, Merge, Visualize",
-                "Merge, Visualize",
-                "Heatmaps, Contour Lines"
+                "Geo Task Set 03",
+                "Buffer Analysis",
+                "Vector Overlay, Intersection, and Topological Relations",
+                "Geometric Calculation"
             ],
             "reference_solution_description": "Load the Loess Plateau boundary and forest water conservation zones, derive the plateau centroid, build a 100 km dissolved buffer centered on that point, intersect the buffer with the conservation zones, measure the overlapping area, and visualize the buffer versus the intersected conservation features on a basemap.",
             "reference_solutions": [
@@ -295,14 +287,14 @@
             ]
         },
         {
-            "task_ID": "TASK_1_2_037",
+            "task_ID": "TASK_1_2_179",
             "task_text": "Identify all areas within the Weihe River Basin where the slope is greater than 5 and the distance to the nearest traditional village is less than 20 kilometers.",
             "task_labels": [
-                "Spatial operations",
-                "Task Set 03",
-                "Process, Merge, Visualize",
-                "Merge, Visualize",
-                "Heatmaps, Contour Lines"
+                "Geo Task Set 01",
+                "Basic Factor Extraction",
+                "Geo Task Set 03",
+                "Vector Overlay, Intersection, and Topological Relations",
+                "Spatial Proximity and Direction"
             ],
             "reference_solution_description": "Retrieve the Weihe Basin slope raster, delineate its basin boundary, filter China's traditional villages that fall inside the basin, build a dissolved 20 km buffer around those villages, reclassify the slope raster to isolate values greater than five, rasterize the village buffer to match the slope grid, and analyze the overlap of the two rasters to highlight pixels that satisfy both criteria.",
             "reference_solutions": [
@@ -400,14 +392,11 @@
             ]
         },
         {
-            "task_ID": "TASK_1_2_038",
+            "task_ID": "TASK_1_2_180",
             "task_text": "In the Xinxiang heavy rainfall area, identify all areas that are 20 kilometers away from traditional villages.",
             "task_labels": [
-                "Spatial operations",
-                "Task Set 03",
-                "Process, Merge, Visualize",
-                "Merge, Visualize",
-                "Heatmaps, Contour Lines"
+                "Geo Task Set 03",
+                "Spatial Proximity and Direction"
             ],
             "reference_solution_description": "Load China's traditional villages, retrieve the Xinxiang rainstorm raster boundary to define the analysis extent, select the villages inside or touching that boundary, create a dissolved 20 km buffer around those villages, and intersect the buffer with the Xinxiang boundary to map the areas lying within 20 km of the settlements.",
             "reference_solutions": [
@@ -474,14 +463,13 @@
             ]
         },
         {
-            "task_ID": "TASK_1_2_039",
+            "task_ID": "TASK_1_2_181",
             "task_text": "Based on the Guangming District DEM (Shenzhen), identify all areas with a slope less than 5 degrees, and calculate the total area of these flat regions.",
             "task_labels": [
-                "Spatial operations",
-                "Task Set 03",
-                "Process, Merge, Visualize",
-                "Merge, Visualize",
-                "Heatmaps, Contour Lines"
+                "Geo Task Set 01",
+                "Basic Factor Extraction",
+                "Geo Task Set 03",
+                "Geometric Calculation"
             ],
             "reference_solution_description": "Retrieve the Guangming District DEM, convert it to a slope raster, reclassify the slope so pixels below five degrees are labeled as flat, and calculate the overall area represented by those flat pixels.",
             "reference_solutions": [
@@ -534,14 +522,13 @@
             ]
         },
         {
-            "task_ID": "TASK_1_2_040",
+            "task_ID": "TASK_1_2_182",
             "task_text": "Select suitable locations for agricultural development planning in the Piura region of Peru, requiring the identification of areas with a slope of less than 10 degrees and negative profile curvature.",
             "task_labels": [
-                "Spatial operations",
-                "Task Set 03",
-                "Process, Merge, Visualize",
-                "Merge, Visualize",
-                "Heatmaps, Contour Lines"
+                "Geo Task Set 01",
+                "Basic Factor Extraction",
+                "Geo Task Set 05",
+                "Site Selection Analysis and Suitability Evaluation"
             ],
             "reference_solution_description": "Load the Piura DEM, convert it into slope and profile curvature rasters, reclassify the slope to highlight values below ten degrees, reclassify the curvature to focus on negative values, and analyze the overlap of those two classified rasters to delineate agricultural-friendly terrain.",
             "reference_solutions": [

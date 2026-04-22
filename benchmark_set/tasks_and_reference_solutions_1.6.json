@@ -1,0 +1,1006 @@
+{
+    "metadata": {
+        "author": "ZSX",
+        "notes": "Version 1.1 task definitions without solutions"
+    },
+    "tasks": [
+        {
+            "task_ID": "TASK_test126",
+            "task_text": "Construct an 'Eco-Economic Development Potential Index' for the Loess Plateau region, defined as a weighted composition of normalized POI density and forest water conservation area coverage rate.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_test127",
+            "task_text": "Calculate the total number of POIs categorized as 'school' in China in 2014.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_test128",
+            "task_text": "Identify all Highways within Inner Mongolia with a length exceeding 50 kilometers.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_test129",
+            "task_text": "Extract all areas within the Wei River Basin where the slope exceeds 25 degrees and calculate the total area of these regions.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_test130",
+            "task_text": "In Wuhan City, filter urban parks with an area smaller than 10,000 square meters that do not contain any water bodies.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_test131",
+            "task_text": "Assess which major roads in Inner Mongolia intersect with China's Water Conservation Function Zones and calculate the total length of road segments passing through these zones.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_test132",
+            "task_text": "Count the total number of POIs classified as 'Hospital' within China in 2014.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_test133",
+            "task_text": "Identify Inner Mongolian Provincial Highways that cross the outline of the Yellow River Basin.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_test134",
+            "task_text": "Identify all Chinese Traditional Villages located within both the Loess Plateau and the Yellow River Basin to assess their dual ecological pressures.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_test135",
+            "task_text": "Simulate the reduction in travel time between two major cities in Inner Mongolia following the construction of a new expressway.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_test136",
+            "task_text": "Compare the two vector extents of The source region of the Yellow River and the Jiuzhaigou earthquake zone, and calculate the percentage of their overlapping area relative to their respective total areas.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": "Load the Yellow River source-region polygon and the Jiuzhaigou earthquake zone boundary, intersect them, measure areas for each dataset plus the overlap, and compute the percentage of overlap relative to both inputs.",
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "load_geodata",
+                            "arguments": {
+                                "geodataset": "The source region of the Yellow River",
+                                "output_geodataframe_name": "yellow_river_source_region"
+                            },
+                            "comment": "Load the Yellow River source polygon (data/Data/GeoData/YellowRiver_SourceRegion.shp)."
+                        },
+                        {
+                            "function_name": "load_geodata",
+                            "arguments": {
+                                "geodataset": "Jiuzhaigou earthquake zone",
+                                "output_geodataframe_name": "jiuzhaigou_quake_zone"
+                            },
+                            "comment": "Load the Jiuzhaigou earthquake polygon (data/Data/GeoData/Jiuzhai.shp)."
+                        },
+                        {
+                            "function_name": "analyze_vector_overlap",
+                            "arguments": {
+                                "geodataframe_a_name": "yellow_river_source_region",
+                                "geodataframe_b_name": "jiuzhaigou_quake_zone",
+                                "output_geodataframe_name": "source_vs_jiuzhai_overlap"
+                            },
+                            "comment": "Use the lightweight overlap tool to intersect the two regions and store the shared footprint for downstream area calculations."
+                        },
+                        {
+                            "function_name": "calculate_polygon_areas",
+                            "arguments": {
+                                "geodataframe_name": "yellow_river_source_region",
+                                "output_variable_name": "yellow_source_area_stats",
+                                "area_column_name": "yellow_source_area_sq_km"
+                            },
+                            "comment": "Measure the total area of the Yellow River source region."
+                        },
+                        {
+                            "function_name": "calculate_polygon_areas",
+                            "arguments": {
+                                "geodataframe_name": "jiuzhaigou_quake_zone",
+                                "output_variable_name": "jiuzhaigou_area_stats",
+                                "area_column_name": "jiuzhaigou_area_sq_km"
+                            },
+                            "comment": "Measure the total area of the Jiuzhaigou earthquake zone."
+                        },
+                        {
+                            "function_name": "calculate_polygon_areas",
+                            "arguments": {
+                                "geodataframe_name": "source_vs_jiuzhai_overlap",
+                                "output_variable_name": "source_vs_jiuzhai_overlap_area_stats",
+                                "area_column_name": "overlap_area_sq_km"
+                            },
+                            "comment": "Calculate the absolute size of the overlapping footprint."
+                        },
+                        {
+                            "function_name": "perform_arithmetic_operation",
+                            "arguments": {
+                                "values": "[\"state:source_vs_jiuzhai_overlap_area_stats.total_area_sq_km\", \"state:yellow_source_area_stats.total_area_sq_km\"]",
+                                "operation": "divide",
+                                "output_variable_name": "overlap_vs_source_ratio"
+                            },
+                            "comment": "Divide overlap area by the Yellow River source total to get the fractional coverage."
+                        },
+                        {
+                            "function_name": "perform_arithmetic_operation",
+                            "arguments": {
+                                "values": "[\"state:overlap_vs_source_ratio\", 100]",
+                                "operation": "multiply",
+                                "output_variable_name": "overlap_vs_source_pct"
+                            },
+                            "comment": "Convert the ratio into a percentage for easier reporting."
+                        },
+                        {
+                            "function_name": "perform_arithmetic_operation",
+                            "arguments": {
+                                "values": "[\"state:source_vs_jiuzhai_overlap_area_stats.total_area_sq_km\", \"state:jiuzhaigou_area_stats.total_area_sq_km\"]",
+                                "operation": "divide",
+                                "output_variable_name": "overlap_vs_jiuzhaigou_ratio"
+                            },
+                            "comment": "Repeat the ratio calculation using the Jiuzhaigou earthquake zone total area."
+                        },
+                        {
+                            "function_name": "perform_arithmetic_operation",
+                            "arguments": {
+                                "values": "[\"state:overlap_vs_jiuzhaigou_ratio\", 100]",
+                                "operation": "multiply",
+                                "output_variable_name": "overlap_vs_jiuzhaigou_pct"
+                            },
+                            "comment": "Convert the Jiuzhaigou ratio into a percentage."
+                        },
+                        {
+                            "function_name": "visualize_geographies",
+                            "arguments": {
+                                "geodataframe_names": "[\"jiuzhaigou_quake_zone\", \"yellow_river_source_region\", \"source_vs_jiuzhai_overlap\"]",
+                                "layer_styles": "[{\"color\": \"#fdae6b\", \"alpha\": 0.35, \"label\": \"Jiuzhaigou quake zone\"}, {\"color\": \"#3182bd\", \"alpha\": 0.2, \"linewidth\": 1.2, \"label\": \"Yellow River source\"}, {\"color\": \"#31a354\", \"alpha\": 0.5, \"label\": \"Overlap\"}]",
+                                "title": "Overlap between Yellow River Source Region and Jiuzhaigou Earthquake Zone",
+                                "add_legend": true
+                            },
+                            "comment": "Map both regions and the overlap to visually confirm the percentages reported in the calculator outputs."
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_test137",
+            "task_text": "Calculate the total area of China's forest water conservation zones within a 10000 meter buffer zone(use tool create_dissolved_buffer to create 10000 meter) of the Loess Plateau Region, and compute the percentage it represents of the entire buffer zone area.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": "Load the Yellow River source-region polygon and the Jiuzhaigou earthquake zone boundary, intersect them, measure areas for each dataset plus the overlap, and compute the percentage of overlap relative to both inputs.",
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "load_geodata",
+                            "arguments": {
+                                "geodataset": "The source region of the Yellow River",
+                                "output_geodataframe_name": "yellow_river_source_region"
+                            },
+                            "comment": "Load the Yellow River source polygon (data/Data/GeoData/YellowRiver_SourceRegion.shp)."
+                        },
+                        {
+                            "function_name": "load_geodata",
+                            "arguments": {
+                                "geodataset": "Jiuzhaigou earthquake zone",
+                                "output_geodataframe_name": "jiuzhaigou_quake_zone"
+                            },
+                            "comment": "Load the Jiuzhaigou earthquake polygon (data/Data/GeoData/Jiuzhai.shp)."
+                        },
+                        {
+                            "function_name": "analyze_vector_overlap",
+                            "arguments": {
+                                "geodataframe_a_name": "yellow_river_source_region",
+                                "geodataframe_b_name": "jiuzhaigou_quake_zone",
+                                "output_geodataframe_name": "source_vs_jiuzhai_overlap"
+                            },
+                            "comment": "Use the lightweight overlap tool to intersect the two regions and store the shared footprint for downstream area calculations."
+                        },
+                        {
+                            "function_name": "calculate_polygon_areas",
+                            "arguments": {
+                                "geodataframe_name": "yellow_river_source_region",
+                                "output_variable_name": "yellow_source_area_stats",
+                                "area_column_name": "yellow_source_area_sq_km"
+                            },
+                            "comment": "Measure the total area of the Yellow River source region."
+                        },
+                        {
+                            "function_name": "calculate_polygon_areas",
+                            "arguments": {
+                                "geodataframe_name": "jiuzhaigou_quake_zone",
+                                "output_variable_name": "jiuzhaigou_area_stats",
+                                "area_column_name": "jiuzhaigou_area_sq_km"
+                            },
+                            "comment": "Measure the total area of the Jiuzhaigou earthquake zone."
+                        },
+                        {
+                            "function_name": "calculate_polygon_areas",
+                            "arguments": {
+                                "geodataframe_name": "source_vs_jiuzhai_overlap",
+                                "output_variable_name": "source_vs_jiuzhai_overlap_area_stats",
+                                "area_column_name": "overlap_area_sq_km"
+                            },
+                            "comment": "Calculate the absolute size of the overlapping footprint."
+                        },
+                        {
+                            "function_name": "perform_arithmetic_operation",
+                            "arguments": {
+                                "values": "[\"state:source_vs_jiuzhai_overlap_area_stats.total_area_sq_km\", \"state:yellow_source_area_stats.total_area_sq_km\"]",
+                                "operation": "divide",
+                                "output_variable_name": "overlap_vs_source_ratio"
+                            },
+                            "comment": "Divide overlap area by the Yellow River source total to get the fractional coverage."
+                        },
+                        {
+                            "function_name": "perform_arithmetic_operation",
+                            "arguments": {
+                                "values": "[\"state:overlap_vs_source_ratio\", 100]",
+                                "operation": "multiply",
+                                "output_variable_name": "overlap_vs_source_pct"
+                            },
+                            "comment": "Convert the ratio into a percentage for easier reporting."
+                        },
+                        {
+                            "function_name": "perform_arithmetic_operation",
+                            "arguments": {
+                                "values": "[\"state:source_vs_jiuzhai_overlap_area_stats.total_area_sq_km\", \"state:jiuzhaigou_area_stats.total_area_sq_km\"]",
+                                "operation": "divide",
+                                "output_variable_name": "overlap_vs_jiuzhaigou_ratio"
+                            },
+                            "comment": "Repeat the ratio calculation using the Jiuzhaigou earthquake zone total area."
+                        },
+                        {
+                            "function_name": "perform_arithmetic_operation",
+                            "arguments": {
+                                "values": "[\"state:overlap_vs_jiuzhaigou_ratio\", 100]",
+                                "operation": "multiply",
+                                "output_variable_name": "overlap_vs_jiuzhaigou_pct"
+                            },
+                            "comment": "Convert the Jiuzhaigou ratio into a percentage."
+                        },
+                        {
+                            "function_name": "visualize_geographies",
+                            "arguments": {
+                                "geodataframe_names": "[\"jiuzhaigou_quake_zone\", \"yellow_river_source_region\", \"source_vs_jiuzhai_overlap\"]",
+                                "layer_styles": "[{\"color\": \"#fdae6b\", \"alpha\": 0.35, \"label\": \"Jiuzhaigou quake zone\"}, {\"color\": \"#3182bd\", \"alpha\": 0.2, \"linewidth\": 1.2, \"label\": \"Yellow River source\"}, {\"color\": \"#31a354\", \"alpha\": 0.5, \"label\": \"Overlap\"}]",
+                                "title": "Overlap between Yellow River Source Region and Jiuzhaigou Earthquake Zone",
+                                "add_legend": true
+                            },
+                            "comment": "Map both regions and the overlap to visually confirm the percentages reported in the calculator outputs."
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_test138",
+            "task_text": "Identify the centroid of the Loess Plateau, and use this point as the center to create a buffer zone (use tool create_dissolved_buffer to create 100000 meter) with a radius of 100 kilometers; then calculate the area of China's forest water conservation zones within this region (use analyze_vector_overlap and calculate_polygon_areas) and plot for visualization.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": "Load the Yellow River source-region polygon and the Jiuzhaigou earthquake zone boundary, intersect them, measure areas for each dataset plus the overlap, and compute the percentage of overlap relative to both inputs.",
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "load_geodata",
+                            "arguments": {
+                                "geodataset": "The source region of the Yellow River",
+                                "output_geodataframe_name": "yellow_river_source_region"
+                            },
+                            "comment": "Load the Yellow River source polygon (data/Data/GeoData/YellowRiver_SourceRegion.shp)."
+                        },
+                        {
+                            "function_name": "load_geodata",
+                            "arguments": {
+                                "geodataset": "Jiuzhaigou earthquake zone",
+                                "output_geodataframe_name": "jiuzhaigou_quake_zone"
+                            },
+                            "comment": "Load the Jiuzhaigou earthquake polygon (data/Data/GeoData/Jiuzhai.shp)."
+                        },
+                        {
+                            "function_name": "analyze_vector_overlap",
+                            "arguments": {
+                                "geodataframe_a_name": "yellow_river_source_region",
+                                "geodataframe_b_name": "jiuzhaigou_quake_zone",
+                                "output_geodataframe_name": "source_vs_jiuzhai_overlap"
+                            },
+                            "comment": "Use the lightweight overlap tool to intersect the two regions and store the shared footprint for downstream area calculations."
+                        },
+                        {
+                            "function_name": "calculate_polygon_areas",
+                            "arguments": {
+                                "geodataframe_name": "yellow_river_source_region",
+                                "output_variable_name": "yellow_source_area_stats",
+                                "area_column_name": "yellow_source_area_sq_km"
+                            },
+                            "comment": "Measure the total area of the Yellow River source region."
+                        },
+                        {
+                            "function_name": "calculate_polygon_areas",
+                            "arguments": {
+                                "geodataframe_name": "jiuzhaigou_quake_zone",
+                                "output_variable_name": "jiuzhaigou_area_stats",
+                                "area_column_name": "jiuzhaigou_area_sq_km"
+                            },
+                            "comment": "Measure the total area of the Jiuzhaigou earthquake zone."
+                        },
+                        {
+                            "function_name": "calculate_polygon_areas",
+                            "arguments": {
+                                "geodataframe_name": "source_vs_jiuzhai_overlap",
+                                "output_variable_name": "source_vs_jiuzhai_overlap_area_stats",
+                                "area_column_name": "overlap_area_sq_km"
+                            },
+                            "comment": "Calculate the absolute size of the overlapping footprint."
+                        },
+                        {
+                            "function_name": "perform_arithmetic_operation",
+                            "arguments": {
+                                "values": "[\"state:source_vs_jiuzhai_overlap_area_stats.total_area_sq_km\", \"state:yellow_source_area_stats.total_area_sq_km\"]",
+                                "operation": "divide",
+                                "output_variable_name": "overlap_vs_source_ratio"
+                            },
+                            "comment": "Divide overlap area by the Yellow River source total to get the fractional coverage."
+                        },
+                        {
+                            "function_name": "perform_arithmetic_operation",
+                            "arguments": {
+                                "values": "[\"state:overlap_vs_source_ratio\", 100]",
+                                "operation": "multiply",
+                                "output_variable_name": "overlap_vs_source_pct"
+                            },
+                            "comment": "Convert the ratio into a percentage for easier reporting."
+                        },
+                        {
+                            "function_name": "perform_arithmetic_operation",
+                            "arguments": {
+                                "values": "[\"state:source_vs_jiuzhai_overlap_area_stats.total_area_sq_km\", \"state:jiuzhaigou_area_stats.total_area_sq_km\"]",
+                                "operation": "divide",
+                                "output_variable_name": "overlap_vs_jiuzhaigou_ratio"
+                            },
+                            "comment": "Repeat the ratio calculation using the Jiuzhaigou earthquake zone total area."
+                        },
+                        {
+                            "function_name": "perform_arithmetic_operation",
+                            "arguments": {
+                                "values": "[\"state:overlap_vs_jiuzhaigou_ratio\", 100]",
+                                "operation": "multiply",
+                                "output_variable_name": "overlap_vs_jiuzhaigou_pct"
+                            },
+                            "comment": "Convert the Jiuzhaigou ratio into a percentage."
+                        },
+                        {
+                            "function_name": "visualize_geographies",
+                            "arguments": {
+                                "geodataframe_names": "[\"jiuzhaigou_quake_zone\", \"yellow_river_source_region\", \"source_vs_jiuzhai_overlap\"]",
+                                "layer_styles": "[{\"color\": \"#fdae6b\", \"alpha\": 0.35, \"label\": \"Jiuzhaigou quake zone\"}, {\"color\": \"#3182bd\", \"alpha\": 0.2, \"linewidth\": 1.2, \"label\": \"Yellow River source\"}, {\"color\": \"#31a354\", \"alpha\": 0.5, \"label\": \"Overlap\"}]",
+                                "title": "Overlap between Yellow River Source Region and Jiuzhaigou Earthquake Zone",
+                                "add_legend": true
+                            },
+                            "comment": "Map both regions and the overlap to visually confirm the percentages reported in the calculator outputs."
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_test139",
+            "task_text": "Identify all areas within the Weihe River Basin where the slope is greater than icon 5 and the distance to the nearest traditional village exceeds 20 kilometers. (You can first load the Wei River Basin Topographic Slope Classification Dataset and extract the boundary of the Wei River Basin Topographic Slope Classification Dataset as a vector polygon, then use select_features_by_spatial_relationship​ to extract all scattered points within the region, and create a 20,000‑meter dissolved buffer only for these points. Next, reload the Wei River Basin Topographic Slope Classification Dataset raster data and reclassify it to filter out values greater than 5. Then, use the rasterize_vector_tool​ to convert the resulting buffer into raster data with the same specifications. Finally, perform an overlay operation on these two raster datasets—using the reclassified Weihe raster data to subtract the rasterized buffer data—to obtain the final result.)",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": "Load the Weihe slope raster and traditional village points, convert the raster footprint into a lightweight polygon to select overlapping villages, build a unified 20 km exclusion buffer, reclassify the raster to isolate slope classes >5, and subtract the buffered overlap from the steep-area totals.",
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "load_geodata",
+                            "arguments": {
+                                "geodataset": "Traditional Villages of China",
+                                "output_geodataframe_name": "villages_china"
+                            },
+                            "comment": "Load the nationwide traditional village points (data/Data/GeoData/VillagesChina.shp) so we can check which ones fall on the Weihe slope dataset."
+                        },
+                        {
+                            "function_name": "get_raster_path",
+                            "arguments": {
+                                "rasterdataset": "Wei River Basin Topographic Slope Classification Dataset"
+                            },
+                            "comment": "Resolve the absolute path to data/Data/GeoData/WeiheBasin.tif so the downstream raster tools reference the correct slope grid."
+                        },
+                        {
+                            "function_name": "extract_raster_boundary",
+                            "arguments": {
+                                "raster_path": "d:/code/GeoBenchX/GeoBenchX/data/Data/GeoData/WeiheBasin.tif",
+                                "output_geodataframe_name": "weihe_basin_boundary",
+                                "band_number": 1,
+                                "maximum_vertices": 8000,
+                                "dissolve_polygons": true,
+                                "simplify_tolerance_meters": null,
+                                "output_file_path": null,
+                                "overwrite_existing": true
+                            },
+                            "comment": "Convert the Weihe slope raster footprint into a compact polygon boundary that can be used for vector selections."
+                        },
+                        {
+                            "function_name": "select_features_by_spatial_relationship",
+                            "arguments": {
+                                "features_geodataframe_name": "villages_china",
+                                "reference_geodataframe_name": "weihe_basin_boundary",
+                                "spatial_predicates": "[\"within\"]",
+                                "output_geodataframe_name": "villages_on_weihe",
+                                "plot_result": false
+                            },
+                            "comment": "Keep only the villages that fall inside the Weihe Basin boundary."
+                        },
+                        {
+                            "function_name": "create_dissolved_buffer",
+                            "arguments": {
+                                "geodataframe_name": "villages_on_weihe",
+                                "buffer_size_meters": 20000,
+                                "output_geodataframe_name": "villages_on_weihe_buffer",
+                                "dissolve_by_attribute": null,
+                                "output_file_path": null,
+                                "overwrite_existing": true
+                            },
+                            "comment": "Build a fused 20 km exclusion buffer around the overlapping villages so the final mask removes every buffered area as a single geometry."
+                        },
+                        {
+                            "function_name": "classify_raster_zones",
+                            "arguments": {
+                                "raster_path": "d:/code/GeoBenchX/GeoBenchX/data/Data/GeoData/WeiheBasin.tif",
+                                "reclassification_table": "[{\"min_value\": 5.0001, \"max_value\": 7.0, \"new_value\": 1, \"label\": \"Slope > 5\", \"color\": \"#b30000\"}]",
+                                "output_variable_name": "weihe_high_slope_summary",
+                                "output_raster_path": "d:/code/GeoBenchX/GeoBenchX/scratch/weihe_high_slope_mask.tif",
+                                "output_dtype": "uint8",
+                                "classification_model_name": "weihe_gt5",
+                                "append_timestamp_to_output": false,
+                                "plot_title": "Weihe Basin Slope > 5",
+                                "legend_location": "lower left"
+                            },
+                            "comment": "Create a binary raster where class value 1 marks every Weihe pixel whose slope class exceeds 5, and store the summary (including pixel area for later area calculations)."
+                        },
+                        {
+                            "function_name": "get_values_from_raster_with_geometries",
+                            "arguments": {
+                                "raster_path": "d:/code/GeoBenchX/GeoBenchX/scratch/weihe_high_slope_mask.tif",
+                                "geodataframe_name": "villages_on_weihe_buffer",
+                                "output_variable_name": "buffer_overlap_stats",
+                                "plot_result": false
+                            },
+                            "comment": "Mask the high-slope raster by the fused buffer to quantify how many steep pixels are disqualified because they fall inside the buffered exclusion zone."
+                        },
+                        {
+                            "function_name": "perform_arithmetic_operation",
+                            "arguments": {
+                                "values": "[\"state:weihe_high_slope_summary.class_info[0].area_sq_km\", \"state:weihe_high_slope_summary.class_info[0].pixel_count\"]",
+                                "operation": "divide",
+                                "output_variable_name": "weihe_gt5_pixel_area_sq_km"
+                            },
+                            "comment": "Derive the square-kilometer size of a single classified pixel by dividing the high-slope area by its pixel count."
+                        },
+                        {
+                            "function_name": "perform_arithmetic_operation",
+                            "arguments": {
+                                "values": "[\"state:buffer_overlap_stats.count\", \"state:weihe_gt5_pixel_area_sq_km\"]",
+                                "operation": "multiply",
+                                "output_variable_name": "buffer_overlap_area_sq_km"
+                            },
+                            "comment": "Convert the number of overlapping pixels into square kilometers using the per-pixel area derived above."
+                        },
+                        {
+                            "function_name": "perform_arithmetic_operation",
+                            "arguments": {
+                                "values": "[\"state:weihe_high_slope_summary.class_info[0].area_sq_km\", \"state:buffer_overlap_area_sq_km\"]",
+                                "operation": "subtract",
+                                "output_variable_name": "eligible_high_slope_area_sq_km"
+                            },
+                            "comment": "Subtract the buffered-overlap area from the total square kilometers of slope>5 pixels to report the eligible steep region that still satisfies the 20 km separation constraint."
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_test140",
+            "task_text": "In the Xinxiang heavy rainfall area, identify all areas that are 20 kilometers away from traditional villages.(First, import the corresponding data; then vectorize the raster data of the Xinxiang boundary, identify the traditional villages in the corresponding area, create a dissolved buffer for the villages, and finally perform vector overlap analysis using analyze_vector_overlap.)",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": "Load the Weihe slope raster and traditional village points, convert the raster footprint into a lightweight polygon to select overlapping villages, build a unified 20 km exclusion buffer, reclassify the raster to isolate slope classes >5, and subtract the buffered overlap from the steep-area totals.",
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "load_geodata",
+                            "arguments": {
+                                "geodataset": "Traditional Villages of China",
+                                "output_geodataframe_name": "villages_china"
+                            },
+                            "comment": "Load the nationwide traditional village points (data/Data/GeoData/VillagesChina.shp) so we can check which ones fall on the Weihe slope dataset."
+                        },
+                        {
+                            "function_name": "get_raster_path",
+                            "arguments": {
+                                "rasterdataset": "Wei River Basin Topographic Slope Classification Dataset"
+                            },
+                            "comment": "Resolve the absolute path to data/Data/GeoData/WeiheBasin.tif so the downstream raster tools reference the correct slope grid."
+                        },
+                        {
+                            "function_name": "extract_raster_boundary",
+                            "arguments": {
+                                "raster_path": "d:/code/GeoBenchX/GeoBenchX/data/Data/GeoData/WeiheBasin.tif",
+                                "output_geodataframe_name": "weihe_basin_boundary",
+                                "band_number": 1,
+                                "maximum_vertices": 8000,
+                                "dissolve_polygons": true,
+                                "simplify_tolerance_meters": null,
+                                "output_file_path": null,
+                                "overwrite_existing": true
+                            },
+                            "comment": "Convert the Weihe slope raster footprint into a compact polygon boundary that can be used for vector selections."
+                        },
+                        {
+                            "function_name": "select_features_by_spatial_relationship",
+                            "arguments": {
+                                "features_geodataframe_name": "villages_china",
+                                "reference_geodataframe_name": "weihe_basin_boundary",
+                                "spatial_predicates": "[\"within\"]",
+                                "output_geodataframe_name": "villages_on_weihe",
+                                "plot_result": false
+                            },
+                            "comment": "Keep only the villages that fall inside the Weihe Basin boundary."
+                        },
+                        {
+                            "function_name": "create_dissolved_buffer",
+                            "arguments": {
+                                "geodataframe_name": "villages_on_weihe",
+                                "buffer_size_meters": 20000,
+                                "output_geodataframe_name": "villages_on_weihe_buffer",
+                                "dissolve_by_attribute": null,
+                                "output_file_path": null,
+                                "overwrite_existing": true
+                            },
+                            "comment": "Build a fused 20 km exclusion buffer around the overlapping villages so the final mask removes every buffered area as a single geometry."
+                        },
+                        {
+                            "function_name": "classify_raster_zones",
+                            "arguments": {
+                                "raster_path": "d:/code/GeoBenchX/GeoBenchX/data/Data/GeoData/WeiheBasin.tif",
+                                "reclassification_table": "[{\"min_value\": 5.0001, \"max_value\": 7.0, \"new_value\": 1, \"label\": \"Slope > 5\", \"color\": \"#b30000\"}]",
+                                "output_variable_name": "weihe_high_slope_summary",
+                                "output_raster_path": "d:/code/GeoBenchX/GeoBenchX/scratch/weihe_high_slope_mask.tif",
+                                "output_dtype": "uint8",
+                                "classification_model_name": "weihe_gt5",
+                                "append_timestamp_to_output": false,
+                                "plot_title": "Weihe Basin Slope > 5",
+                                "legend_location": "lower left"
+                            },
+                            "comment": "Create a binary raster where class value 1 marks every Weihe pixel whose slope class exceeds 5, and store the summary (including pixel area for later area calculations)."
+                        },
+                        {
+                            "function_name": "get_values_from_raster_with_geometries",
+                            "arguments": {
+                                "raster_path": "d:/code/GeoBenchX/GeoBenchX/scratch/weihe_high_slope_mask.tif",
+                                "geodataframe_name": "villages_on_weihe_buffer",
+                                "output_variable_name": "buffer_overlap_stats",
+                                "plot_result": false
+                            },
+                            "comment": "Mask the high-slope raster by the fused buffer to quantify how many steep pixels are disqualified because they fall inside the buffered exclusion zone."
+                        },
+                        {
+                            "function_name": "perform_arithmetic_operation",
+                            "arguments": {
+                                "values": "[\"state:weihe_high_slope_summary.class_info[0].area_sq_km\", \"state:weihe_high_slope_summary.class_info[0].pixel_count\"]",
+                                "operation": "divide",
+                                "output_variable_name": "weihe_gt5_pixel_area_sq_km"
+                            },
+                            "comment": "Derive the square-kilometer size of a single classified pixel by dividing the high-slope area by its pixel count."
+                        },
+                        {
+                            "function_name": "perform_arithmetic_operation",
+                            "arguments": {
+                                "values": "[\"state:buffer_overlap_stats.count\", \"state:weihe_gt5_pixel_area_sq_km\"]",
+                                "operation": "multiply",
+                                "output_variable_name": "buffer_overlap_area_sq_km"
+                            },
+                            "comment": "Convert the number of overlapping pixels into square kilometers using the per-pixel area derived above."
+                        },
+                        {
+                            "function_name": "perform_arithmetic_operation",
+                            "arguments": {
+                                "values": "[\"state:weihe_high_slope_summary.class_info[0].area_sq_km\", \"state:buffer_overlap_area_sq_km\"]",
+                                "operation": "subtract",
+                                "output_variable_name": "eligible_high_slope_area_sq_km"
+                            },
+                            "comment": "Subtract the buffered-overlap area from the total square kilometers of slope>5 pixels to report the eligible steep region that still satisfies the 20 km separation constraint."
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_251212_141500_007001",
+            "task_text": "Based on the Guangming District DEM (Shenzhen), identify all areas with a slope less than 5 degrees, and calculate the total area of these flat regions.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": "Resolve the Guangming DEM path, convert it to a slope raster, reclassify it so slopes below 5 degrees become a binary mask, then feed that mask into the raster-area tool to measure the flat terrain.",
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "get_raster_path",
+                            "arguments": {
+                                "rasterdataset": "Guangming District DEM (Shenzhen)"
+                            },
+                            "comment": "Resolve the catalog path to data/Data/GeoData/guangming.tif so downstream tools read the correct DEM."
+                        },
+                        {
+                            "function_name": "convert_dem_to_slope",
+                            "arguments": {
+                                "dem_raster_path": "d:/code/GeoBenchX/GeoBenchX/data/Data/GeoData/guangming.tif",
+                                "output_variable_name": "guangming_slope_metadata",
+                                "band_number": 1,
+                                "output_raster_path": "d:/code/GeoBenchX/GeoBenchX/scratch/guangming_slope.tif",
+                                "overwrite_existing": true,
+                                "append_timestamp_to_output": false,
+                                "plot_title": "Guangming DEM Slope (degrees)",
+                                "colormap": "terrain"
+                            },
+                            "comment": "Convert the Guangming DEM into a slope raster so slope thresholds can be evaluated in degrees."
+                        },
+                        {
+                            "function_name": "classify_raster_zones",
+                            "arguments": {
+                                "raster_path": "d:/code/GeoBenchX/GeoBenchX/scratch/guangming_slope.tif",
+                                "reclassification_table": "[{\"min_value\": 0.0, \"max_value\": 4.9999, \"new_value\": 1, \"label\": \"Slope < 5 deg\", \"color\": \"#2ca25f\"}, {\"min_value\": 5.0, \"max_value\": 90.0, \"new_value\": 0, \"label\": \"Slope >= 5 deg\", \"color\": \"#de2d26\"}]",
+                                "output_variable_name": "guangming_flat_mask_summary",
+                                "output_raster_path": "d:/code/GeoBenchX/GeoBenchX/scratch/guangming_flat_mask.tif",
+                                "output_dtype": "uint8",
+                                "classification_model_name": "guangming_flat_mask",
+                                "append_timestamp_to_output": false,
+                                "plot_title": "Guangming Slope < 5 degrees",
+                                "legend_location": "lower left"
+                            },
+                            "comment": "Reclassify the slope raster so cells below 5 degrees become value 1 and all other slopes become 0."
+                        },
+                        {
+                            "function_name": "calculate_raster_selection_area",
+                            "arguments": {
+                                "raster_path": "d:/code/GeoBenchX/GeoBenchX/scratch/guangming_flat_mask.tif",
+                                "output_variable_name": "guangming_flat_area",
+                                "band_number": 1,
+                                "target_equal_area_epsg": 6933,
+                                "selected_values": [
+                                    1
+                                ],
+                                "treat_nonzero_as_selected": false,
+                                "report_units": "square_kilometers"
+                            },
+                            "comment": "Measure the cumulative area of all pixels coded as 1 (slope < 5 degrees), reporting the flat terrain in square kilometers."
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_test141",
+            "task_text": "Select suitable sites for agricultural development planning in the Piura region of Peru, requiring that the land parcel slope be < 10 degrees and the profile curvature be negative.(Please follow the instructions below to solve the problem: load the file for the Piura region of Peru, convert the file into a slope map, classify areas with a slope of less than 10 degrees, then perform curvature calculation on this subset of data, classify areas with negative curvature, and finally obtain the result.)",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        }
+    ]
+}

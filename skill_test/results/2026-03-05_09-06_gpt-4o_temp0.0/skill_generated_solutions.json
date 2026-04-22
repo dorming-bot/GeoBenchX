@@ -1,0 +1,246 @@
+{
+    "metadata": {
+        "author": "Codex-SKILL",
+        "notes": "Skill-oriented tasks leveraging GeoSpatialProcessingSkill wrappers.",
+        "model": "gpt-4o",
+        "temperature": 0.0,
+        "generated_at": "2026-03-05T09:06:14.433872Z",
+        "total_input_tokens_for_generation": 30711,
+        "total_output_tokens_for_generation": 540
+    },
+    "tasks": [
+        {
+            "task_ID": "SKILL_TASK_001",
+            "task_text": "Mark the centroid of Chengdu surface.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": "Load the Chengdu boundary polygon and use the GeoSpatialProcessingSkill centroid method to export the centroid layer and preview map.",
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "load_vector_data",
+                            "arguments": {
+                                "dataset_name": "Chengdu Surface",
+                                "output_name": "chengdu_boundary"
+                            },
+                            "comment": "Load the Chengdu administrative polygon using vector data loading."
+                        },
+                        {
+                            "function_name": "GeoSpatialProcessingSkill.get_centroids",
+                            "arguments": {
+                                "geodataframe_name": "chengdu_boundary",
+                                "output_geodataframe_name": "chengdu_centroid_points",
+                                "output_variable_name": "chengdu_centroid_summary",
+                                "output_shapefile_path": "d:/code/GeoBenchX/GeoBenchX/scratch/chengdu_centroid_skill.shp",
+                                "output_tif_path": "d:/code/GeoBenchX/GeoBenchX/scratch/chengdu_centroid_skill_map.tif",
+                                "title": "Centroid of Chengdu via SKILL",
+                                "basemap_style": "Carto Positron"
+                            },
+                            "comment": "Call the SKILL wrapper to compute the centroid, persist it as a shapefile, and capture the TIFF preview with metadata stored in 'chengdu_centroid_summary'."
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": {
+                "steps": [
+                    {
+                        "function_name": "load_vector_data",
+                        "arguments": {
+                            "dataset_name": "Chengdu_Surface.shp",
+                            "output_name": "chengdu_surface"
+                        }
+                    },
+                    {
+                        "function_name": "load_vector_data",
+                        "arguments": {
+                            "dataset_name": "Chengdu_Surface.shp",
+                            "output_name": "chengdu_surface"
+                        }
+                    },
+                    {
+                        "function_name": "load_vector_data",
+                        "arguments": {
+                            "dataset_name": "Chengdu_Surface.shp",
+                            "output_name": "chengdu_surface"
+                        }
+                    },
+                    {
+                        "function_name": "load_vector_data",
+                        "arguments": {
+                            "dataset_name": "Chengdu_Surface.shp",
+                            "output_name": "chengdu_surface"
+                        }
+                    },
+                    {
+                        "function_name": "load_vector_data",
+                        "arguments": {
+                            "dataset_name": "Chengdu Surface",
+                            "output_name": "chengdu_surface"
+                        }
+                    },
+                    {
+                        "function_name": "get_centroids",
+                        "arguments": {
+                            "geodataframe_name": "chengdu_surface",
+                            "output_geodataframe_name": "chengdu_surface_centroid",
+                            "title": "Centroid of Chengdu Surface",
+                            "basemap_style": "Carto Positron"
+                        }
+                    }
+                ]
+            },
+            "generated_solution_input_tokens": 17112,
+            "generated_solution_output_tokens": 229,
+            "generated_solution_message": "The centroid of the Chengdu Surface has been marked. You can view the map with the centroid marked [here](sandbox:/mnt/data/scratch/chengdu_surface_centroid_map.tif)."
+        },
+        {
+            "task_ID": "SKILL_TASK_002",
+            "task_text": "Create a 1,000-meter dissolved buffer for Wuhan urban parks and calculate its total area.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": "Load the Wuhan park polygons, run the SKILL buffer generator at 1 km, and feed the dissolved result into the polygon-area SKILL call to report the buffer coverage.",
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "load_vector_data",
+                            "arguments": {
+                                "dataset_name": "Wuhan Urban Parks",
+                                "output_name": "wuhan_parks"
+                            },
+                            "comment": "Load the Wuhan park dataset using vector data loading."
+                        },
+                        {
+                            "function_name": "GeoSpatialProcessingSkill.create_dissolved_buffer",
+                            "arguments": {
+                                "geodataframe_name": "wuhan_parks",
+                                "buffer_size_meters": 1000.0,
+                                "output_geodataframe_name": "wuhan_parks_buffer_1000m",
+                                "output_file_path": "d:/code/GeoBenchX/GeoBenchX/scratch/wuhan_parks_1000m_buffer.shp",
+                                "basemap_style": "Carto Positron",
+                                "plot_title": "Wuhan Urban Park 1000 m Buffer"
+                            },
+                            "comment": "Use the SKILL buffer method to dissolve the 1 km service area around all parks and save the resulting shapefile for reuse."
+                        },
+                        {
+                            "function_name": "GeoSpatialProcessingSkill.calculate_polygon_areas",
+                            "arguments": {
+                                "geodataframe_name": "wuhan_parks_buffer_1000m",
+                                "output_variable_name": "wuhan_buffer_area_stats",
+                                "area_column_name": "buffer_area_sq_km"
+                            },
+                            "comment": "Feed the dissolved buffer GeoDataFrame back into the SKILL area calculator to obtain the total coverage of the 1 km buffer zone."
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": {
+                "steps": [
+                    {
+                        "function_name": "load_vector_data",
+                        "arguments": {
+                            "dataset_name": "park_in_wuhan.shp",
+                            "output_name": "wuhan_parks"
+                        }
+                    },
+                    {
+                        "function_name": "create_dissolved_buffer",
+                        "arguments": {
+                            "geodataframe_name": "wuhan_parks",
+                            "buffer_size_meters": 1000,
+                            "output_geodataframe_name": "wuhan_parks_buffer",
+                            "dissolve_by_attribute": null,
+                            "output_file_path": null,
+                            "overwrite_existing": true,
+                            "basemap_style": "Carto Positron",
+                            "plot_title": "Wuhan Urban Parks 1,000m Buffer"
+                        }
+                    },
+                    {
+                        "function_name": "calculate_polygon_areas",
+                        "arguments": {
+                            "geodataframe_name": "wuhan_parks_buffer",
+                            "output_variable_name": "wuhan_parks_buffer_area"
+                        }
+                    },
+                    {
+                        "function_name": "load_vector_data",
+                        "arguments": {
+                            "dataset_name": "park_in_wuhan.shp",
+                            "output_name": "wuhan_parks"
+                        }
+                    },
+                    {
+                        "function_name": "load_vector_data",
+                        "arguments": {
+                            "dataset_name": "3_places_in_wuhan.shp",
+                            "output_name": "wuhan_parks"
+                        }
+                    }
+                ]
+            },
+            "generated_solution_input_tokens": 9372,
+            "generated_solution_output_tokens": 248,
+            "generated_solution_message": "I am unable to find the dataset for Wuhan Urban Parks. Please check the dataset availability or provide the correct dataset."
+        },
+        {
+            "task_ID": "SKILL_TASK_003",
+            "task_text": "Use the DEM data of Guangming District and describe how high the highest point of this raster data is.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": "Load the Guangming District DEM raster and use the raster description skill to extract metadata and statistics including the maximum elevation.",
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "load_raster_data",
+                            "arguments": {
+                                "dataset_name": "Guangming District DEM (Shenzhen)",
+                                "output_name": "guangming_dem_path"
+                            },
+                            "comment": "Load the Guangming District DEM raster path using raster data loading."
+                        },
+                        {
+                            "function_name": "get_raster_description",
+                            "arguments": {
+                                "raster_path": "guangming_dem_path",
+                                "output_variable_name": "guangming_dem_stats"
+                            },
+                            "comment": "Extract raster metadata and band statistics to determine the highest elevation point."
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": {
+                "steps": [
+                    {
+                        "function_name": "get_raster_description",
+                        "arguments": {
+                            "raster_path": "scratch/Guangming_DEM.tif",
+                            "output_variable_name": "dem_description"
+                        }
+                    }
+                ]
+            },
+            "generated_solution_input_tokens": 4227,
+            "generated_solution_output_tokens": 63,
+            "generated_solution_message": "I currently do not have access to the DEM data for Guangming District. Please provide the dataset or check if it is available in the catalog."
+        }
+    ]
+}

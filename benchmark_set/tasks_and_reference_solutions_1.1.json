@@ -5,14 +5,13 @@
     },
     "tasks": [
         {
-            "task_ID": "TASK_1_1_001",
-            "task_text": "Identify and select areas located within the Jiuzhaigou earthquake zone that belong to forest water conservation zones(use tool analyze_vector_overlap and visualize the photo), designate them as ecological core restoration areas, and calculate their area.",
+            "task_ID": "TASK_1_1_143",
+            "task_text": "Identify and select areas located within the Jiuzhaigou earthquake zone that belong to forest water conservation zones, designate them as ecological core restoration areas, and calculate their area.",
             "task_labels": [
-                "Spatial operations",
-                "Task Set 03",
-                "Process, Merge, Visualize",
-                "Merge, Visualize",
-                "Heatmaps, Contour Lines"
+                "Geo Task Set 01",
+                "Basic Factor Extraction",
+                "Geo Task Set 05",
+                "Site Selection Analysis and Suitability Evaluation"
             ],
             "reference_solution_description": "Load the national forest water conservation polygons together with the Jiuzhaigou earthquake boundary, intersect them with analyze_vector_overlap to isolate the ecological core restoration candidates, visualize the overlap, and measure its total area in square kilometers.",
             "reference_solutions": [
@@ -91,14 +90,11 @@
             "match_score_Human": null
         },
         {
-            "task_ID": "TASK_1_1_002",
+            "task_ID": "TASK_1_1_144",
             "task_text": "Find all urban parks in Wuhan with an area greater than 2 square kilometers.",
             "task_labels": [
-                "Spatial operations",
-                "Task Set 03",
-                "Process, Merge, Visualize",
-                "Merge, Visualize",
-                "Heatmaps, Contour Lines"
+                "Geo Task Set 03",
+                "Geometric Calculation"
             ],
             "reference_solution_description": "Load the Wuhan urban park polygons, convert their stored area values from square meters to square kilometers, filter for parks at least 2 sq km, and visualize the resulting subset.",
             "reference_solutions": [
@@ -133,14 +129,11 @@
             "match_score_Human": null
         },
         {
-            "task_ID": "TASK_1_1_003",
+            "task_ID": "TASK_1_1_145",
             "task_text": "Identify all Chinese forest water conservation zones that intersect with the Jiuzhaigou earthquake area and visualize the photo.",
             "task_labels": [
-                "Spatial operations",
-                "Task Set 03",
-                "Process, Merge, Visualize",
-                "Merge, Visualize",
-                "Heatmaps, Contour Lines"
+                "Geo Task Set 03",
+                "Vector Overlay, Intersection, and Topological Relations"
             ],
             "reference_solution_description": "Bring the Jiuzhaigou earthquake polygon and national forest water conservation dataset into memory, intersect them to keep only the overlapping conservation zones, and map the result.",
             "reference_solutions": [
@@ -209,14 +202,13 @@
             "match_score_Human": null
         },
         {
-            "task_ID": "TASK_1_1_004",
+            "task_ID": "TASK_1_1_146",
             "task_text": "Identify 2014 China POI that were completely submerged during the flood in Xinxiang City and visualize the photo.",
             "task_labels": [
-                "Spatial operations",
-                "Task Set 03",
-                "Process, Merge, Visualize",
-                "Merge, Visualize",
-                "Heatmaps, Contour Lines"
+                "Geo Task Set 03",
+                "Vector Overlay, Intersection, and Topological Relations",
+                "Geo Task Set 05",
+                "Hazard Risk Assessment and Simulation"
             ],
             "reference_solution_description": "Load the nationwide 2014 POI points, sample the Xinxiang flood raster to keep only points where the inundation value equals 1, and output a visualization highlighting the submerged POIs.",
             "reference_solutions": [
@@ -263,14 +255,13 @@
             "match_score_Human": null
         },
         {
-            "task_ID": "TASK_1_1_005",
+            "task_ID": "TASK_1_1_147",
             "task_text": "Filter out traditional Chinese villages that are entirely located within the Wei River Basin terrain and within areas where the slope is greater than or equal to the value labeled \"3.\"",
             "task_labels": [
-                "Spatial operations",
-                "Task Set 03",
-                "Process, Merge, Visualize",
-                "Merge, Visualize",
-                "Heatmaps, Contour Lines"
+                "Geo Task Set 01",
+                "Basic Factor Extraction",
+                "Geo Task Set 03",
+                "Vector Overlay, Intersection, and Topological Relations"
             ],
             "reference_solution_description": "Clip the national traditional village points to the Wei River Basin footprint derived from the slope raster, then sample the slope classification grid to keep only villages whose slope value is at least class 3.",
             "reference_solutions": [
@@ -343,29 +334,14 @@
             "match_score_Human": null
         },
         {
-            "task_ID": "TASK_1_1_006",
-            "task_text": "Calculate the area (in square meters) of each urban park in Wuhan",
+            "task_ID": "TASK_1_1_148",
+            "task_text": "",
             "task_labels": [
-                "Spatial operations",
-                "Task Set 03",
-                "Process, Merge, Visualize",
-                "Merge, Visualize",
-                "Heatmaps, Contour Lines"
+                "Geo Task Set 03",
+                "Geometric Calculation"
             ],
             "reference_solution_description": "Load the Wuhan urban park polygons, compute their areas via the polygon-area tool, and convert those results from square kilometers to square meters for per-park reporting.",
             "reference_solutions": [
-                {
-                    "steps": [
-                        {
-                            "function_name": "load_geodata",
-                            "arguments": {
-                                "geodataset": "Wuhan Urban Parks",
-                                "output_geodataframe_name": "wuhan_parks"
-                            },
-                            "comment": "Load data/Data/GeoData/park_in_wuhan.shp so every park polygon can be measured."
-                        }
-                    ]
-                }
             ],
             "generated_solution": null,
             "generated_solution_input_tokens": null,
@@ -376,14 +352,11 @@
             "match_score_Human": null
         },
         {
-            "task_ID": "TASK_1_1_007",
+            "task_ID": "TASK_1_1_149",
             "task_text": "Calculate the average area of major urban parks in Wuhan.",
             "task_labels": [
-                "Spatial operations",
-                "Task Set 03",
-                "Process, Merge, Visualize",
-                "Merge, Visualize",
-                "Heatmaps, Contour Lines"
+                "Geo Task Set 03",
+                "Geometric Calculation"
             ],
             "reference_solution_description": "Measure each Wuhan park's area, convert it to square meters, and run a statistics summary to report the mean area representing the major urban parks dataset.",
             "reference_solutions": [
@@ -430,14 +403,11 @@
             "match_score_Human": null
         },
         {
-            "task_ID": "TASK_1_1_008",
+            "task_ID": "TASK_1_1_150",
             "task_text": "Based on DEM data, extract all areas in Guangming District, Shenzhen, with an elevation higher than 80 meters.",
             "task_labels": [
-                "Spatial operations",
-                "Task Set 03",
-                "Process, Merge, Visualize",
-                "Merge, Visualize",
-                "Heatmaps, Contour Lines"
+                "Geo Task Set 01",
+                "Elevation Feature Recognition and Terrain Visualization"
             ],
             "reference_solution_description": "Use the Guangming DEM to build a binary raster mask of elevations above 80 meters and compute the total area covered by those high-elevation zones.",
             "reference_solutions": [
@@ -491,14 +461,13 @@
             "match_score_Human": null
         },
         {
-            "task_ID": "TASK_1_1_009",
+            "task_ID": "TASK_1_1_151",
             "task_text": "Identify all 'Traditional Villages of China' located within the flooded areas of Xinxiang City, Henan Province.",
             "task_labels": [
-                "Spatial operations",
-                "Task Set 03",
-                "Process, Merge, Visualize",
-                "Merge, Visualize",
-                "Heatmaps, Contour Lines"
+                "Geo Task Set 03",
+                "Vector Overlay, Intersection, and Topological Relations",
+                "Geo Task Set 05",
+                "Hazard Risk Assessment and Simulation"
             ],
             "reference_solution_description": "Select the traditional villages that fall inside the Xinxiang flood raster footprint and retain only those with flood values indicating inundation.",
             "reference_solutions": [
@@ -572,14 +541,13 @@
             "match_score_Human": null
         },
         {
-            "task_ID": "TASK_1_1_010",
+            "task_ID": "TASK_1_1_152",
             "task_text": "Assuming the flood inundation data for Xinxiang uses a value of 1 to indicate inundation, calculate the total area of the inundated regions (in square kilometers).",
             "task_labels": [
-                "Spatial operations",
-                "Task Set 03",
-                "Process, Merge, Visualize",
-                "Merge, Visualize",
-                "Heatmaps, Contour Lines"
+                "Geo Task Set 03",
+                "Geometric Calculation",
+                "Geo Task Set 05",
+                "Hazard Risk Assessment and Simulation"
             ],
             "reference_solution_description": "Read the Xinxiang flood raster and run the raster-area calculator counting only pixels whose value equals 1 so the inundated surface can be reported in square kilometers.",
             "reference_solutions": [
@@ -618,14 +586,11 @@
             "match_score_Human": null
         },
         {
-            "task_ID": "TASK_1_1_011",
+            "task_ID": "TASK_1_1_153",
             "task_text": "In Wuhan, filter out all urban parks with an area smaller than 10,000 square meters.",
             "task_labels": [
-                "Spatial operations",
-                "Task Set 03",
-                "Process, Merge, Visualize",
-                "Merge, Visualize",
-                "Heatmaps, Contour Lines"
+                "Geo Task Set 03",
+                "Geometric Calculation"
             ],
             "reference_solution_description": "Load the Wuhan park layer, inspect the built-in area attribute, filter the polygons whose recorded area is below 10,000 square meters, and map the result to highlight the smallest parks.",
             "reference_solutions": [
@@ -691,14 +656,13 @@
             ]
         },
         {
-            "task_ID": "TASK_1_1_012",
+            "task_ID": "TASK_1_1_154",
             "task_text": "Identify overlapping areas within the Loess Plateau Region that are both forest water conservation zones and newly added traditional village distribution zones, and designate them as priority areas for ecological and cultural protection.",
             "task_labels": [
-                "Spatial operations",
-                "Task Set 03",
-                "Process, Merge, Visualize",
-                "Merge, Visualize",
-                "Heatmaps, Contour Lines"
+                "Geo Task Set 03",
+                "Vector Overlay, Intersection, and Topological Relations",
+                "Geo Task Set 05",
+                "Resource, Potential, and Ecological Assessment"
             ],
             "reference_solution_description": "Intersect the Loess Plateau boundary with both the national forest water conservation polygons and buffered traditional-village distribution zones to delineate ecological-cultural priority areas and measure their extent.",
             "reference_solutions": [
@@ -809,14 +773,13 @@
             ]
         },
         {
-            "task_ID": "TASK_1_1_013",
+            "task_ID": "TASK_1_1_155",
             "task_text": "Identify and count the number of traditional villages in the Loess Plateau region, and calculate their spatial density within this area expressed in units of “number per square kilometer.”",
             "task_labels": [
-                "Spatial operations",
-                "Task Set 03",
-                "Process, Merge, Visualize",
-                "Merge, Visualize",
-                "Heatmaps, Contour Lines"
+                "Geo Task Set 02",
+                "Distribution Patterns, Clustering, and Anomaly Detection",
+                "Geo Task Set 03",
+                "Geometric Calculation"
             ],
             "reference_solution_description": "Select the traditional villages inside the Loess Plateau, count them, measure the plateau area, and divide the totals to obtain a density expressed in villages per square kilometer.",
             "reference_solutions": [
@@ -888,14 +851,11 @@
             ]
         },
         {
-            "task_ID": "TASK_1_1_014",
+            "task_ID": "TASK_1_1_156",
             "task_text": "Calculate and visualize the density of China POIs (points of interest) within the Loess Plateau, expressed in units of “number per square kilometer.”",
             "task_labels": [
-                "Spatial operations",
-                "Task Set 03",
-                "Process, Merge, Visualize",
-                "Merge, Visualize",
-                "Heatmaps, Contour Lines"
+                "Geo Task Set 02",
+                "Distribution Patterns, Clustering, and Anomaly Detection"
             ],
             "reference_solution_description": "Clip the 2014 national POI layer to the Loess Plateau, compute the POI density per square kilometer, and create a kernel-density visualization of the hotspot pattern.",
             "reference_solutions": [
@@ -980,14 +940,12 @@
             ]
         },
         {
-            "task_ID": "TASK_1_1_015",
+            "task_ID": "TASK_1_1_157",
             "task_text": "Calculate the total area of China’s forest water conservation zones within the Loess Plateau region, and determine its percentage of the total area of the Loess Plateau region.",
             "task_labels": [
-                "Spatial operations",
-                "Task Set 03",
-                "Process, Merge, Visualize",
-                "Merge, Visualize",
-                "Heatmaps, Contour Lines"
+                "Geo Task Set 03",
+                "Geometric Calculation",
+                "Vector Overlay, Intersection, and Topological Relations"
             ],
             "reference_solution_description": "Intersect China’s forest water conservation layer with the Loess Plateau, total the overlap area, and express it as a percentage of the entire plateau.",
             "reference_solutions": [
@@ -1092,14 +1050,11 @@
             ]
         },
         {
-            "task_ID": "TASK_1_1_016",
+            "task_ID": "TASK_1_1_158",
             "task_text": "Based on DEM data, calculate the average elevation of Guangming District, Shenzhen.",
             "task_labels": [
-                "Spatial operations",
-                "Task Set 03",
-                "Process, Merge, Visualize",
-                "Merge, Visualize",
-                "Heatmaps, Contour Lines"
+                "Geo Task Set 01",
+                "Terrain Statistics and Profile Analysis"
             ],
             "reference_solution_description": "Inspect the Guangming District DEM to report its descriptive statistics, focusing on the mean elevation for the district.",
             "reference_solutions": [
@@ -1125,14 +1080,13 @@
             ]
         },
         {
-            "task_ID": "TASK_1_1_017",
+            "task_ID": "TASK_1_1_159",
             "task_text": "Identify the flooded areas in Xinxiang City, Henan Province, and calculate the ratio of their area to the city’s total area.",
             "task_labels": [
-                "Spatial operations",
-                "Task Set 03",
-                "Process, Merge, Visualize",
-                "Merge, Visualize",
-                "Heatmaps, Contour Lines"
+                "Geo Task Set 03",
+                "Geometric Calculation",
+                "Geo Task Set 05",
+                "Hazard Risk Assessment and Simulation"
             ],
             "reference_solution_description": "Vectorize the Xinxiang flood raster footprint to approximate the city extent, compute the flooded area (value 1) and the total valid area, and express the inundated share as a ratio.",
             "reference_solutions": [
@@ -1204,14 +1158,13 @@
             ]
         },
         {
-            "task_ID": "TASK_1_1_018",
+            "task_ID": "TASK_1_1_160",
             "task_text": "Analyze the proportion of forest water conservation zones in terms of area coverage within the Loess Plateau region.",
             "task_labels": [
-                "Spatial operations",
-                "Task Set 03",
-                "Process, Merge, Visualize",
-                "Merge, Visualize",
-                "Heatmaps, Contour Lines"
+                "Geo Task Set 04",
+                "Zonal Statistics and Raster Attribute Calculation",
+                "Geo Task Set 03",
+                "Geometric Calculation"
             ],
             "reference_solution_description": "Quantify how much of the Loess Plateau is covered by forest water conservation zones and express that share as a percentage for area-coverage analysis.",
             "reference_solutions": [
@@ -1289,14 +1242,13 @@
             ]
         },
         {
-            "task_ID": "TASK_1_1_019",
+            "task_ID": "TASK_1_1_161",
             "task_text": "Calculate the area proportion of high‑slope regions (slope classification value > 5) within the Wei River Basin.",
             "task_labels": [
-                "Spatial operations",
-                "Task Set 03",
-                "Process, Merge, Visualize",
-                "Merge, Visualize",
-                "Heatmaps, Contour Lines"
+                "Geo Task Set 01",
+                "Basic Factor Extraction",
+                "Geo Task Set 03",
+                "Geometric Calculation"
             ],
             "reference_solution_description": "Create a binary raster for slope classes greater than 5 in the Wei River Basin, quantify the square kilometers in that mask, and divide by the total basin area to obtain the proportion of high-slope terrain.",
             "reference_solutions": [
@@ -1367,138 +1319,11 @@
             ]
         },
         {
-            "task_ID": "TASK_1_1_020",
-            "task_text": "Calculate the area proportion of high‑slope regions (slope classification value > 5) within the Wei River Basin.",
-            "task_labels": [
-                "Spatial operations",
-                "Task Set 03",
-                "Process, Merge, Visualize",
-                "Merge, Visualize",
-                "Heatmaps, Contour Lines"
-            ],
-            "reference_solution_description": "Repeat the slope>5 analysis for the Wei River Basin, this time converting the fraction into a percentage and producing a visualization of the high-slope footprint.",
-            "reference_solutions": [
-                {
-                    "steps": [
-                        {
-                            "function_name": "get_raster_path",
-                            "arguments": {
-                                "rasterdataset": "Wei River Basin Topographic Slope Classification Dataset"
-                            },
-                            "comment": "Confirm the slope raster path before processing."
-                        },
-                        {
-                            "function_name": "classify_raster_zones",
-                            "arguments": {
-                                "raster_path": "d:/code/GeoBenchX/GeoBenchX/data/Data/GeoData/WeiheBasin.tif",
-                                "reclassification_table": "[{\"min_value\": 5.0001, \"max_value\": 7.0, \"new_value\": 1, \"label\": \"Slope > 5\", \"color\": \"#d73027\"}]",
-                                "output_variable_name": "weihe_high_slope_mask_pct",
-                                "output_raster_path": "d:/code/GeoBenchX/GeoBenchX/scratch/weihe_high_slope_mask_pct.tif",
-                                "output_dtype": "uint8",
-                                "classification_model_name": "weihe_gt5_pct",
-                                "append_timestamp_to_output": false,
-                                "plot_title": "Wei River Basin High-Slope Cells",
-                                "legend_location": "lower right"
-                            },
-                            "comment": "Create a binary raster identical to Task 19 but saved separately for visualization."
-                        },
-                        {
-                            "function_name": "calculate_raster_selection_area",
-                            "arguments": {
-                                "raster_path": "d:/code/GeoBenchX/GeoBenchX/scratch/weihe_high_slope_mask_pct.tif",
-                                "output_variable_name": "weihe_high_slope_area_pct",
-                                "band_number": 1,
-                                "selected_values": [
-                                    1
-                                ],
-                                "treat_nonzero_as_selected": false,
-                                "report_units": "square_kilometers"
-                            },
-                            "comment": "Measure the square kilometers in the high-slope mask."
-                        },
-                        {
-                            "function_name": "calculate_raster_selection_area",
-                            "arguments": {
-                                "raster_path": "d:/code/GeoBenchX/GeoBenchX/data/Data/GeoData/WeiheBasin.tif",
-                                "output_variable_name": "weihe_total_area_pct",
-                                "band_number": 1,
-                                "selected_values": null,
-                                "treat_nonzero_as_selected": true,
-                                "report_units": "square_kilometers"
-                            },
-                            "comment": "Measure the total basin area once more for this task."
-                        },
-                        {
-                            "function_name": "perform_arithmetic_operation",
-                            "arguments": {
-                                "values": [
-                                    "state:weihe_high_slope_area_pct.reported_area_value",
-                                    "state:weihe_total_area_pct.reported_area_value"
-                                ],
-                                "operation": "divide",
-                                "output_variable_name": "weihe_high_slope_ratio_pct"
-                            },
-                            "comment": "Calculate the fraction of the basin occupied by high-slope terrain."
-                        },
-                        {
-                            "function_name": "perform_arithmetic_operation",
-                            "arguments": {
-                                "values": [
-                                    "state:weihe_high_slope_ratio_pct",
-                                    100
-                                ],
-                                "operation": "multiply",
-                                "output_variable_name": "weihe_high_slope_percent"
-                            },
-                            "comment": "Convert the ratio into a percentage for clearer communication."
-                        },
-                        {
-                            "function_name": "extract_raster_boundary",
-                            "arguments": {
-                                "raster_path": "d:/code/GeoBenchX/GeoBenchX/scratch/weihe_high_slope_mask_pct.tif",
-                                "output_geodataframe_name": "weihe_high_slope_boundary",
-                                "band_number": 1,
-                                "maximum_vertices": 8000,
-                                "dissolve_polygons": true,
-                                "simplify_tolerance_meters": null,
-                                "output_file_path": null,
-                                "overwrite_existing": true
-                            },
-                            "comment": "Convert the binary mask into polygons for easy mapping."
-                        },
-                        {
-                            "function_name": "visualize_geographies",
-                            "arguments": {
-                                "geodataframe_names": [
-                                    "weihe_high_slope_boundary"
-                                ],
-                                "layer_styles": [
-                                    {
-                                        "color": "#d73027",
-                                        "alpha": 0.65,
-                                        "linewidth": 0.8,
-                                        "label": "Slope class > 5"
-                                    }
-                                ],
-                                "basemap_style": "Carto Positron",
-                                "title": "Wei River Basin High-Slope Footprint",
-                                "add_legend": true
-                            },
-                            "comment": "Produce a quick visualization of where slope classes exceed the threshold."
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "task_ID": "TASK_1_1_021",
+            "task_ID": "TASK_1_1_163",
             "task_text": "Calculate the total area and perimeter of the Loess Plateau, and determine its centroid.",
             "task_labels": [
-                "Spatial operations",
-                "Task Set 03",
-                "Process, Merge, Visualize",
-                "Merge, Visualize",
-                "Heatmaps, Contour Lines"
+                "Geo Task Set 03",
+                "Geometric Calculation"
             ],
             "reference_solution_description": "Load the Loess Plateau polygon, compute its total area, derive the perimeter length by treating the boundary as a line feature, and generate centroid points for reporting.",
             "reference_solutions": [
@@ -1546,14 +1371,12 @@
             ]
         },
         {
-            "task_ID": "TASK_1_1_022",
+            "task_ID": "TASK_1_1_164",
             "task_text": "Create 500‑meter and 1,000‑meter merged buffer zones for all major urban parks in Wuhan to assess their overall service coverage range.",
             "task_labels": [
-                "Spatial operations",
-                "Task Set 03",
-                "Process, Merge, Visualize",
-                "Merge, Visualize",
-                "Heatmaps, Contour Lines"
+                "Geo Task Set 03",
+                "Buffer Analysis",
+                "Spatial Proximity and Direction"
             ],
             "reference_solution_description": "Create dissolved service buffers of 500 m and 1,000 m around the Wuhan urban parks layer to evaluate major park coverage extents.",
             "reference_solutions": [
@@ -1630,14 +1453,11 @@
             ]
         },
         {
-            "task_ID": "TASK_1_1_023",
+            "task_ID": "TASK_1_1_165",
             "task_text": "Identify the ecological core protected area formed by contracting the boundary of the Loess Plateau inward by 20 kilometers.",
             "task_labels": [
-                "Spatial operations",
-                "Task Set 03",
-                "Process, Merge, Visualize",
-                "Merge, Visualize",
-                "Heatmaps, Contour Lines"
+                "Geo Task Set 03",
+                "Buffer Analysis"
             ],
             "reference_solution_description": "Contract the Loess Plateau boundary inward by 20 km to delineate an ecological core protected area and document its size.",
             "reference_solutions": [
@@ -1701,14 +1521,12 @@
             ]
         },
         {
-            "task_ID": "TASK_1_1_024",
+            "task_ID": "TASK_1_1_166",
             "task_text": "Find all China POIs (points of interest) located within the 1‑kilometer buffer zone of parks in Wuhan.",
             "task_labels": [
-                "Spatial operations",
-                "Task Set 03",
-                "Process, Merge, Visualize",
-                "Merge, Visualize",
-                "Heatmaps, Contour Lines"
+                "Geo Task Set 03",
+                "Buffer Analysis",
+                "Vector Overlay, Intersection, and Topological Relations"
             ],
             "reference_solution_description": "Generate a 1 km dissolved buffer around all Wuhan parks and select the China POIs that fall inside this zone.",
             "reference_solutions": [
@@ -1787,14 +1605,13 @@
             ]
         },
         {
-            "task_ID": "TASK_1_1_025",
+            "task_ID": "TASK_1_1_167",
             "task_text": "Based on the DEM of Guangming District, Shenzhen, generate the aspect map of the area and calculate the area of the main orientations (e.g., east, south, west, north).",
             "task_labels": [
-                "Spatial operations",
-                "Task Set 03",
-                "Process, Merge, Visualize",
-                "Merge, Visualize",
-                "Heatmaps, Contour Lines"
+                "Geo Task Set 01",
+                "Basic Factor Extraction",
+                "Geo Task Set 03",
+                "Geometric Calculation"
             ],
             "reference_solution_description": "Generate the Guangming District aspect raster and reclassify it into four main orientations (north, east, south, west) so their areas can be compared.",
             "reference_solutions": [
@@ -1838,14 +1655,13 @@
             ]
         },
         {
-            "task_ID": "TASK_1_1_026",
+            "task_ID": "TASK_1_1_168",
             "task_text": "Reclassify the two slope classes “1–3 degrees” and “4–5 degrees” from the Wei River Basin Terrain Slope Classification Datasetinto “gentle slope” and “steep slope,” respectively.",
             "task_labels": [
-                "Spatial operations",
-                "Task Set 03",
-                "Process, Merge, Visualize",
-                "Merge, Visualize",
-                "Heatmaps, Contour Lines"
+                "Geo Task Set 01",
+                "Basic Factor Extraction",
+                "Geo Task Set 04",
+                "Reclassification and Classification"
             ],
             "reference_solution_description": "Reclassify the Wei River Basin slope raster so that classes 1–3 map to a 'gentle slope' category and classes 4–5 map to a 'steep slope' category.",
             "reference_solutions": [
@@ -1878,14 +1694,11 @@
             ]
         },
         {
-            "task_ID": "TASK_1_1_027",
+            "task_ID": "TASK_1_1_169",
             "task_text": "Measure the average area and standard deviation of the area for all submerged crab ponds within the Changxing Taihu Lake Scientific Experimental Area in 2021.",
             "task_labels": [
-                "Spatial operations",
-                "Task Set 03",
-                "Process, Merge, Visualize",
-                "Merge, Visualize",
-                "Heatmaps, Contour Lines"
+                "Geo Task Set 03",
+                "Geometric Calculation"
             ],
             "reference_solution_description": "Measure the per-feature areas of the 2021 submerged crab ponds and summarize their mean and standard deviation (in square meters).",
             "reference_solutions": [
@@ -1936,14 +1749,11 @@
             ]
         },
         {
-            "task_ID": "TASK_1_1_028",
+            "task_ID": "TASK_1_1_170",
             "task_text": "Perform descriptive statistics on the DEM data of Guangming District, Shenzhen, calculating the minimum, maximum, mean, and standard deviation of elevation.",
             "task_labels": [
-                "Spatial operations",
-                "Task Set 03",
-                "Process, Merge, Visualize",
-                "Merge, Visualize",
-                "Heatmaps, Contour Lines"
+                "Geo Task Set 01",
+                "Terrain Statistics and Profile Analysis"
             ],
             "reference_solution_description": "Produce descriptive statistics (min, max, mean, standard deviation) for the Guangming District DEM elevations.",
             "reference_solutions": [
@@ -1969,14 +1779,13 @@
             ]
         },
         {
-            "task_ID": "TASK_1_1_029",
+            "task_ID": "TASK_1_1_171",
             "task_text": "To assess economic losses from flooding, calculate the area statistics (sum, mean, median) of all submerged crab pond patches in Changxing, Zhejiang.",
             "task_labels": [
-                "Spatial operations",
-                "Task Set 03",
-                "Process, Merge, Visualize",
-                "Merge, Visualize",
-                "Heatmaps, Contour Lines"
+                "Geo Task Set 03",
+                "Geometric Calculation",
+                "Geo Task Set 05",
+                "Hazard Risk Assessment and Simulation"
             ],
             "reference_solution_description": "For the submerged crab ponds in Changxing (Taihu Lake scientific experiment), compute area summaries in square meters including the sum, mean, and median to support flood-loss estimates.",
             "reference_solutions": [
@@ -2036,14 +1845,11 @@
             ]
         },
         {
-            "task_ID": "TASK_1_1_030",
+            "task_ID": "TASK_1_1_172",
             "task_text": "Generate an aspect map of the Tangxun Lake experimental area in Hubei Province based on DEM data.",
             "task_labels": [
-                "Spatial operations",
-                "Task Set 03",
-                "Process, Merge, Visualize",
-                "Merge, Visualize",
-                "Heatmaps, Contour Lines"
+                "Geo Task Set 01",
+                "Basic Factor Extraction"
             ],
             "reference_solution_description": "Use the Tangxun Lake DEM to generate an aspect raster and visualization of the experimental area in Hubei.",
             "reference_solutions": [
@@ -2072,14 +1878,12 @@
             ]
         },
         {
-            "task_ID": "TASK_1_1_031",
+            "task_ID": "TASK_1_1_173",
             "task_text": "Identify and extract all flat areas with a slope less than 2 degrees from the DEM of Tangxun Lake in Hubei.",
             "task_labels": [
-                "Spatial operations",
-                "Task Set 03",
-                "Process, Merge, Visualize",
-                "Merge, Visualize",
-                "Heatmaps, Contour Lines"
+                "Geo Task Set 01",
+                "Basic Factor Extraction",
+                "Elevation Feature Recognition and Terrain Visualization"
             ],
             "reference_solution_description": "Convert the Tangxun Lake DEM to slope (degrees), classify slopes below 2°, and extract their total area.",
             "reference_solutions": [
@@ -2123,14 +1927,11 @@
             ]
         },
         {
-            "task_ID": "TASK_1_1_032",
+            "task_ID": "TASK_1_1_174",
             "task_text": "Extract all slope surfaces facing due south (within the range of 157.5°–202.5°) from the DEM of Tangxun Lake in Hubei.",
             "task_labels": [
-                "Spatial operations",
-                "Task Set 03",
-                "Process, Merge, Visualize",
-                "Merge, Visualize",
-                "Heatmaps, Contour Lines"
+                "Geo Task Set 01",
+                "Basic Factor Extraction"
             ],
             "reference_solution_description": "Derive the Tangxun Lake aspect raster and isolate slopes facing due south (157.5°–202.5°).",
             "reference_solutions": [

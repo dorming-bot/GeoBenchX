@@ -160,7 +160,9 @@ RASTER_CATALOG = {
     "Guangming District DEM (Shenzhen)": "guangming.tif",
     "Guangming District Slope (Shenzhen)": "guangmingSlope.tif",
     "DEM data of the Tangxun Lake Experimental Area in Hubei":"Tangxun_lake_DEM.tif",
-    "Piura region of Peru":"piura_dem.tif"
+    "Piura region of Peru":"piura_dem.tif",
+    "Shanxi Province Surface Evapotranspiration Dataset":"Shanxi Province Surface Evapotranspiration.tif",
+    "Heilongjiang River Basin Elevation Classification Data":"Heilongjiang River Basin Elevation Classification.tif"
 }
 
 COLORMAPS = {

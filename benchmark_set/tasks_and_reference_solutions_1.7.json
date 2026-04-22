@@ -1,0 +1,303 @@
+{
+    "metadata": {
+        "author": "ZSX",
+        "notes": "Version 1.1 task definitions without solutions"
+    },
+    "tasks": [
+        {
+            "task_ID": "TASK_test116",
+            "task_text": "Calculate the area proportion of high-slope regions (slope value > 20) within the Wei River Basin.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_test117",
+            "task_text": "Analyze extreme temperature raster data for China's coastal provinces and identify the Kernel Density center of the region with the highest average temperature.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_test118",
+            "task_text": "Analyze road line density across different functional zones in Nanjing (e.g., water bodies, green spaces) to compare variations in traffic accessibility.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_test119",
+            "task_text": "In Inner Mongolia, analyze whether a spatial coupling relationship exists between the Kernel Density hotspots of the road network (lines) and traditional villages (points).",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_test120",
+            "task_text": "Perform a Kernel Density Analysis centered on Wuhan's urban parks to identify park service hotspots, and compare these with commercial POI hotspots to identify underserved commercial areas.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_test121",
+            "task_text": "In Changxing County, Zhejiang, calculate the proportion of inundated crab ponds relative to the total area of all crab ponds, and analyze the relationship between elevation (based on DEM data) and inundation ratio to provide a basis for agricultural insurance loss assessment.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_test122",
+            "task_text": "Overlay China's coastal extreme temperature rasters with traditional village data to extract the temperature at each village location, then perform a Kernel Density Analysis on villages located within high-temperature zones.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_test123",
+            "task_text": "Calculate road line density across Inner Mongolia to assess the overall level of regional transport infrastructure.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_test124",
+            "task_text": " Identify the areas inundated by floods in Xinxiang City, Henan Province (2021), and calculate the ratio of the inundated area to the city's total administrative area.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_test125",
+            "task_text": "Analyze the number of POIs within the 500-meter buffer zone of Nanjing's water systems to evaluate the intensity of commercial development.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        }
+    ]
+}
