@@ -29,6 +29,7 @@ MODEL_SHER_LOCKER = 'gpt-4.1-nano'
 MODEL_SHER_LOCKER_4o = 'gpt-4o'
 MODEL_SHER_LOCKER_GEMINI_FLASH = 'gemini-2.5-flash'
 MODEL_SHER_LOCKER_4mini = 'gpt-4o-mini-2024-07-18'
+MODEL_SHER_LOCKER_GPT5.4 = 'gpt-5.4-2026-03-05'
 
 
 class ScoreValues(IntEnum):

@@ -1,0 +1,273 @@
+{
+    "metadata": {
+        "author": "ZSX",
+        "notes": "Version 1.1 task definitions without solutions"
+    },
+    "tasks": [
+        {
+            "task_ID": "TASK_test291",
+            "task_text": "Load the data 'Protected_region' and 'roads_polyline' firstly.Then compute the road lengths inside each protected region. The identifier of projected region is “fid”",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_test292",
+            "task_text": "Load the data 'PA_Data_EPSG4326' and 'Pennsylvania boundaries' firstly.Then from Pennsylvania boundaries dataset select only those counties that the number of data from PA_DATA_EPSG4326 are completely within their boundaries but the count of point is less than 10.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_test293",
+            "task_text": "Load the data 'Pennsylvania boundaries' firstly.Then I want you to measure the length of boundary of each county in km based on this input data. Then display your result in an HTML file.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_test294",
+            "task_text": "Load the data 'tl_2019_42_prisecroads' and 'PennsylvaniaCounties' firstly.Then I want you to find all roads that crossed the centre county and then extract them from tl_2019_42_prisecroads.shp, and save the roads result in a new shapefile.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_test295",
+            "task_text": "Load the data 'SC_county_boundaries' and 'SC_weatherstations' firstly.Then for each county, 1) find the weather stations inside the county, and 2) list the weather station names inside the county.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_test296",
+            "task_text": "Load the data 'Pennsylvania boundaries' firstly.Then I would like to identify which counties in Pennsylvania are suitable for planting more trees, using annual rainfall as a key parameter. Counties receiving more than 2.5 inches of rain per year should be considered suitable for tree planting.  Based on your analysis, please answer the following: what percentage of Pennsylvania is suitable for planting more trees? How many counties meet the criteria for tree planting suitability?",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_test297",
+            "task_text": "Load the data 'HW_Sites_EPSG4326' and 'North_Carolina_blockgroup_boundaries' ,load 'blockgroup_population_north_carolina' firstly.Then using the provided hazard waste sites shapefile, block groups shapefile, and population CSV, calculate the total population living in block groups containing hazard waste sites. Start by loading the hazard sites and block groups data, ensuring their coordinate reference systems (CRS) match. Next, generate spatial points for hazard sites based on their latitude and longitude, then perform a spatial join to identify which block groups contain these sites. Extract the unique identifiers (GEOID) of these block groups and ensure that hazard_geoid_list and blockgroup_fips are in a consistent format (e.g., both as 12-digit strings). Match the GEOID values to the blockgroup_fips field in the population data. Finally, sum the population values for the matching block groups and output the total population, saving the filtered population data as a CSV for further analysis.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_test298",
+            "task_text": "Load the data 'sidewalk in Columbia' and 'schools in Columbia' firstly.Then for each school in Columbia, calculate the length of sidewalks within 500 meters.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_test299",
+            "task_text": "Load the data 'US counties' and 'HIV_points' firstly.Then join the provided datasets, 'HIV Points' and 'US Counties,' to create a new file that assigns each county an HIV rate based on the HIV Points dataset. Then generate a symbology map that visualizes the HIV rate distribution across counties. Ensure the symbology map uses an appropriate color scheme to reflect variations in HIV rates, with distinct colors representing different levels of HIV rates. Avoid overrepresentation of a single color on the map by using a diverging or sequential colormap that balances the visualization of both high and low values effectively.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        }
+    ]
+}

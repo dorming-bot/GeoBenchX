@@ -106,7 +106,13 @@ DATA_CATALOG = {
     "Incidence of Tuberculosis Disease, 2023, Massachusetts Counties":"Incidence of Tuberculosis Disease 2023 Massachusetts Counties.csv",
     "Incidence of Tuberculosis Disease, 2023, New York State Counties": "NYS TB cases 2023.csv",
     "Rail lines (total route-km)":"API_IS.RRS.TOTL.KM_DS2_en_csv_v2_1937",
-    "Regional GDP in departments (provinces) of Peru, constant prices 2007, thousand of soles": "Regional GDPs Peru.csv"
+    "Regional GDP in departments (provinces) of Peru, constant prices 2007, thousand of soles": "Regional GDPs Peru.csv",
+    "HIV":"HIV.csv",
+    "Richland":"Richland_jsons.csv",
+    "Place_visit_rates":"Place_visit_rates.csv",
+    "Rolla_2021_population_block_group":"Rolla_2021_population_block_group.csv",
+    "blockgroup_population_north_carolina":"blockgroup_population_north_carolina.csv",
+    "ShortLongDurationHeavyRainfallChina1961-2015":"ShortLongDurationHeavyRainfallChina1961-2015.xlsx"
 }
 
 GEO_CATALOG = {
@@ -141,7 +147,117 @@ GEO_CATALOG = {
     "Beijing-Tianjin-Hebei boundary": "2020jjj.shp",
     "Traditional Villages of China": "VillagesChina.shp",
     "The source region of the Yellow River": "YellowRiver_SourceRegion.shp",
-    "2021 Taihu Lake scientific experiment submerged crab pond data":"2021 Taihu Lake scientific experiment submerged crab pond data.shp"
+    "2021 Taihu Lake scientific experiment submerged crab pond data":"2021 Taihu Lake scientific experiment submerged crab pond data.shp",
+    "roads in Columbia":"Columbia_road.shp",
+    "roads in SanFrancisco":"roads_in_SanFrancisco.shp",
+    "schools in Columbia":"Columbia_schools.shp",
+    "sidewalk in Columbia":"Columbia_sidewalk.shp",
+    "US counties":"US_Counties.shp",
+    "Pennsylvania boundaries":"PennsylvaniaBoundaries.shp",
+    "fastfood in Pennsylvania":"Pennsylvania_Fastfoods.shp",
+    "San Andreas Special Studies Zones":"San_Andreas_Special_Studies_Zones.shp",
+    "damaged houses around San Andreas Special Studies Zones":"damaged_houses_around_San_Andreas_Special_Studies_Zones.shp",
+    "Nigeria Railways":"Nigeria_Railways.shp",
+    "Nigeria Roads":"Nigeria_Major_Roads.shp",
+    "buildings in Pennsylvania":"Penn_State_Buildings.shp",
+    "US Counties Obesity Covid":"US_Counties_Obesity_Covid.shp",
+    "US_rivers":"US_rivers.shp",
+    "US_FLOOD":"US_flood.shp",
+    "flood in 2015":"flood2015may.shp",
+    "rivers in 2015":"rivers2015may.shp",
+    "US Counties Data":"US_Counties_Data.shp",
+    "tl_2019_42_prisecroads":"tl_2019_42_prisecroads.shp",
+    "network line":"network_lines.shp",
+    "Pennsylvania_generated_polygon":"generated_polygon.shp",
+    "tract_37_EPSG4326":"tract_37_EPSG4326.shp",
+    "Laramie":"Laramie.shp",
+    "Rectangle_grid":"Rectangle_grid.shp",
+    "DC_Health_Facilities":"DC_Health_Facilities.shp",
+    "Points_inside_Rectangle_grid":"Points_inside_Rectangle_grid.shp",
+    "center_point_in_Rectangle_grid":"center_point_in_Rectangle_grid.shp",
+    "Richland_SC_fastfood":"Richland_SC_fastfood.shp",
+    "PSU_b":"PSU_b.shp",
+    "distance_matrix":"distance_matrix.shp",
+    "PennsylvaniaCounties":"PennsylvaniaCounties.shp",
+    "SC_Counties":"SC_Counties.shp",
+    "PA_Hospital":"PA_Hospital.shp",
+    "Motoway_EPSG32111":"Motoway_EPSG32111.shp",
+    "Walmart_4_site_EPSG32111":"Walmart_4_site_EPSG32111.shp",
+    "Washington":"Washington.shp",
+    "Poverty":"Poverty.shp",
+    "SanFranciscoHospitals":"SanFranciscoHospitals.shp",
+    "SanFrancisco_tracts_central":"SanFrancisco_tracts_central.shp",
+    "New_York_coffee_shop":"New_York_coffee_shop.shp",
+    "bus_metro_stop":"bus_metro_stop.shp",
+    "Rolla_building_footprints":"Rolla_building_footprints.shp",
+    "street_image":"street_image.shp",
+    "trunk_location_ground_truth_EPSG6569":"trunk_location_ground_truth_EPSG6569.shp",
+    "trunk_location_estimated_EPSG6569":"trunk_location_estimated_EPSG6569.shp",
+    "Rolla_downtown_block_groups_2021":"Rolla_downtown_block_groups_2021.shp",
+    "Rolla_downtown_block_groups_2019":"Rolla_downtown_block_groups_2019.shp",
+    "Columbia_image_points":"Columbia_image_points.shp",
+    "Outlet":"Outlet.shp",
+    "Richland_downtown_street_view_image_location_EPSG6569":"Richland_downtown_street_view_image_location_EPSG6569.shp",
+    "Richland_downtown_street_view_image_location":"Richland_downtown_street_view_image_location.shp",
+    "Street_Tree_EPSG6852_subset":"Street_Tree_EPSG6852_subset.shp",
+    "Roads_Potland_EPSG6852_subset":"Roads_Potland_EPSG6852_subset.shp",
+    "roads_polyline":"roads_polyline.shp",
+    "Protected_region":"Protected_region.shp",
+    "PA_Data_EPSG4326":"PA_Data_EPSG4326.shp",
+    "SC_county_boundaries":"SC_county_boundaries.shp",
+    "SC_weatherstations":"SC_weatherstations.shp",
+    "HIV_points":"HIV_points.shp",
+    "points_random":"points_random.shp",
+    "Checkpoints_Columbia":"Checkpoints_Columbia.shp",
+    "PA_Roads":"PA_Roads.shp",
+    "road_in_China":"road_in_China.shp",
+    "Generate_road_1_2":"Generate_road_1_2.shp",
+    "Generate_area_1_2":"Generate_area_1_2.shp",
+    "Generate_zone_1_3":"Generate_zone_1_3.shp",
+    "Generate_zone_lines_1_4":"Generate_zone_lines_1_4.shp",
+    "Generate_roads_1_6":"Generate_roads_1_6.shp",
+    "Generate_provinces_1_6":"Generate_provinces_1_6.shp",
+    "Generate_area_1_7":"Generate_area_1_7.shp",
+    "Generate_points_1_8":"Generate_points_1_8.shp",
+    "Generate_points_1_9":"Generate_points_1_9.shp",
+    "Generate_line_1_10":"Generate_line_1_10.shp",
+    "Generate_area_1_11":"Generate_area_1_11.shp",
+    "Generate_road_1_11":"Generate_road_1_11.shp",
+    "Generate_points_1_12":"Generate_points_1_12.shp",
+    "Generate_road_1_13":"Generate_road_1_13.shp",
+    "Generate_points_1_14":"Generate_points_1_14.shp",
+    "Generate_Points_1_15":"Generate_Points_1_15.shp",
+    "Generate_road_1_17":"Generate_road_1_17.shp",
+    "Generate_circles_1_18":"Generate_circles_1_18.shp",
+    "Generate_points_1_20":"Generate_points_1_20.shp",
+    "Generate_buildings_1_21":"Generate_buildings_1_21.shp",
+    "Generate_line_1_22":"Generate_line_1_22.shp",
+    "Generate_parcel_1_22":"Generate_parcel_1_22.shp",
+    "Generate_Points_2_1":"Generate_Points_2_1.shp",
+    "Generate_circles_2_2":"Generate_circles_2_2.shp",
+    "Generate_rainfall_2_7":"Generate_rainfall_2_7.shp",
+    "Generate_rivers_2_4":"Generate_rivers_2_4.shp",
+    "Generate_grid_2_4":"Generate_grid_2_4.shp",
+    "Generate_area_2_5":"Generate_area_2_5.shp",
+    "Generate_zone_2_6":"Generate_zone_2_6.shp",
+    "Generate_points_3_1":"Generate_points_3_1.shp",
+    "Generate_Points_3_2":"Generate_Points_3_2.shp",
+    "Generate_line_3_3":"Generate_line_3_3.shp",
+    "Generate_area_points_3_3":"Generate_area_points_3_3.shp",
+    "Generate_point_3_4":"Generate_point_3_4.shp",
+    "Generate_Points_3_5":"Generate_Points_3_5.shp",
+    "Generate_line_3_5":"Generate_line_3_5.shp",
+    "Generate_area_3_6":"Generate_area_3_6.shp",
+    "Generate_rectangles_4_1":"Generate_rectangles_4_1.shp",
+    "Generate_country_12_1":"Generate_country_12_1.shp",
+    "Generate_country_12_3":"Generate_country_12_3.shp",
+    "Generate_rectangles_12_4":"Generate_rectangles_12_4.shp",
+    "Generate_points_12_5":"Generate_points_12_5.shp",
+    "Generate_area_stats":"Generate_area_stats.shp",
+    "NanJingBoundaries":"NanJingBoundaries.shp",
+    "City walls in Chinese cities during the late imperial period (15th-19th centuries)":"MingQingCityWall.shp",
+    "HeavyRain_Region_in_China":"HeavyRain_Region_in_China.shp",
+    "mangrove distribution map of Southeast Asia":"mangrove2015.shp"
     }
 
 RASTER_CATALOG = {
@@ -163,7 +279,35 @@ RASTER_CATALOG = {
     "DEM data of the Tangxun Lake Experimental Area in Hubei":"Tangxun_lake_DEM.tif",
     "Piura region of Peru":"piura_dem.tif",
     "Shanxi Province Surface Evapotranspiration Dataset":"Shanxi Province Surface Evapotranspiration.tif",
-    "Heilongjiang River Basin Elevation Classification Data":"Heilongjiang River Basin Elevation Classification.tif"
+    "PA DEM":"PA_DEM.tif",
+    "DEM of Puerto":"Puerto_DEM.tif",
+    "SC_DEM":"SouthCarolina_DEM.tif",
+    "n40_w078_1arc_v3":"n40_w078_1arc_v3.tif",
+    "landscan-usa-2021-conus-night":"landscan-usa-2021-conus-night.tif",
+    "Richland_DEM":"Richland_DEM.tif",
+    "Richland_SC_DEM_UTM17":"Richland_SC_DEM_UTM17.tif",
+    "Nighttime":"Nighttime.tif",
+    "srtm_41_19":"srtm_41_19.tif",
+    "elevation_mask":"elevation_mask.tif",
+    "Rolla_DEM_projected":"Rolla_DEM_projected.tif",
+    "PSU_DEM":"PSU_DEM.tif",
+    "idw_output":"idw_output.tif",
+    "Richland_DEM_EPSG_6569":"Richland_DEM_EPSG_6569.tif",
+    "China's population in 2010":"China's population in 2010.tif",
+    "China's population in 2005":"China's population in 2010.tif",
+    "cover data for Henan Province":"coverdata _ for_Henan_Province.tif",
+    "ASTGTM DEM data for a city in Zhejiang Province":"ASTGTM_DEM_data__in_Zhejiang.tif",
+    "DEM data of Jalaid Banner, Xing'an League, Inner Mongolia":"zlt30dem.tif",
+    "China Ecological, Residential, and Industrial Land Use Spatial Dataset":"EcoReslndLand.tif",
+    "Spatial Distribution Dataset of Grassland Degradation Types on the Tibetan Plateau":"qtpgdd.tif",
+    "average temperature in China for January 2020":"Temp_pred_2020_1_Tmean.tif",
+    "temperatures in China's coastal provinces":"csdi_m.tif",
+    "China's cropland cropping system resources":"mci_0110",
+    "LT05_L1TP_123042_20110928_20200820_02_T1_B5":"LT05_L1TP_123042_20110928_20200820_02_T1_B5.tif",
+    "LT05_L1TP_123042_20110928_20200820_02_T1_B2":"LT05_L1TP_123042_20110928_20200820_02_T1_B2.tif",
+    "LT05_L1TP_123042_20110928_20200820_02_T1_B3":"LT05_L1TP_123042_20110928_20200820_02_T1_B3.tif",
+    "LT05_L1TP_123042_20110928_20200820_02_T1_B4":"LT05_L1TP_123042_20110928_20200820_02_T1_B4.tif",
+    "composited_rgb":"composited_rgb.tif"
 }
 
 COLORMAPS = {
@@ -2834,6 +2978,331 @@ def create_dissolved_buffer(
     except Exception as e:
         return f"Error creating dissolved buffer: {type(e).__name__} : {str(e)}"
 
+def create_statistical_chart(
+    chart_type: Annotated[
+        Literal["histogram", "bar", "pie"],
+        "Type of chart to create: histogram, bar, or pie"
+    ],
+    output_variable_name: Annotated[str, "Name for storing chart metadata in state data_store"],
+    state: Annotated[dict, InjectedState],
+    dataframe_name: Annotated[str | None, "Name of DataFrame/GeoDataFrame from data_store"] = None,
+    column_name: Annotated[str | None, "Numeric column for histogram"] = None,
+    raster_path: Annotated[str | None, "Path to raster file for histogram input"] = None,
+    band: Annotated[int, "Raster band index (1-based)"] = 1,
+    category_column: Annotated[str | None, "Category column used by bar/pie chart"] = None,
+    value_column: Annotated[str | None, "Numeric value column used by bar/pie chart"] = None,
+    aggregation: Annotated[
+        Literal["count", "sum", "mean", "median", "min", "max"],
+        "Aggregation for bar/pie when category column is provided"
+    ] = "count",
+    bins: Annotated[int, "Number of bins for histogram"] = 30,
+    top_n: Annotated[int, "Keep top N categories for bar/pie"] = 20,
+    dropna: Annotated[bool, "Drop null values before plotting"] = True,
+    sort_desc: Annotated[bool, "Sort categories descending by value"] = True,
+    normalize: Annotated[bool, "Normalize histogram to probability density"] = False,
+    title: Annotated[str | None, "Custom chart title"] = None,
+    x_label: Annotated[str | None, "Custom x-axis label"] = None,
+    y_label: Annotated[str | None, "Custom y-axis label"] = None,
+) -> str:
+    """Create histogram/bar/pie charts from table columns or raster values and store preview in image_store."""
+    try:
+        if "image_store" not in state:
+            state["image_store"] = []
+        if "data_store" not in state:
+            state["data_store"] = {}
+
+        fig, ax = plt.subplots(figsize=(11, 7))
+        summary: dict[str, Any] = {"chart_type": chart_type}
+
+        if chart_type == "histogram":
+            values = None
+            source_desc = None
+
+            if raster_path:
+                raster_input = raster_path
+                if ":" in raster_input and "Constructed path to raster dataset" in raster_input:
+                    raster_input = raster_input.split(":", 1)[1].strip()
+
+                with rasterio.open(raster_input) as src:
+                    band_data = src.read(int(band), masked=True)
+                    values = band_data.compressed()
+                    source_desc = f"raster band {band} from {os.path.basename(raster_input)}"
+            else:
+                if not dataframe_name or not column_name:
+                    return "Error: histogram requires either raster_path or both dataframe_name and column_name"
+                df = state["data_store"].get(dataframe_name)
+                if df is None:
+                    return f"Error: DataFrame/GeoDataFrame '{dataframe_name}' not found in data store"
+                if column_name not in df.columns:
+                    return f"Error: Column '{column_name}' not found in '{dataframe_name}'"
+                series = pd.to_numeric(df[column_name], errors="coerce")
+                values = series.dropna().to_numpy() if dropna else series.to_numpy()
+                source_desc = f"column '{column_name}' from '{dataframe_name}'"
+
+            if values is None or len(values) == 0:
+                return "Error: No valid values found for histogram"
+
+            ax.hist(values, bins=max(int(bins), 1), color="#3A86FF", edgecolor="white", density=normalize)
+            ax.grid(axis="y", alpha=0.25)
+            ax.set_title(title or f"Histogram of {source_desc}")
+            ax.set_xlabel(x_label or "Value")
+            ax.set_ylabel(y_label or ("Density" if normalize else "Frequency"))
+
+            summary.update(
+                {
+                    "source": source_desc,
+                    "count": int(len(values)),
+                    "min": float(np.min(values)),
+                    "max": float(np.max(values)),
+                    "mean": float(np.mean(values)),
+                    "std": float(np.std(values)),
+                    "bins": int(bins),
+                }
+            )
+
+        else:
+            if not dataframe_name or not category_column:
+                return "Error: bar/pie charts require dataframe_name and category_column"
+            df = state["data_store"].get(dataframe_name)
+            if df is None:
+                return f"Error: DataFrame/GeoDataFrame '{dataframe_name}' not found in data store"
+            if category_column not in df.columns:
+                return f"Error: Column '{category_column}' not found in '{dataframe_name}'"
+
+            work_df = df.copy()
+            if dropna:
+                work_df = work_df[work_df[category_column].notna()]
+
+            if value_column:
+                if value_column not in work_df.columns:
+                    return f"Error: Column '{value_column}' not found in '{dataframe_name}'"
+                work_df[value_column] = pd.to_numeric(work_df[value_column], errors="coerce")
+                if dropna:
+                    work_df = work_df[work_df[value_column].notna()]
+                grouped = getattr(work_df.groupby(category_column)[value_column], aggregation)()
+            else:
+                if aggregation != "count":
+                    return "Error: aggregation must be 'count' when value_column is not provided"
+                grouped = work_df.groupby(category_column).size()
+
+            grouped = grouped.dropna()
+            if grouped.empty:
+                return "Error: No valid category values available for plotting"
+
+            grouped = grouped.sort_values(ascending=not sort_desc)
+            if top_n and top_n > 0 and len(grouped) > top_n:
+                grouped = grouped.iloc[:top_n]
+
+            labels = grouped.index.astype(str).tolist()
+            vals = grouped.values.astype(float)
+
+            if chart_type == "bar":
+                ax.bar(labels, vals, color="#2A9D8F")
+                ax.set_title(title or f"Bar Chart by '{category_column}'")
+                ax.set_xlabel(x_label or category_column)
+                default_y = f"{aggregation}({value_column})" if value_column else "Count"
+                ax.set_ylabel(y_label or default_y)
+                ax.tick_params(axis="x", rotation=45)
+                ax.grid(axis="y", alpha=0.25)
+            else:
+                ax.pie(vals, labels=labels, autopct="%1.1f%%", startangle=90)
+                ax.axis("equal")
+                ax.set_title(title or f"Pie Chart by '{category_column}'")
+
+            summary.update(
+                {
+                    "source_dataframe": dataframe_name,
+                    "category_column": category_column,
+                    "value_column": value_column,
+                    "aggregation": aggregation,
+                    "categories": labels,
+                    "values": [float(v) for v in vals],
+                }
+            )
+
+        fig.tight_layout()
+
+        buf = io.BytesIO()
+        fig.savefig(buf, format="png", bbox_inches="tight", dpi=150)
+        buf.seek(0)
+        img_base64 = base64.b64encode(buf.read()).decode("utf-8")
+        buf.close()
+
+        state["image_store"].append(
+            {
+                "type": "chart",
+                "description": f"Generated {chart_type} chart",
+                "base64": img_base64,
+            }
+        )
+        state["data_store"][output_variable_name] = summary
+
+        if "visualize" in state and state["visualize"]:
+            plt.show()
+        plt.close(fig)
+
+        return f"Created {chart_type} chart and stored metadata in '{output_variable_name}'."
+    except Exception as e:
+        return f"Error creating chart: {type(e).__name__} : {str(e)}"
+
+def reproject_vector_data(
+    geodataframe_name: Annotated[str, "Name of GeoDataFrame in data_store"],
+    target_crs: Annotated[
+        str | int,
+        "Target CRS to reproject to (EPSG code, WKT, PROJ string, or CRS name)"
+    ],
+    output_file_path: Annotated[str, "Path where the reprojected vector file will be saved"],
+    state: Annotated[dict, InjectedState],
+    output_geodataframe_name: Annotated[str | None, "Optional name for storing the reprojected GeoDataFrame"] = None,
+    preserve_index: Annotated[bool, "Whether to preserve the original index in the saved file"] = False,
+) -> str:
+    """Reproject a vector dataset and save it to a new file."""
+    try:
+        if "data_store" not in state:
+            state["data_store"] = {}
+
+        gdf = state["data_store"].get(geodataframe_name)
+        if gdf is None:
+            return f"Error: GeoDataFrame '{geodataframe_name}' not found in data store"
+        if gdf.empty:
+            return f"Error: GeoDataFrame '{geodataframe_name}' has no features"
+        if gdf.crs is None:
+            return f"Error: GeoDataFrame '{geodataframe_name}' has no CRS defined"
+
+        target_crs_value = CRS.from_user_input(target_crs)
+        reprojected_gdf = gdf.to_crs(target_crs_value)
+
+        scratch_root = Path(SCRATCH_PATH) if SCRATCH_PATH else Path(__file__).resolve().parent.parent / "scratch"
+        scratch_root.mkdir(parents=True, exist_ok=True)
+
+        requested_path = Path(output_file_path)
+        output_path = requested_path if requested_path.is_absolute() and scratch_root in requested_path.parents else scratch_root / requested_path
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+
+        suffix = output_path.suffix.lower()
+        driver_map = {
+            ".shp": "ESRI Shapefile",
+            ".gpkg": "GPKG",
+            ".geojson": "GeoJSON",
+            ".json": "GeoJSON",
+            ".feather": "Feather",
+            ".parquet": "Parquet",
+        }
+        driver = driver_map.get(suffix)
+        if driver is None:
+            return (
+                f"Error: Unsupported output format '{suffix}'. "
+                "Use .shp, .gpkg, .geojson, .json, .feather, or .parquet"
+            )
+
+        reprojected_gdf.to_file(output_path.as_posix(), driver=driver, index=preserve_index)
+
+        if output_geodataframe_name:
+            state["data_store"][output_geodataframe_name] = reprojected_gdf
+
+        return (
+            f"Reprojected '{geodataframe_name}' to {target_crs_value.to_string()} and saved to '{output_path.as_posix()}'."
+            + (f" Stored in '{output_geodataframe_name}'." if output_geodataframe_name else "")
+        )
+    except Exception as e:
+        return f"Error reprojecting vector data: {type(e).__name__} : {str(e)}"
+
+def convert_csv_to_shapefile(
+    csv_file_path: Annotated[str, "Path to source CSV file OR dataframe name already loaded in data_store"],
+    output_shapefile_name: Annotated[str, "Output shapefile name, e.g. points.shp"],
+    state: Annotated[dict, InjectedState],
+    x_column: Annotated[str | None, "Longitude/X column name. If omitted, try auto-detection"] = None,
+    y_column: Annotated[str | None, "Latitude/Y column name. If omitted, try auto-detection"] = None,
+    source_crs: Annotated[str, "CRS of source XY coordinates"] = "EPSG:4326",
+    output_geodataframe_name: Annotated[str | None, "Optional data_store key to save generated GeoDataFrame"] = None,
+) -> str:
+    """Convert a CSV table (or loaded DataFrame) with XY coordinates to a shapefile saved under project scratch folder."""
+    try:
+        if "data_store" not in state:
+            state["data_store"] = {}
+
+        df = None
+        source_desc = csv_file_path
+        if csv_file_path in state["data_store"]:
+            candidate = state["data_store"][csv_file_path]
+            if isinstance(candidate, pd.DataFrame):
+                df = candidate.copy()
+                source_desc = f"data_store['{csv_file_path}']"
+            else:
+                return f"Error: '{csv_file_path}' exists in data_store but is not a DataFrame"
+        else:
+            csv_path = Path(csv_file_path)
+            if not csv_path.exists():
+                return f"Error: CSV file not found at '{csv_file_path}' and no DataFrame named '{csv_file_path}' in data_store"
+            df = pd.read_csv(csv_path)
+            source_desc = csv_path.as_posix()
+
+        if df is None or df.empty:
+            return f"Error: Input table '{csv_file_path}' has no rows"
+
+        if x_column is None or y_column is None:
+            normalized = {c.lower().strip(): c for c in df.columns}
+            x_candidates = ["longitude", "lon", "lng", "x", "x_coord", "xcoord"]
+            y_candidates = ["latitude", "lat", "y", "y_coord", "ycoord"]
+
+            if x_column is None:
+                for candidate in x_candidates:
+                    if candidate in normalized:
+                        x_column = normalized[candidate]
+                        break
+            if y_column is None:
+                for candidate in y_candidates:
+                    if candidate in normalized:
+                        y_column = normalized[candidate]
+                        break
+
+        if x_column is None or y_column is None:
+            return "Error: Could not infer coordinate columns. Please provide both x_column and y_column."
+        if x_column not in df.columns or y_column not in df.columns:
+            return f"Error: x_column='{x_column}' or y_column='{y_column}' not found in CSV columns"
+
+        x_vals = pd.to_numeric(df[x_column], errors="coerce")
+        y_vals = pd.to_numeric(df[y_column], errors="coerce")
+        valid_mask = x_vals.notna() & y_vals.notna()
+        if not valid_mask.any():
+            return "Error: No valid numeric coordinate rows found in CSV"
+
+        cleaned_df = df.loc[valid_mask].copy()
+        cleaned_df[x_column] = x_vals.loc[valid_mask]
+        cleaned_df[y_column] = y_vals.loc[valid_mask]
+
+        gdf = gpd.GeoDataFrame(
+            cleaned_df,
+            geometry=gpd.points_from_xy(cleaned_df[x_column], cleaned_df[y_column]),
+            crs=source_crs,
+        )
+
+        scratch_root = Path(SCRATCH_PATH) if SCRATCH_PATH else Path(__file__).resolve().parent.parent / "scratch"
+        scratch_root.mkdir(parents=True, exist_ok=True)
+
+        normalized_name = output_shapefile_name if output_shapefile_name.lower().endswith(".shp") else f"{output_shapefile_name}.shp"
+        stem = Path(normalized_name).stem
+        relative_parent = Path(normalized_name).parent
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
+        unique_name = f"{stem}_{timestamp}.shp"
+        output_path = scratch_root / relative_parent / unique_name
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+
+        gdf.to_file(output_path.as_posix(), driver="ESRI Shapefile", index=False)
+
+        if output_geodataframe_name:
+            state["data_store"][output_geodataframe_name] = gdf
+
+        dropped = int(len(df) - len(cleaned_df))
+        return (
+            f"Converted '{source_desc}' to shapefile '{output_path.as_posix()}'. "
+            f"Used columns x='{x_column}', y='{y_column}'. "
+            f"Kept {len(cleaned_df)} rows and dropped {dropped} invalid rows."
+            + (f" Stored GeoDataFrame in '{output_geodataframe_name}'." if output_geodataframe_name else "")
+        )
+    except Exception as e:
+        return f"Error converting CSV to shapefile: {type(e).__name__} : {str(e)}"
+
 # Create make_choropleth_map tool function to plot a geodataframe
 def make_choropleth_map(
     dataframe_name: Annotated[str, "Name of GeoDataFrame containing map data"],
@@ -3273,11 +3742,13 @@ def analyze_vector_overlap(
     geodataframe_a_name: Annotated[str, "Name of the first GeoDataFrame (reference)"],
     geodataframe_b_name: Annotated[str, "Name of the second GeoDataFrame (comparison)"],
     output_geodataframe_name: Annotated[str, "Name for storing the intersection GeoDataFrame"],
-    state: Annotated[dict, InjectedState]
+    state: Annotated[dict, InjectedState],
+    output_file_name: Annotated[str | None, "Optional output vector filename (.shp/.gpkg/.geojson). Saved under project scratch folder"] = None,
 ) -> str:
     """
-    Compute only the geometric intersection between two vector datasets and store the overlap GeoDataFrame.
-    Use other tools (e.g., calculate_polygon_areas, perform_arithmetic_operation) for measurements and math.
+    Compute geometric overlap between two vector datasets and store the overlap GeoDataFrame.
+    For mixed geometry dimensions (e.g., points vs polygons/lines), automatically uses spatial join
+    with intersects predicate so point-vector overlap is preserved.
     """
     try:
         if "data_store" not in state:
@@ -3296,26 +3767,150 @@ def analyze_vector_overlap(
         if gdf_a.crs != gdf_b.crs:
             gdf_b = gdf_b.to_crs(gdf_a.crs)
 
+        def _has_geometry_type(gdf: gpd.GeoDataFrame, prefix: str) -> bool:
+            geom_types = gdf.geometry.geom_type.dropna().astype(str).str.lower()
+            return geom_types.str.startswith(prefix).any()
+
+        a_has_points = _has_geometry_type(gdf_a, "point")
+        b_has_points = _has_geometry_type(gdf_b, "point")
+
         try:
-            overlap_gdf = gpd.overlay(gdf_a, gdf_b, how="intersection", keep_geom_type=True)
+            # Mixed-dimension overlap: preserve points by using intersects-based spatial join.
+            if a_has_points != b_has_points:
+                if a_has_points:
+                    overlap_gdf = gpd.sjoin(gdf_a, gdf_b, how="inner", predicate="intersects")
+                else:
+                    overlap_gdf = gpd.sjoin(gdf_b, gdf_a, how="inner", predicate="intersects")
+            elif a_has_points and b_has_points:
+                # Point-point overlap by exact coordinate equality via intersects.
+                overlap_gdf = gpd.sjoin(gdf_a, gdf_b, how="inner", predicate="intersects")
+            else:
+                # Same-dimension non-point overlap (line/line, polygon/polygon, etc.)
+                overlap_gdf = gpd.overlay(gdf_a, gdf_b, how="intersection", keep_geom_type=False)
         except Exception as e:
             return f"Error computing vector overlap: {type(e).__name__} : {str(e)}"
 
         state["data_store"][output_geodataframe_name] = overlap_gdf
 
+        scratch_root = Path(SCRATCH_PATH) if SCRATCH_PATH else Path(__file__).resolve().parent.parent / "scratch"
+        scratch_root.mkdir(parents=True, exist_ok=True)
+
+        if output_file_name:
+            requested_name = output_file_name
+        else:
+            requested_name = f"{output_geodataframe_name}.shp"
+
+        ext = Path(requested_name).suffix.lower()
+        if ext not in [".shp", ".gpkg", ".geojson", ".json"]:
+            requested_name = f"{Path(requested_name).stem}.shp"
+            ext = ".shp"
+
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
+        out_stem = Path(requested_name).stem
+        out_parent = Path(requested_name).parent
+        out_name = f"{out_stem}_{timestamp}{ext}"
+        saved_path = (scratch_root / out_parent / out_name)
+        saved_path.parent.mkdir(parents=True, exist_ok=True)
+
+        driver_map = {
+            ".shp": "ESRI Shapefile",
+            ".gpkg": "GPKG",
+            ".geojson": "GeoJSON",
+            ".json": "GeoJSON",
+        }
+
+        overlap_gdf.to_file(saved_path.as_posix(), driver=driver_map[ext], index=False)
+
         if overlap_gdf.empty:
             return (
-                f"No overlapping area found between '{geodataframe_a_name}' and '{geodataframe_b_name}'.\n"
-                f"Empty GeoDataFrame stored as '{output_geodataframe_name}'."
+                f"No overlap found between '{geodataframe_a_name}' and '{geodataframe_b_name}'.\n"
+                f"Empty GeoDataFrame stored as '{output_geodataframe_name}'.\n"
+                f"Result vector saved to '{saved_path.as_posix()}'."
             )
 
         return (
             f"Computed intersection of '{geodataframe_a_name}' and '{geodataframe_b_name}'.\n"
-            f"Overlap layer stored as '{output_geodataframe_name}' with {len(overlap_gdf)} feature(s)."
+            f"Overlap layer stored as '{output_geodataframe_name}' with {len(overlap_gdf)} feature(s).\n"
+            f"Result vector saved to '{saved_path.as_posix()}'."
         )
 
     except Exception as e:
         return f"Error analyzing vector overlap: {type(e).__name__} : {str(e)}"
+
+def perform_vector_topology_operation(
+    geodataframe_a_name: Annotated[str, "Name of the first GeoDataFrame (A)"],
+    geodataframe_b_name: Annotated[str, "Name of the second GeoDataFrame (B)"],
+    operation: Annotated[
+        Literal["union", "intersection", "difference", "symmetric_difference"],
+        "Topology operation between A and B"
+    ],
+    output_geodataframe_name: Annotated[str, "Name for storing the result GeoDataFrame in data_store"],
+    state: Annotated[dict, InjectedState],
+    output_file_name: Annotated[str | None, "Optional output filename (.shp/.gpkg/.geojson/.json). Saved under project scratch folder"] = None,
+) -> str:
+    """Perform vector topology operation (union/difference/intersection/symmetric_difference) and save result to scratch."""
+    try:
+        if "data_store" not in state:
+            state["data_store"] = {}
+
+        gdf_a = state["data_store"].get(geodataframe_a_name)
+        gdf_b = state["data_store"].get(geodataframe_b_name)
+
+        if gdf_a is None or gdf_b is None:
+            return "Error: One or both GeoDataFrames were not found in the data store."
+        if gdf_a.empty or gdf_b.empty:
+            return "Error: One or both GeoDataFrames are empty."
+        if gdf_a.crs is None or gdf_b.crs is None:
+            return "Error: Both GeoDataFrames must have a defined CRS before topology analysis."
+
+        if gdf_a.crs != gdf_b.crs:
+            gdf_b = gdf_b.to_crs(gdf_a.crs)
+
+        try:
+            result_gdf = gpd.overlay(gdf_a, gdf_b, how=operation, keep_geom_type=False)
+        except Exception as e:
+            return f"Error computing topology operation: {type(e).__name__} : {str(e)}"
+
+        state["data_store"][output_geodataframe_name] = result_gdf
+
+        scratch_root = Path(SCRATCH_PATH) if SCRATCH_PATH else Path(__file__).resolve().parent.parent / "scratch"
+        scratch_root.mkdir(parents=True, exist_ok=True)
+
+        requested_name = output_file_name if output_file_name else f"{output_geodataframe_name}.shp"
+        ext = Path(requested_name).suffix.lower()
+        if ext not in [".shp", ".gpkg", ".geojson", ".json"]:
+            requested_name = f"{Path(requested_name).stem}.shp"
+            ext = ".shp"
+
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
+        out_stem = Path(requested_name).stem
+        out_parent = Path(requested_name).parent
+        out_name = f"{out_stem}_{timestamp}{ext}"
+        saved_path = scratch_root / out_parent / out_name
+        saved_path.parent.mkdir(parents=True, exist_ok=True)
+
+        driver_map = {
+            ".shp": "ESRI Shapefile",
+            ".gpkg": "GPKG",
+            ".geojson": "GeoJSON",
+            ".json": "GeoJSON",
+        }
+        result_gdf.to_file(saved_path.as_posix(), driver=driver_map[ext], index=False)
+
+        if result_gdf.empty:
+            return (
+                f"Topology operation '{operation}' completed with no resulting features.\n"
+                f"Empty result stored as '{output_geodataframe_name}'.\n"
+                f"Result vector saved to '{saved_path.as_posix()}'."
+            )
+
+        return (
+            f"Topology operation '{operation}' completed between '{geodataframe_a_name}' and '{geodataframe_b_name}'.\n"
+            f"Result stored as '{output_geodataframe_name}' with {len(result_gdf)} feature(s).\n"
+            f"Result vector saved to '{saved_path.as_posix()}'."
+        )
+    except Exception as e:
+        return f"Error performing vector topology operation: {type(e).__name__} : {str(e)}"
 
 def calculate_nearest_distances(
     source_geodataframe_name: Annotated[str, "Name of GeoDataFrame containing source point features"],
@@ -5436,8 +6031,15 @@ calculate_polygon_areas_tool = StructuredTool.from_function(
 analyze_vector_overlap_tool = StructuredTool.from_function(
     func=_wrap_tool_function(analyze_vector_overlap),
     name='analyze_vector_overlap',
-    description='Intersect two GeoDataFrames and store the resulting overlap layer for downstream measurements or visualization.'
+    description='Intersect two GeoDataFrames and store the resulting overlap layer for downstream measurements or visualization, including point-vs-line/polygon overlap. Saves the overlap vector to the project root scratch folder.'
 )
+
+perform_vector_topology_operation_tool = StructuredTool.from_function(
+    func=_wrap_tool_function(perform_vector_topology_operation),
+    name='perform_vector_topology_operation',
+    description='Perform vector topology operations (union, difference, intersection, symmetric_difference) between two GeoDataFrames, store the result in data_store, and save the vector output to the project root scratch folder.'
+)
+
 
 calculate_nearest_distances_tool = StructuredTool.from_function(
     func=_wrap_tool_function(calculate_nearest_distances),
@@ -5470,6 +6072,28 @@ scale_column_by_value_tool = StructuredTool.from_function(
     description='Performs a basic mathematical operation (multiply, divide, add, or subtract) between a column\'s values and a specified numeric value. \
         It returns a new DataFrame/GeoDataFrame with the original data plus a new column containing the calculation results as well as and message about operation, resulting dataframe and column.'
 )
+
+create_statistical_chart_tool = StructuredTool.from_function(
+    func=_wrap_tool_function(create_statistical_chart),
+    name='create_statistical_chart',
+    description='Create histogram, bar, or pie charts from DataFrame/GeoDataFrame columns or raster pixel values (QGIS Histogram-style). \
+        Stores chart metadata in data_store and chart image preview in image_store.'
+)
+
+reproject_vector_data_tool = StructuredTool.from_function(
+    func=_wrap_tool_function(reproject_vector_data),
+    name='reproject_vector_data',
+    description='Reproject a vector GeoDataFrame to a target CRS and save the result to a new vector file. \
+        Optionally stores the reprojected GeoDataFrame in data_store.'
+)
+
+convert_csv_to_shapefile_tool = StructuredTool.from_function(
+    func=_wrap_tool_function(convert_csv_to_shapefile),
+    name='convert_csv_to_shapefile',
+    description='Convert a CSV file with coordinate columns into a point shapefile and save it to the project root scratch folder. \
+        Supports explicit or auto-detected X/Y columns and optional data_store output.'
+)
+
 perform_arithmetic_operation_tool = StructuredTool.from_function(
     func=_wrap_tool_function(perform_arithmetic_operation),
     name='perform_arithmetic_operation',

@@ -35,6 +35,7 @@ from geobenchx.constants import (
     MODEL_SHER_LOCKER_4mini,
     MODEL_SHER_LOCKER_4o,
     MODEL_SHER_LOCKER_GEMINI_FLASH,
+    MODEL_SHER_LOCKER_GPT5.4,
 )
 from geobenchx.dataclasses import Solution, Step
 from geobenchx.prompts import RULES_PROMPT, SYSTEM_PROMPT
@@ -80,6 +81,15 @@ from skill.calculate_column_statistics_statements.calculate_column_statistics im
     calculate_column_statistics,
 )
 from skill.calculate_columns_statements.calculate_columns import calculate_columns
+from skill.create_statistical_chart_statements.create_statistical_chart import (
+    create_statistical_chart,
+)
+from skill.reproject_vector_data_statements.reproject_vector_data import (
+    reproject_vector_data,
+)
+from skill.convert_csv_to_shapefile_statements.convert_csv_to_shapefile import (
+    convert_csv_to_shapefile,
+)
 from skill.calculate_line_direction_rose_statements.calculate_line_direction_rose import (
     calculate_line_direction_rose,
 )
@@ -111,6 +121,9 @@ from skill.calculate_line_lengths_statements.calculate_line_lengths import (
 )
 from skill.analyze_vector_overlap_statements.analyze_vector_overlap import (
     analyze_vector_overlap,
+)
+from skill.perform_vector_topology_operation_statements.perform_vector_topology_operation import (
+    perform_vector_topology_operation,
 )
 from skill.calculate_nearest_distances_statements.calculate_nearest_distances import (
     calculate_nearest_distances,
@@ -312,6 +325,16 @@ tools = [
         _SKILL_ROOT / "analyze_vector_overlap_statements" / "SKILL.md",
     ),
     _tool_from_skill(
+        perform_vector_topology_operation,
+        "perform_vector_topology_operation",
+        _SKILL_ROOT / "perform_vector_topology_operation_statements" / "SKILL.md",
+    ),
+    _tool_from_skill(
+        random_sample_from_layer,
+        "random_sample_from_layer",
+        _SKILL_ROOT / "random_sample_from_layer_statements" / "SKILL.md",
+    ),
+    _tool_from_skill(
         calculate_nearest_distances,
         "calculate_nearest_distances",
         _SKILL_ROOT / "calculate_nearest_distances_statements" / "SKILL.md",
@@ -335,6 +358,21 @@ tools = [
         scale_column_by_value,
         "scale_column_by_value",
         _SKILL_ROOT / "scale_column_by_value_statements" / "SKILL.md",
+    ),
+    _tool_from_skill(
+        create_statistical_chart,
+        "create_statistical_chart",
+        _SKILL_ROOT / "create_statistical_chart_statements" / "SKILL.md",
+    ),
+    _tool_from_skill(
+        reproject_vector_data,
+        "reproject_vector_data",
+        _SKILL_ROOT / "reproject_vector_data_statements" / "SKILL.md",
+    ),
+    _tool_from_skill(
+        convert_csv_to_shapefile,
+        "convert_csv_to_shapefile",
+        _SKILL_ROOT / "convert_csv_to_shapefile_statements" / "SKILL.md",
     ),
     _tool_from_skill(
         make_heatmap,

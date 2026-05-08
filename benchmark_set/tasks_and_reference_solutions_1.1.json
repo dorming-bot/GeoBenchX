@@ -340,7 +340,7 @@
                 "Geo Task Set 03",
                 "Geometric Calculation"
             ],
-            "reference_solution_description": "Load the Wuhan urban park polygons, compute their areas via the polygon-area tool, and convert those results from square kilometers to square meters for per-park reporting.",
+            "reference_solution_description": "Load the Wuhan urban park polygons, compute their areas, and convert those results from square kilometers to square meters for per-park reporting.",
             "reference_solutions": [
             ],
             "generated_solution": null,
@@ -774,7 +774,7 @@
         },
         {
             "task_ID": "TASK_1_1_155",
-            "task_text": "Identify and count the number of traditional villages in the Loess Plateau region, and calculate their spatial density within this area expressed in units of “number per square kilometer.”",
+            "task_text": "Identify and count the number of traditional villages within the Loess Plateau region, and calculate their spatial density (in individuals/ha).",
             "task_labels": [
                 "Geo Task Set 02",
                 "Distribution Patterns, Clustering, and Anomaly Detection",
@@ -941,7 +941,7 @@
         },
         {
             "task_ID": "TASK_1_1_157",
-            "task_text": "Calculate the total area of China’s forest water conservation zones within the Loess Plateau region, and determine its percentage of the total area of the Loess Plateau region.",
+            "task_text": "Calculate the total area of China's forest water conservation zones within the Loess Plateau region, and determine its percentage of the total area of the Loess Plateau region.",
             "task_labels": [
                 "Geo Task Set 03",
                 "Geometric Calculation",

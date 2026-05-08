@@ -1,0 +1,1127 @@
+[
+    {
+        "id": 1,
+        "task": "Select the roads belonging to the residential type and save as a new Shapefile. Note that tags are string types and you need to parse them correctly.",
+        "old_task": "Select the counties that have less than 10% increase in population from 2005 to 2008.",
+        "task_level": "basic",
+        "data_path": "Columbia_school_walkability/Columbia_road",
+        "old_data_path": "SouthCarolinaData/SC_Counties",
+        "edit_prompt": "True",
+        "edit_data": "True"
+    },
+    {
+        "id": 2,
+        "task": "Create barchart showing obesity prevalence in the United States. Ensure all labels are clear.",
+        "task_level": "basic",
+        "data_path": "US_Counties_Data/US_Counties"
+    },
+    {
+        "id": 3,
+        "task": "Clip the DEM to PA Boundaries",
+        "task_level": "basic",
+        "data_path": [
+            "Pennsylvania/PA_DEM.tif",
+            "Pennsylvania/PACounties"
+        ]
+    },
+    {
+        "id": 4,
+        "task": "Generate contour lines from the DEM of Puerto Rico with a 50-meter interval",
+        "task_level": "basic",
+        "data_path": "Puerto Rico/Puerto_DEM.tif"
+    },
+    {
+        "id": 5,
+        "task": "Add new fields for latitude and longitude to the fast food restaurants layer",
+        "task_level": "basic",
+        "data_path": "Pennsylvania/PA_Fastfoods"
+    },
+    {
+        "id": 6,
+        "task": "Extract the counties with Median household below 50,000 USD in Pennsylvania. Save the output as a shapefile.",
+        "old_task": "Extract the counties with Median household below 50,000 USD in Pennsylvania.",
+        "task_level": "basic",
+        "data_path": "US_Counties_Data/US_Counties",
+        "edit_prompt": "True"
+    },
+    {
+        "id": 7,
+        "task": "How many damaged houses were located within the San Andreas Special Studies Zones?",
+        "task_level": "basic",
+        "data_path": [
+            "SpatialQueryData/DamagedHouses",
+            "SpatialQueryData/SAF_SpecialStudyZone"
+        ]
+    },
+    {
+        "id": 8,
+        "task": "Generate point features at the intersections of railways and the road features",
+        "task_level": "basic",
+        "data_path": [
+            "Nigeria/Nigeria_Major_Roads",
+            "Nigeria/Nigeria_Railways"
+        ]
+    },
+    {
+        "id": 9,
+        "task": "Apply an affine transformation to the building layer to scale by a factor of 2 and rotate 30 degrees.",
+        "task_level": "basic",
+        "data_path": "Pennsylvania/Penn_State_Buildings"
+    },
+    {
+        "id": 10,
+        "task": "Based on the provided data layers, draw a scatter plot for the Obesity rate and Covid-19 death rate.",
+        "task_level": "basic",
+        "data_path": "US_Counties_Data/US_Counties_Obesity_Covid"
+    },
+    {
+        "id": 11,
+        "task": "Use HTML to describe the information about this raster data in detail",
+        "old_task": "Report the information for this raster data in HTML.",
+        "task_level": "basic",
+        "data_path": "SouthCarolinaData/SC_DEM.tif",
+        "edit_prompt": "True"
+    },
+    {
+        "id": 12,
+        "task": "Can you show me the histogram for the DEM pixel values?",
+        "task_level": "basic",
+        "data_path": "SouthCarolinaData/SC_DEM.tif"
+    },
+    {
+        "id": 13,
+        "task": "Do a Fourier conversion for the loaded image.",
+        "task_level": "basic",
+        "data_path": [
+            "LandSat/LT05_L1TP_123042_20110928_20200820_02_T1_B5.TIF",
+            "LandSat/LT05_L1TP_123042_20110928_20200820_02_T1_B5.TIF.aux.xml"
+        ]
+    },
+    {
+        "id": 14,
+        "task": "Composite the three bands of LandSat 5 to a RGB image using the most commonly used band composition.",
+        "task_level": "basic",
+        "data_path": "LT05_L1TP_123042_20110928_20200820_02_T1"
+    },
+    {
+        "id": 15,
+        "task": "Separate each band of the image into a single TIF file.",
+        "task_level": "basic",
+        "data_path": "LandSat/TM5_L2/composited_rgb.tif"
+    },
+    {
+        "id": 16,
+        "task": "Compute the distance of each flood to the nearest river. Create a histogram to visualize this distance",
+        "old_task": "Create a histogram of the distance from the flood event location to its nearest river.",
+        "task_level": "basic",
+        "data_path": [
+            "flood2015may",
+            "rivers"
+        ],
+        "edit_prompt": "True"
+    },
+    {
+        "id": 17,
+        "task": "Compute the distance of each flood to the nearest river.",
+        "task_level": "basic",
+        "data_path": [
+            "flood2015may_ESRI102965",
+            "rivers_ESRI102965"
+        ]
+    },
+    {
+        "id": 18,
+        "task": "Create the shortest line between the flood location and the river, save the output as a shapefile. note the handling of outliers to prevent abnormal lengths of the line elements.",
+        "old_task": "Draw the shortest line between the flood locations and rivers.",
+        "task_level": "basic",
+        "data_path": [
+            "flood2015may_ESRI102965",
+            "rivers_ESRI102965"
+        ],
+        "edit_prompt": "True"
+    },
+    {
+        "id": 19,
+        "task": "Reproject both Shapefiles to ESRI:102005 (USA_Contiguous_Equidistant_Conic). Please use the EPSG.io API to get the wkt definition of the projection and use this wkt to convert the projection.",
+        "old_task": "Reproject the loaded layers to ESRI:102005 USA_Contiguous_Equidista nt_Conic.",
+        "task_level": "basic",
+        "data_path": [
+            "flood2015may",
+            "rivers"
+        ],
+        "edit_prompt": "True"
+    },
+    {
+        "id": 20,
+        "task": "Reproject all loaded layers into EPSG6569, and save them into the same folder, adding \"EPSG6569\" to the current basenames.",
+        "task_level": "basic",
+        "data_path": [
+            "Columbia_school_walkability/Columbia_road",
+            "Columbia_school_walkability/Columbia_schools",
+            "Columbia_school_walkability/Columbia_sidewalk"
+        ]
+    },
+    {
+        "id": 21,
+        "task": "I want you to convert this csv file into a shapefile. The longitude is presented as 'X' and the latitude is in column 'Y'.",
+        "task_level": "basic",
+        "data_path": "HIV"
+    },
+    {
+        "id": 22,
+        "task": "I want you to only keep US contiguous counties from this input data.",
+        "task_level": "basic",
+        "data_path": "US_Counties_Data/US_Counties_Data"
+    },
+    {
+        "id": 23,
+        "task": "I want you to calculate the length of each polyline and then add a layer named 'length'.",
+        "task_level": "basic",
+        "data_path": "tl_2019_42_prisecroads"
+    },
+    {
+        "id": 24,
+        "task": "I want you to buffer this polyline and the buffer distance should be 0.1m.",
+        "task_level": "basic",
+        "data_path": "Network_Analysis"
+    },
+    {
+        "id": 25,
+        "task": "I want you to clip all counties of Pennsylvania from this input data.",
+        "task_level": "basic",
+        "data_path": "US_Counties_Data/US_Counties"
+    },
+    {
+        "id": 26,
+        "task": "I want you to identify all points that intersect with Pennsylvania _Counties_Clip data. You have to convert the HIV to a Shapefile first, and then intersect it afterward.",
+        "old_task": "I want you to identify all points that intersect with Pennsylvania _Counties_Clip data.",
+        "task_level": "basic",
+        "data_path": [
+            "Pennsylvania/PACounties",
+            "HIV"
+        ],
+        "edit_prompt": "True"
+    },
+    {
+        "id": 27,
+        "task": "I want you to find the difference of the two shapefiles that overlap.",
+        "task_level": "basic",
+        "data_path": [
+            "generated_polygon",
+            "Pennsylvania/PACounties"
+        ]
+    },
+    {
+        "id": 28,
+        "task": "I want you to dissolve the selected shapefile.",
+        "task_level": "basic",
+        "data_path": "Pennsylvania/PACounties"
+    },
+    {
+        "id": 29,
+        "task": "I want you to apply symmetrical difference operations on these two selected shapefiles.",
+        "task_level": "basic",
+        "data_path": [
+            "generated_polygon",
+            "Pennsylvania/PACounties"
+        ]
+    },
+    {
+        "id": 30,
+        "task": "I want you to apply union operations on these two selected shapefiles.",
+        "task_level": "basic",
+        "data_path": [
+            "generated_polygon",
+            "Pennsylvania/PACounties"
+        ]
+    },
+    {
+        "id": 31,
+        "task": "Remove the part of generated_polygon that overlaps with PACounties and merge the two Shapefiles to return one Shapefile.",
+        "old_task": "I want you to apply eliminate selected polygons operations on these two selected shapefiles.",
+        "task_level": "basic",
+        "data_path": [
+            "generated_polygon",
+            "Pennsylvania/PACounties"
+        ],
+        "edit_prompt": "True"
+    },
+    {
+        "id": 32,
+        "task": "I want you to generate the centriod of all these counties that are in this shapefile. Save the output as a shapefile.",
+        "old_task": "I want you to generate the centriod of all these counties that are in this shapefile.",
+        "task_level": "basic",
+        "data_path": "Pennsylvania/PACounties",
+        "edit_prompt": "True"
+    },
+    {
+        "id": 33,
+        "task": "Generate a shapefile from the CSV file.",
+        "task_level": "basic",
+        "data_path": "Street_view_image/Richland_jsons.csv"
+    },
+    {
+        "id": 34,
+        "task": "Extract the boundary polygon of Laramie County and save it to the individual shape file.",
+        "task_level": "basic",
+        "data_path": "Wyoming_Counties_projected"
+    },
+    {
+        "id": 35,
+        "task": "From this input DEM data, I want you to generate a hillshade",
+        "task_level": "basic",
+        "data_path": "n40_w078_1arc_v3"
+    },
+    {
+        "id": 36,
+        "task": "Provide pixel statistics inside the polygon, saves the minimum, maximum, mean, standard deviation, and sum of pixels in new fields in the Shapefile.",
+        "old_task": "Sum all the pixel values inside a Census tract polygon for each tract.",
+        "task_level": "basic",
+        "data_path": [
+            "LandScan/landscan-usa-2021-conus-night",
+            "tract_37_EPSG4326"
+        ],
+        "edit_prompt": "True"
+    },
+    {
+        "id": 37,
+        "task": "Provide pixel statistics inside the polygon, save the results in a new field in the Shapefile.",
+        "old_task": "Provide pixel statistics inside the polygon.",
+        "task_level": "basic",
+        "data_path": [
+            "LandScan/landscan-usa-2021-conus-night",
+            "LandScan/Laramie"
+        ],
+        "edit_prompt": "True"
+    },
+    {
+        "id": 38,
+        "task": "Reproject the DEM to EPSG6569, and set the cell size to 30 * 30 meters.",
+        "task_level": "basic",
+        "data_path": "Richland_DEM"
+    },
+    {
+        "id": 39,
+        "task": "Assign EPSG6569 to the file.",
+        "task_level": "basic",
+        "data_path": "Richland_DEM"
+    },
+    {
+        "id": 40,
+        "task": "Find out the number of fastfood restaurants in each county of Pennsylvania",
+        "task_level": "basic",
+        "data_path": [
+            "Pennsylvania/PennsylvaniaCounties",
+            "Pennsylvania/PA_Fastfoods"
+        ]
+    },
+    {
+        "id": 41,
+        "task": "Generate 20 random points inside this polygon",
+        "task_level": "basic",
+        "data_path": "Circle"
+    },
+    {
+        "id": 42,
+        "task": "Apply the Extract Layer Range operation based on these two input shapefiles. Using the bounding box of the circle, extract the complete data of US_Counties and save the result as a new Shapefile.",
+        "old_task": "Apply extract layer extent operation based on these two input shapefiles.",
+        "task_level": "basic",
+        "data_path": [
+            "Circle",
+            "US_Counties_Data/US_Counties"
+        ],
+        "edit_prompt": "True"
+    },
+    {
+        "id": 43,
+        "task": "Divide the polygon into a 10x10 mesh and save the mesh polygon result as a new shapefile file.",
+        "old_task": "Generate grid inside this selected polygon and the cell size should be 2 by 2 meters.",
+        "task_level": "basic",
+        "data_path": "Rectangle_grid",
+        "edit_prompt": "True"
+    },
+    {
+        "id": 44,
+        "task": "Generate a distance matrix table showing distances between all DC health facilities.",
+        "task_level": "basic",
+        "data_path": "DC health center/DC_Health_Facilities"
+    },
+    {
+        "id": 45,
+        "task": "Based on these two input shapefiles, please conduct mean coordinate operation. You have to calculate the mean coordinates of the points, the Rectangle is used as an indication of the area and is not involved in the calculation.",
+        "old_task": "Based on these two input shapefiles, please conduct mean coordinate operation.",
+        "task_level": "basic",
+        "data_path": [
+            "Points_inside_polygon",
+            "Rectangle_grid"
+        ],
+        "edit_prompt": "True"
+    },
+    {
+        "id": 46,
+        "task": "Identify the 5 nearest neighbors to the center point from the points dataset. Save the results as a new Shapefile.",
+        "old_task": "Identify the 5 nearest neighbors to the center point from the points dataset.",
+        "task_level": "basic",
+        "data_path": [
+            "points",
+            "center"
+        ],
+        "edit_prompt": "True"
+    },
+    {
+        "id": 47,
+        "task": "Generate regularly spaced points inside the selected polygon, ensuring that the distance between each point is 10000 meters. Be careful to use the correct projected coordinate system to generate the point data, such as EPSG:32618, save the result as a new shapefile, and adjust the coordinate system back Consistent with polygon.",
+        "old_task": "Generate regularly spaced points inside the selected polygon, ensuring that the distance between each point is 0.1 meters.",
+        "task_level": "basic",
+        "data_path": "Rectangle_grid",
+        "edit_prompt": "True"
+    },
+    {
+        "id": 48,
+        "task": "Using raster calculator, convert the nighttime satellite image pixel digital number (DN) to radiance (L) using the formula: L=DN^(1.5)*10e-10",
+        "task_level": "basic",
+        "data_path": "Nighttime"
+    },
+    {
+        "id": 49,
+        "task": "Generate a distance raster based on the fast food restaurant point data, where each pixel value represents the distance from that pixel to the nearest fast food restaurant point, save the result as a new tif file.",
+        "old_task": "Generate a raster distance for the fastfood restaurants.",
+        "task_level": "basic",
+        "data_path": "Richland_SC_fastfood",
+        "edit_prompt": "True"
+    },
+    {
+        "id": 50,
+        "task": "Generate the roughness index based on the DEM data.",
+        "task_level": "basic",
+        "data_path": "Richland_SC_DEM"
+    },
+    {
+        "id": 51,
+        "task": "Generate the terrain ruggedness index based on the DEM data.",
+        "task_level": "basic",
+        "data_path": "Richland_SC_DEM"
+    },
+    {
+        "id": 52,
+        "task": "Reproject the building layer to UTM Zone 17 and then convert the projected data to a raster",
+        "task_level": "basic",
+        "data_path": "Pennsylvania/PSU_b"
+    },
+    {
+        "id": 53,
+        "task": "Use the raster calculator to create a mask showing cells greater than 1000 meters as 1, and cells less than 1000 meters as 0. Use the binary mask expression.",
+        "task_level": "basic",
+        "data_path": "srtm_41_19"
+    },
+    {
+        "id": 54,
+        "task": "Set no data value for the pixel values equal to 0",
+        "task_level": "basic",
+        "data_path": "elevation_mask"
+    },
+    {
+        "id": 55,
+        "task": "Convert the mask layer to vector.",
+        "task_level": "basic",
+        "data_path": "elevation_mask_nodata"
+    },
+    {
+        "id": 56,
+        "task": "Save the data as a shapefile. The user's target area is the area with 0 pixels.",
+        "old_task": "Save the data as a shapefile",
+        "task_level": "basic",
+        "data_path": "elevation_mask_nodata",
+        "edit_prompt": "True"
+    },
+    {
+        "id": 57,
+        "task": "Create Thiessen polygons for the point data, use the outsourced rectangles of the points or larger rectangles as boundaries, make sure that all the points are contained within the Tyson polygon, and end up with a Thiessen polygon that has the shape of a complete rectangle, save the final result as a Shapefile.",
+        "old_task": "Create Thiessen Polygons for the point data",
+        "task_level": "basic",
+        "data_path": "Richland_SC_fastfood",
+        "edit_prompt": "True"
+    },
+    {
+        "id": 58,
+        "task": "Please generate a detailed report in Markdown to describe the nature of the two datasets based on your observation. In addition, in the report, please suggest some potential applications or analysis scenarios using the two datasets.",
+        "old_task": "Please generate a detailed report in HTML to describe the nature of the two datasets based on your observation. In addition, in the report, please suggest some potential applications or analysis scenarios using the two datasets.",
+        "task_level": "basic",
+        "data_path": [
+            "Richland_SC_fastfood",
+            "Richland_SC_DEM_UTM17"
+        ],
+        "edit_prompt": "True"
+    },
+    {
+        "id": 59,
+        "task": "Generate a HTML table to show the distance matrix in the matrix style. Use a symmetric distance matrix.",
+        "old_task": "Generate a HTML table to show the distance matrix in the matrix style.",
+        "task_level": "basic",
+        "data_path": "distance_matrix",
+        "edit_prompt": "True"
+    },
+    {
+        "id": 60,
+        "task": "Please draw a histogram for the DEM data.",
+        "old_task": "Please draw a histogram for the DEM data using plotly",
+        "task_level": "basic",
+        "data_path": "Richland_SC_DEM_UTM17",
+        "edit_prompt": "True"
+    },
+    {
+        "id": 61,
+        "task": "Perform the following tasks: 1) Count the fast food restaurants in each county and store the result in a new field named \"Count\". 2) Calculate the fast food accessibility score for each county as (Count / Population) * 1,000 and store the result in a new field named \"Score\". 3) Create a thematic map showing the fast food accessibility score for each county.",
+        "task_level": "intermediate",
+        "data_path": [
+            "Pennsylvania/PennsylvaniaCounties",
+            "Pennsylvania/PA_Fastfoods_XY"
+        ]
+    },
+    {
+        "id": 62,
+        "task": "Perform the following task: 1) Clip the DEM to SC boundary and load the clipped DEM. 2) Show me the histogram for the clipped DEM pixel values. 3) Generate the zonal statistics for every county in SC, focusing on average elevation. 4) Finally create a choropleth map showing the average elevation of each county in SC.",
+        "task_level": "intermediate",
+        "data_path": "SouthCarolinaData"
+    },
+    {
+        "id": 63,
+        "task": "Can you please generate a HTML report to show the building area for each building? You can look at the columns information, if no building area exists, please calculate yourself. Also make sure to use map projection when calculating area",
+        "task_level": "intermediate",
+        "data_path": "Pennsylvania/Penn_State_Buildings"
+    },
+    {
+        "id": 64,
+        "task": "Perform the following task: 1) Reproject this road vector layer to NAD27/ UTM Zone 10 . 2) Create a new field that contains the length of the road features. Let the name of the field be \"Length\". 3) Use the 'Length' column and find how many roads have length shorter 100-meters .",
+        "task_level": "intermediate",
+        "data_path": "SanFrancisco/Roads"
+    },
+    {
+        "id": 65,
+        "task": "Calculate the ruggedness index for Pennsylvania, then summarize the ruggedness index values for each counties, save the result in a Shapefile with the new fields.",
+        "old_task": "Calculate the ruggedness index for Pennsylvania, then summarize the ruggedness index values for each counties",
+        "task_level": "intermediate",
+        "data_path": [
+            "Pennsylvania/PennsylvaniaCounties",
+            "Pennsylvania/PA_DEM.tif"
+        ]
+    },
+    {
+        "id": 66,
+        "task": "Add new fields for latitude and longitude to the fast food restaurants layer, then extract the elevation values from the DEM layer and save the results in a new layer.",
+        "task_level": "intermediate",
+        "data_path": [
+            "Pennsylvania/PA_Fastfoods",
+            "Pennsylvania/PA_DEM.tif"
+        ]
+    },
+    {
+        "id": 67,
+        "task": "Merge the four DEMs into a single raster and perform terrain characteristic analysis for Richland County, including slope, aspect, hillshade, terrain ruggedness index (TRI), and topographic Position Index (TPI).",
+        "task_level": "intermediate",
+        "data_path": "Richland"
+    },
+    {
+        "id": 68,
+        "task": "Count the number of hospitals and number of fastfoods in each county and save the results into a new county layer by adding two fields.",
+        "task_level": "intermediate",
+        "data_path": [
+            "Pennsylvania/PA_Hospital",
+            "Pennsylvania/PACounties",
+            "Pennsylvania/PA_Fastfoods"
+        ]
+    },
+    {
+        "id": 69,
+        "task": "Reproject this hospital layer to UTM Zone 17, and then create a 1000 meters buffer around each hospital",
+        "task_level": "intermediate",
+        "data_path": [
+            "Pennsylvania/PA_Hospital"
+        ]
+    },
+    {
+        "id": 70,
+        "task": "Project the Nigeria railways into EPSG:26392 map projection, save the result in a Shapefile, then calculate the total length. save the total length in a text file.",
+        "old_task": "Project the Nigeria railways into EPSG:26392 map projection, then calculate the total length.",
+        "task_level": "intermediate",
+        "data_path": "Nigeria/Nigeria_Major_Roads",
+        "edit_prompt": "True"
+    },
+    {
+        "id": 71,
+        "task": "Generate a distance raster map for each grocery store site within 15 km, respectively; the resolution is 50 m; use the “id” column to name the raster files.",
+        "task_level": "intermediate",
+        "data_path": "Walmart_site/Walmart_4_site_EPSG32111"
+    },
+    {
+        "id": 72,
+        "task": "Select the Census tracts in the Washington area, and then save the tracts that possess the top 10% of the poverty ratio in the selected tracts.",
+        "task_level": "intermediate",
+        "data_path": "PovertyData"
+    },
+    {
+        "id": 73,
+        "task": "Create a centroid for each polygon and export the attributes as a table.",
+        "task_level": "intermediate",
+        "data_path": "US_Counties_Data/US_Counties"
+    },
+    {
+        "id": 74,
+        "task": "Generate a raster map, showing the distances from San Francisco census tracts to the nearest hospitals. The map resolution is 100 m.",
+        "task_level": "intermediate",
+        "data_path": [
+            "SanFrancisco/SanFranciscoHospitals",
+            "SanFrancisco/SanFrancisco_tracts_central"
+        ]
+    },
+    {
+        "id": 75,
+        "task": "Aggregate the population with obesity for each state. The “obesity” column is the prevalence in percentage.",
+        "task_level": "intermediate",
+        "data_path": [
+            "US_Counties_Data/US_Counties"
+        ]
+    },
+    {
+        "id": 76,
+        "task": "Find out the top 20 coffee shops in New York City that have the most bus stops or metro entrances within 600 feet. Save the result in a Shapefile.",
+        "old_task": "Find out the top 20 coffee shops in New York City that have the most bus stops or metro entrances within 600 feet.",
+        "task_level": "intermediate",
+        "data_path": "New_York_coffee_shop",
+        "edit_prompt": "True"
+    },
+    {
+        "id": 77,
+        "task": "Compute the terrain slope for each building: 1) compute the slope; 2) create centroid of building footprints; 3) extract the slope for building centroids.",
+        "task_level": "intermediate",
+        "data_path": [
+            "Rolla_watershed/Rolla_building_footprints",
+            "Rolla_watershed/Rolla_DEM_projected"
+        ]
+    },
+    {
+        "id": 78,
+        "task": "Generate centroids for each building feature and save the result in a Shapefile, extract the elevation values from the DEM at each building centroid, and export the elevation data to draw a histogram with 50 bins using Seaborn.",
+        "old_task": "Generate centroids for each building feature, extract the elevation values from the DEM at each building centroid, and export the elevation data to draw a histogram with 50 bins using Seaborn",
+        "task_level": "intermediate",
+        "data_path": [
+            "Pennsylvania/Penn_State_Buildings",
+            "Pennsylvania/PSU_DEM.tif"
+        ],
+        "edit_prompt": "True"
+    },
+    {
+        "id": 79,
+        "task": "Show the year of the street view image location. You can consider such steps: 1) extract the year from the “image_date” column; 2) Use different colors to indicate the year and render each Street View image point to create themed maps.",
+        "old_task": "Show the year of the street view image location. You can consider such steps: 1) extract the year from the “image_date” column; 2) make a thematic map by rendering the extracted year using unique values.",
+        "task_level": "intermediate",
+        "data_path": "Street_view_image/street_image",
+        "edit_prompt": "True"
+    },
+    {
+        "id": 80,
+        "task": "Calculate an obesity risk behavior index for each county in the USA by analyzing the visit rates to unhealthy food retailers (e.g., convenience stores, alcoholic drinking places, and limited-service restaurants) and comparing them to the visit rates to facilities that promote physical activity (e.g., sports centers, parks, and fitness centers). Define a reasonable index formula as the ratio of the total visit rate to unhealthy food retailers divided by the total visit rate to physical activity-supporting facilities. Once the index is calculated for each county, save it as a new column in the shapefile to ensure proper integration with the geographic data. Finally, create a Choropleth Map using the index to visually highlight obesity risk behavior across counties, with darker colors representing higher obesity risk levels.",
+        "old_task": "Generate an obesity risk behavior index of each county in the USA by analyzing the rate of visits to unhealthy food retailers (such as convenience store, alcoholic drinking places, and limited service restaurant) and the visit rate to places that support physical activity (e.g., sports centers, parks, fitness centers). Visualize the results in a thematic map to highlight the obesity risk behavior index across counties.",
+        "task_level": "intermediate",
+        "data_path": "Obesity_Risk_Score",
+        "edit_prompt": "True"
+    },
+    {
+        "id": 81,
+        "task": "You need to compute the location error between the estimated tree trunk and the ground truth: 1) for each ground truth location, find out its nearest estimated location within 3 meters; the nearest distance is the error. 2) compute the average error for ground truth trunks that have the associated estimated location.",
+        "task_level": "intermediate",
+        "data_path": [
+            "Street_view_image/trunk_location_estimated_EPSG6569",
+            "Street_view_image/trunk_location_ground_truth_EPSG6569"
+        ]
+    },
+    {
+        "id": 82,
+        "task": "Link the street view image location points into a path, get the shapefile of the line features. The image was obtained using a mapping vehicle. All points represent the location of a street view image. Each image has an identifier in “panoId” column; the column “link_f_pan” indicates the panoId of the neighbor image in the forward direction, the column “link_b_pan” indicates the panoId of the neighbor image in the backward direction. You can link the location points by: 1) randomly pick up a point; 2) extract its forward and backward neighbors, link them together to form a line segment; 3) find the neighbors of the two ends of the segment, and then link the neighbors to the line segment; 4) repeat step 3, until no more neighbors for the two ends, then start another new path (repeat step 1-4 until all points are processed); 5) ignore points cannot link to others. 6) Make sure that you end up with a shapefile where the line features are stored.",
+        "old_task": "Link the street view image location points into a path. The image was obtained using a mapping vehicle. All points represent the location of a street view image. Each image has an identifier in “panoId” column; the column “link_f_pan” indicates the panoId of the neighbor image in the forward direction, the column “link_b_pan” indicates the panoId of the neighbor image in the backward direction. You can link the location points by: 1) randomly pick up a point; 2) extract its forward and backward neighbors, link them together to form a line segment; 3) find the neighbors of the two ends of the segment, and then link the neighbors to the line segment; 4) repeat step 3, until no more neighbors for the two ends, then start another new path (repeat step 1-4 until all points are processed); 5) ignore points cannot link to others. 6) save the paths in an ERSI shape file.",
+        "task_level": "intermediate",
+        "data_path": "Street_view_image/street_image",
+        "edit_prompt": "True"
+    },
+    {
+        "id": 83,
+        "task": "Join the U.S. Census block group population table to the block group boundaries. Note that you must first create the full block group FIPS for the table by merging state, county, tract, and block group short FIPSs.",
+        "task_level": "intermediate",
+        "data_path": [
+            "Rolla_watershed/Rolla_downtown_block_groups_2021",
+            "Rolla_watershed/Rolla_2021_population_block_group.csv"
+        ]
+    },
+    {
+        "id": 84,
+        "task": "Distribute the population of each Census block group to the individual building footprints within it, proportionally based on building areas. For instance, if a block group has a total population of 30 residents and contains two buildings with areas of 100 square meters and 200 square meters, assign 10 residents to the first building and 20 residents to the second, according to their respective area proportions. Save the results as a Shapefile containing at least the fields block_group_id, building_area and population.",
+        "old_task": "Allocate the Census block group population to the building footprint according to the building area. For example, in a block group of 30 residents, there are two buildings with areas of 100 square meters and 200 square meters, respectively; you need to allot 10 residents and 20 residents to the two buildings accordingly.",
+        "task_level": "intermediate",
+        "data_path": [
+            "Rolla_watershed/Rolla_building_footprints",
+            "Rolla_watershed/Rolla_downtown_block_groups_2019"
+        ],
+        "edit_prompt": "True"
+    },
+    {
+        "id": 85,
+        "task": "Use the county boundary to clip the land cover raster for each county in Wyoming State, US. Clip the land cover raster using the county boundary. Save each county raster as TIF. Use 'NAME' column as the file name. Please perform this task without an hdr file. The projection of the grid file is consistent with the shapefile file.",
+        "old_task": "Use the county boundary to clip the land cover raster for each county in Wyoming State, US. These are steps for your reference: 1) Select the county boundary of a county. 2) Clip the land cover raster using the county boundary. 3) Save each county raster as TIF. Use “NAME” column as the file name.",
+        "task_level": "intermediate",
+        "data_path": [
+            "Landcover/US_Counties_projected",
+            "Landcover/nlcd_2021_land_cover_l48_20230630"
+        ],
+        "edit_prompt": "True"
+    },
+    {
+        "id": 86,
+        "task": "Clip the image using the extent box of the shape file using these steps: 1) generate the extent box of the shape file; 2) clip and save the image.",
+        "task_level": "intermediate",
+        "data_path": "NoiseMap"
+    },
+    {
+        "id": 87,
+        "task": "Using the input DEM layer, generate a watershed with the outlet point specified by the 'Outlet' shapefile. Use 'pysheds' library to complete the analysis. Follow these steps to complete the analysis:  1. Apply a fill operation on the DEM to remove sinks and ensure proper flow. 2. Perform a flow direction analysis based on the filled DEM data. 3. Calculate the watershed using the flow direction output and the specified outlet point. 4. Run a flow accumulation analysis based on the flow direction output. 5. Finally, generate streamlines from the flow accumulation output, considering only areas with flow accumulation values greater than 200.",
+        "old_task": "Using the input DEM layer, generate a watershed with the outlet point specified by the 'Outlet' shapefile. Follow these steps to complete the analysis:  1. Apply a fill operation on the DEM to remove sinks and ensure proper flow. 2. Perform a flow direction analysis based on the filled DEM data. 3. Calculate the watershed using the flow direction output and the specified outlet point. 4. Run a flow accumulation analysis based on the flow direction output. 5. Finally, generate streamlines from the flow accumulation output, considering only areas with flow accumulation values greater than 200.",
+        "task_level": "intermediate",
+        "data_path": [
+            "Outlet",
+            "n40_w078_1arc_v3"
+        ],
+        "edit_prompt": "True"
+    },
+    {
+        "id": 88,
+        "task": "Use Inverse Distance Weighted (IDW) interpolation to create a DEM using the given point data. The elevation column is “elevatio_1”. The raster resolution is 10 m. Please only use the points having the “image_date” column values in year 2013 and after. Save the result as a raster file.",
+        "old_task": "Use Inverse Distance Weighted (IDW) interpolation to create a DEM using the given point data. The elevation column is “elevatio_1”. The raster resolution is 10 m. Please only use the points having the “image_date” column values in year 2013 and after.",
+        "task_level": "intermediate",
+        "data_path": "Street_tree/Richland_downtown_street_view_image_location_EPSG6569"
+    },
+    {
+        "id": 89,
+        "task": "Identify the street tree count within 20-meter buffer for each street.",
+        "task_level": "advanced",
+        "data_path": [
+            "Street_tree/Street_Tree_EPSG6852_subset",
+            "Street_tree/Roads_Potland_EPSG6852_subset"
+        ]
+    },
+    {
+        "id": 90,
+        "task": "Compute the total highly developed area of Orange County, NY, according to the land cover raster. The pixel value of highly developed area is 24. The unit of area is square kilometer.",
+        "task_level": "advanced",
+        "data_path": [
+            "Landcover/nlcd_2021_land_cover_l48_20230630",
+            "NewYork_Counties_projected"
+        ]
+    },
+    {
+        "id": 91,
+        "task": "Compute the road lengths inside each protected region. The identifier of projected region is “fid”.",
+        "task_level": "advanced",
+        "data_path": "Multicriteria Overlay Analysis"
+    },
+    {
+        "id": 92,
+        "task": "From PA_Counties dataset select only those counties that the number of data from PA_DATA_EPSG4326 are completely within their boundaries but the count of point is less than 10.",
+        "old_task": "From PA_Counties dataset select only those counties that the number of data from PA_DATA_EPSG4326 are completely within their boundaries but the count of point is less than 10. Then extract these counties and load them into QGIS.",
+        "task_level": "advanced",
+        "data_path": [
+            "Pennsylvania/PACounties",
+            "Pennsylvania/PA_Data_EPSG4326"
+        ],
+        "edit_prompt": "True"
+    },
+    {
+        "id": 93,
+        "task": "I want you to measure the length of boundary of each county in km based on this input data. Then display your result in an HTML file.",
+        "task_level": "advanced",
+        "data_path": "Pennsylvania/PACounties"
+    },
+    {
+        "id": 94,
+        "task": "I want you to find all roads that crossed the centre county and then extract them from tl_2019_42_prisecroads.shp, and save the roads result in a new shapefile.",
+        "old_task": "I want you to find all roads that crossed the center county and then extract them from tl_2019_42_prisecroads.",
+        "task_level": "advanced",
+        "data_path": [
+            "tl_2019_42_prisecroads",
+            "Pennsylvania/PennsylvaniaCounties"
+        ],
+        "edit_prompt": "True"
+    },
+    {
+        "id": 95,
+        "task": "For each county, 1) find the weather stations inside the county, and 2) list the weather station names inside the county.",
+        "task_level": "advanced",
+        "data_path": [
+            "SC_county_boundaries",
+            "SC_weatherstations"
+        ]
+    },
+    {
+        "id": 96,
+        "task": "I would like to identify which counties in Pennsylvania are suitable for planting more trees, using annual rainfall as a key parameter. Counties receiving more than 2.5 inches of rain per year should be considered suitable for tree planting.  Based on your analysis, please answer the following: what percentage of Pennsylvania is suitable for planting more trees? How many counties meet the criteria for tree planting suitability?",
+        "task_level": "advanced",
+        "data_path": "level3_30"
+    },
+    {
+        "id": 97,
+        "task": "Using the provided hazard waste sites shapefile, block groups shapefile, and population CSV, calculate the total population living in block groups containing hazard waste sites. Start by loading the hazard sites and block groups data, ensuring their coordinate reference systems (CRS) match. Next, generate spatial points for hazard sites based on their latitude and longitude, then perform a spatial join to identify which block groups contain these sites. Extract the unique identifiers (GEOID) of these block groups and ensure that hazard_geoid_list and blockgroup_fips are in a consistent format (e.g., both as 12-digit strings). Match the GEOID values to the blockgroup_fips field in the population data. Finally, sum the population values for the matching block groups and output the total population, saving the filtered population data as a CSV for further analysis.",
+        "old_task": "Calculate the population that live in the block groups having hazard wastes.",
+        "task_level": "advanced",
+        "data_path": "HW_Sites_EPSG4326",
+        "edit_prompt": "True"
+    },
+    {
+        "id": 98,
+        "task": "For each school in Columbia, calculate the length of sidewalks within 500 meters.",
+        "task_level": "advanced",
+        "data_path": [
+            "Columbia_school_walkability/Columbia_schools_EPSG6569",
+            "Columbia_school_walkability/Columbia_sidewalk_EPSG6569"
+        ]
+    },
+    {
+        "id": 99,
+        "task": "Join the provided datasets, 'HIV Points' and 'US Counties,' to create a new file that assigns each county an HIV rate based on the HIV Points dataset. Then generate a symbology map that visualizes the HIV rate distribution across counties. Ensure the symbology map uses an appropriate color scheme to reflect variations in HIV rates, with distinct colors representing different levels of HIV rates. Avoid overrepresentation of a single color on the map by using a diverging or sequential colormap that balances the visualization of both high and low values effectively.",
+        "old_task": "I want you to join these two files and create one file that counties contain HIV rates based on this dataset 'HIV Point'. Then generate a symbology map based on HIV rate.",
+        "task_level": "advanced",
+        "data_path": [
+            "HIV_Points",
+            "US_Counties_Data/US_Counties"
+        ],
+        "edit_prompt": "True"
+    },
+    {
+        "id": 100,
+        "task": "I want you to calculate NVDI index based on these two bands.",
+        "task_level": "advanced",
+        "data_path": "LC08_L1TP_190055_20200214_20200823_02_T1"
+    },
+    {
+        "id": 101,
+        "task": "Using the provided DEM and observation point shapefile, perform a viewshed analysis with 'gdal.ViewshedGenerate' to determine visible areas from the observer's location. Ensure the DEM and observation points are in the same CRS, reprojecting if necessary. Set the observer's height to 2 meters and limit the analysis to a 5-kilometer radius. Save the output as a GeoTIFF raster, with visible areas marked as 255 and invisible areas as 0. Additionally, visualize the results by creating a map that overlays the viewshed output on the DEM and observation point.",
+        "old_task": "Based on this provided DEM data and another observation point (Random_Point), I want you to conduct a viewshade analysis from the observation point. Set a maximum radius for the analysis of 5 kilometers.",
+        "task_level": "advanced",
+        "data_path": [
+            "points_random",
+            "n40_w078_1arc_v3"
+        ],
+        "old_data_path": [
+            "points",
+            "n40_w078_1arc_v3"
+        ],
+        "edit_data": "True"
+    },
+    {
+        "id": 102,
+        "task": "Propose a new Walmart store location, which has similar distances to the existing four locations, while near the roads within 300 meters. Save the proposed location in a new shapefile, after that, draw this new location and the old location on the map and save it as a picture.",
+        "old_task": "Propose a new Walmart store location, which has similar distances to the existing four locations, while near the roads within 300 meters.",
+        "task_level": "advanced",
+        "data_path": "Walmart_site",
+        "edit_prompt": "True"
+    },
+    {
+        "id": 103,
+        "task": "Within the spatial extent of the provided point layer, generate 100 random points.",
+        "task_level": "advanced",
+        "data_path": "Street_tree/Richland_downtown_street_view_image_location"
+    },
+    {
+        "id": 104,
+        "task": "Use the given checkpoint locations, extract the values of the two DEM files, and then compute the RMSE.",
+        "task_level": "advanced",
+        "data_path": [
+            "Street_tree/Checkpoints_Columbia",
+            "Street_tree/idw_output.tif",
+            "Street_view_image/Richland_DEM_EPSG_6569.tif"
+        ]
+    },
+    {
+        "id": 105,
+        "task": "Please analyze the provided DEM and road data to identify areas suitable for camping based on the following criteria: (1) Calculate the terrain aspect from the DEM, and include areas where the aspect value is greater than 100 degrees. (2) Compute the distance of each point in the DEM to the closest road using the provided road shapefile, and retain areas within 1000 meters of a road. (3) Combine these two conditions to save the output as a raster file and generate a suitability map.",
+        "old_task": "Can you help me identify the areas that are suitable for camping. I want the aspect of the area to be greater than 100, and the distance to a closest road not exceeding 1000 meters.",
+        "task_level": "advanced",
+        "data_path": [
+            "Pennsylvania/PA_DEM.tif",
+            "Pennsylvania/PA_Roads"
+        ],
+        "edit_prompt": "True"
+    },
+    {
+        "id": 106,
+        "task": "Please calculate the length of each geometric feature in the uploaded Shapefile. The results should include the ID of each feature and its corresponding length. Save the results as a new Shapefile and ensure that all original attribute fields are included.",
+        "task_level": "basic",
+        "data_path": "1/1/input"
+    },
+    {
+        "id": 107,
+        "task": "Please clip the uploaded target Shapefile layer (road.shp) according to the provided boundaries (area.shp) . Ensure that the clipped results include all original attribute fields and save it as a new Shapefile.",
+        "task_level": "basic",
+        "data_path": "1/2/input"
+    },
+    {
+        "id": 108,
+        "task": "Please convert the geometric features in the uploaded Shapefile into line features. Ensure that the converted line features retain all original attribute fields and save them as a new Shapefile.",
+        "task_level": "basic",
+        "data_path": "1/3/input"
+    },
+    {
+        "id": 109,
+        "task": "Please convert the vertices of line or polygon features in the uploaded Shapefile into point features. Ensure that the converted point features include all original attribute fields and save them as a new Shapefile.",
+        "task_level": "basic",
+        "data_path": "1/4/input"
+    },
+    {
+        "id": 110,
+        "task": "Please convert the line features in the uploaded Shapefile into polygon features. Ensure that the converted polygon features retain all original attribute fields and save them as a new Shapefile.",
+        "task_level": "basic",
+        "data_path": "1/5/input"
+    },
+    {
+        "id": 111,
+        "task": "Overlay analysis of two uploaded Shapefiles to bind properties to roads.",
+        "task_level": "basic",
+        "data_path": "1/6/input"
+    },
+    {
+        "id": 112,
+        "task": "Please create a specified distance buffer for each geometric feature in the uploaded Shapefile. The results should include all original attribute fields and be saved as a new Shapefile.",
+        "task_level": "basic",
+        "data_path": "1/7/input"
+    },
+    {
+        "id": 113,
+        "task": "Please create Thiessen polygons (Voronoi diagrams) for the point features in the uploaded Shapefile. Ensure that all Tyson polygons are bounded and are not discarded. Complete the task with the geovoronoi package. The results should be saved as a new Shapefile.",
+        "old_task": "Please create Thiessen polygons (Voronoi diagrams) for the point features in the uploaded Shapefile. The results should include all original attribute fields and be saved as a new Shapefile.",
+        "task_level": "basic",
+        "data_path": "1/8/input",
+        "edit_prompt": "True"
+    },
+    {
+        "id": 114,
+        "task": "Please create minimum bounding rectangles for the point groups in the uploaded Shapefile. The results should include all original attribute fields and be saved as a new Shapefile.",
+        "task_level": "basic",
+        "data_path": "1/9/input"
+    },
+    {
+        "id": 115,
+        "task": "Please create internal buffers for the closed line features in the uploaded Shapefile. First, convert the line feature into a polygon feature. Then, create an internal buffer for this line with a distance setting of -300 and a flat end type. After the buffer is created, crop and extract it. Finally, save the results as a new Shapefile.",
+        "task_level": "basic",
+        "data_path": "1/10/input"
+    },
+    {
+        "id": 116,
+        "task": "Please create a buffer zone for the disaster area to analyze the potential impact range of the disaster. Initially, create a multi-ring buffer for the area.shp file with distances of 100, 200, 300, and 400 meters. Then, overlay the road.shp file with this buffer to conduct spatial analysis. Upon completion, save the analyzed results as a new Shapefile.",
+        "task_level": "basic",
+        "data_path": "1/11/input"
+    },
+    {
+        "id": 117,
+        "task": "Please create Minimum Area Rectangle and Minimum Convex Hull for the point groups in the Shapefile and Minimum Boundary Geometry for the different point groups in one layer. Finally, save a total of two Shapefiles for the Minimum Area Rectangle and Minimum Convex Hull.",
+        "task_level": "basic",
+        "data_path": "1/12/input"
+    },
+    {
+        "id": 118,
+        "task": "Please convert the vertices of line or polygon features in the uploaded Shapefile into point features. Ensure that the converted point features include all original attribute fields and save them as a new Shapefile.",
+        "task_level": "basic",
+        "data_path": "1/13/input"
+    },
+    {
+        "id": 119,
+        "task": "Please perform a spatial analysis on clustered point features in the provided Shapefile. For each cluster, calculate and describe its spatial distribution, including the cluster's center, shape, orientation, and extent. The results should be stored in a new Shapefile, where each cluster's spatial characteristics (center coordinates, standard deviations, and fitted ellipse geometry) are clearly represented.",
+        "old_task": "Please conduct a spatial feature analysis of clustered point features in the uploaded Shapefile. The results should identify and describe the spatial patterns of each cluster area and be saved as a new Shapefile.",
+        "task_level": "basic",
+        "data_path": "1/14/input",
+        "edit_prompt": "True"
+    },
+    {
+        "id": 120,
+        "task": "Please add coordinate fields, POINT_X and POINT_Y, to each point feature in the provided Shapefile. These fields should capture the X and Y coordinates of each point respectively. Ensure that the updated data is saved in the existing Shapefile or as a new Shapefile, as per the requirement.",
+        "task_level": "basic",
+        "data_path": "1/15/input"
+    },
+    {
+        "id": 121,
+        "task": "Please convert the start (Point_X, Point_Y) and end (NEAR_X, NEAR_Y) point features in the provided Shapefile into line features. Save the resulting lines as a new Shapefile.",
+        "task_level": "basic",
+        "data_path": "1/16/input"
+    },
+    {
+        "id": 122,
+        "task": "Using the two symmetrical line features in the uploaded Shapefile, create the nearest connecting line between their closest points. Save the resulting line feature as a new Shapefile, preserving only the geometry without additional attributes.",
+        "old_task": "Please create the nearest vertical line for the two symmetrical line features in the uploaded Shapefile. First convert the line feature to a vertex point, then nearest neighbor analyze to calculating the point closest to each point feature on the line feature, then add a coordinate column (Point_X, Point_Y) to the vertex point feature, and then convert the starting point (Point_X, Point_Y) and end point coordinates (NEAR_X, NEAR_Y) of the point feature to a line feature, then sort the vertex point files in ascending order according to (NEAR_DIST), then create a line feature connecting the two nearest point features, and finally save this line feature as a new Shapefile.",
+        "task_level": "basic",
+        "data_path": "1/17/input",
+        "edit_prompt": "True"
+    },
+    {
+        "id": 123,
+        "task": "Please extract the overlapping areas between polygon features in the provided Shapefile and create a new Shapefile consisting of the resulting polygon features.",
+        "task_level": "basic",
+        "data_path": "1/18/input"
+    },
+    {
+        "id": 124,
+        "task": "Please analyze the overlapping polygons within the uploaded Shapefile. Begin by extracting the overlapping areas, then use spatial joins to detail the characteristics of these overlaps. Ensure that the results comprehensively describe each overlapping region and save them in a new Shapefile.",
+        "task_level": "basic",
+        "data_path": "1/19/input"
+    },
+    {
+        "id": 125,
+        "task": "Please allocate space for the point features in the uploaded Shapefile based on distance. For each point feature, generate Voronoi polygons using the 'voronoi_regions_from_coords' function in the 'geovoronoi' package. Then, create a 500-meter buffer around each point feature. Use the Voronoi polygons as a spatial mask to clip the buffer areas, resulting in distinct zones for each point. Ensure the coordinate reference systems (CRS) are consistent for all operations. Save the resulting polygons as a new Shapefile, preserving the original point attributes.",
+        "old_task": "Please allocate space for the point features in the uploaded Shapefile based on distance. First, create Voronoi polygons and a 500-meter buffer for the point features. Then, use the Voronoi polygons as a mask to clip the buffer area, resulting in the final output. Save the result as a new Shapefile.",
+        "task_level": "basic",
+        "data_path": "1/20/input"
+    },
+    {
+        "id": 126,
+        "task": "Please generate Voronoi polygons for the building features in the provided Shapefile. Convert the building polygons to points, create Voronoi polygons from these points, and then overlay the Voronoi polygons with the original building polygons for analysis. Ensure that all Tyson polygons are bounded and are not discarded. Save the final results as a new Shapefile.",
+        "old_task": "Please generate Voronoi polygons for the building features in the provided Shapefile. Convert the building polygons to points, create Voronoi polygons from these points, and then overlay the Voronoi polygons with the original building polygons for analysis. Save the final results as a new Shapefile.",
+        "task_level": "basic",
+        "data_path": "1/21/input",
+        "edit_prompt": "True"
+    },
+    {
+        "id": 127,
+        "task": "Please use line to split polygon and save the new polygon as a new shapfile.",
+        "task_level": "basic",
+        "data_path": "1/22/input"
+    },
+    {
+        "id": 128,
+        "task": "Please sort the point features in the provided Shapefile based on a specified field (NEAR_DIST) in ascending order. Save the sorted results as a new Shapefile.'.",
+        "task_level": "basic",
+        "data_path": "2/1/input"
+    },
+    {
+        "id": 129,
+        "task": "Please perform a spatial join on the two uploaded Shapefiles to analyze their spatial relationships. Use the 'intersects' spatial predicate to identify overlapping or intersecting features. The results should include all original attribute fields from both layers, with any conflicting field names properly resolved. Use an 'inner' join operation and save the point features as a new Shapefile.",
+        "old_task": "Please perform a spatial join on the two uploaded Shapefiles to analyze their spatial relationships. The results should include all original attribute fields and be saved as a new Shapefile.",
+        "task_level": "basic",
+        "data_path": "2/7/input",
+        "old_data_path": "2/2/input",
+        "edit_prompt": "True",
+        "edit_data": "True"
+    },
+    {
+        "id": 130,
+        "task": "Please filter the uploaded Shapefile for points with precipitation greater than 1000 by the specified criteria. The result should include all original attribute fields and save it as a new Shapefile.",
+        "task_level": "basic",
+        "data_path": "2/3/input"
+    },
+    {
+        "id": 131,
+        "task": "Perform a spatial overlay analysis to identify polygon grid features in the uploaded grid layer that intersect with the river features in the uploaded river layer. First, ensure that both layers have the same coordinate reference system (CRS). Then, filter the grid features to retain only polygons and the river features to retain only valid line geometries. Merge all river geometries into a single unified geometry to facilitate the spatial query. Finally, identify and extract the grid polygons that intersect with the river geometry, and save the resulting intersecting polygons as a new Shapefile containing only their geometries.",
+        "old_task": "Please perform an overlay query on the multiple uploaded Shapefiles to analyze their spatial and attribute relationships. The results should detail the interactions between each layer and be saved as a new Shapefile.",
+        "task_level": "basic",
+        "data_path": "2/4/input",
+        "edit_prompt": "True"
+    },
+    {
+        "id": 132,
+        "task": "Please export the coordinates of the geometry as a csv file.",
+        "task_level": "basic",
+        "data_path": "2/5/input"
+    },
+    {
+        "id": 133,
+        "task": "Please collect the rainfall statistics for different regions in the specified area and save the precipitation data for each region as a new Shapefile.",
+        "task_level": "basic",
+        "data_path": "2/6/input"
+    },
+    {
+        "id": 134,
+        "task": "Please collect statistical data on precipitation in different parts of the region, save it as a csv file and include the columns index and P, and finally draw a histogram of precipitation in each region. The horizontal axis shows the region and the vertical axis shows the amount of precipitation. The horizontal axis is required to be displayed completely and the picture is beautiful.",
+        "old_task": "Please collect comprehensive statistical data on precipitation in different parts of the region, first spatially connecting and then aggregating to calculate the total value of precipitation in each region and save it as a csv file, and finally draw a histogram of precipitation in each region.",
+        "task_level": "basic",
+        "data_path": "2/7/input",
+        "edit_prompt": "True"
+    },
+    {
+        "id": 135,
+        "task": "Please calculate the distance between each pair of point features in the uploaded Shapefile. The results should be saved as a new csv file.",
+        "task_level": "basic",
+        "data_path": "3/1/input"
+    },
+    {
+        "id": 136,
+        "task": "Please find the two closest point features in the uploaded Shapefile and create a line connecting these two points. First you have to sort the uploaded point elements by distance, after that create a line connecting these two points and finally save the result as a new Shapefile.",
+        "task_level": "basic",
+        "data_path": "3/2/input"
+    },
+    {
+        "id": 137,
+        "task": "Please summarize the distance from each polygon vertex in the shapefile to its nearest line. The distances are already stored in the columns of the vertex file and the summary results should be saved as a new shapefile.",
+        "task_level": "basic",
+        "data_path": "3/3/input"
+    },
+    {
+        "id": 138,
+        "task": "Please calculate the perpendicular distance from all points to the line and save it as a csv file.",
+        "task_level": "basic",
+        "data_path": "3/4/input"
+    },
+    {
+        "id": 139,
+        "task": "Please conduct a nearest neighbor analysis to find the closest point on a line feature for each point feature within the provided Shapefile. The analysis should record the distance to the nearest point, and its coordinates (X and Y), and all original attribute fields of the point features should be preserved. The results should be saved in a new Shapefile.",
+        "task_level": "basic",
+        "data_path": "3/5/input"
+    },
+    {
+        "id": 140,
+        "task": "Identify the nearest vertex within each polygon feature in the polygon Shapefile to the nearest line feature in the polyline Shapefile. Extract these closest vertices and save them as a new Shapefile, retaining their spatial locations and adding relevant attributes from the original polygon features.",
+        "old_task": "Please find the location of the nearest point from each polygon to the nearest line in the uploaded Shapefile. First convert the polygon to polygon vertice, then perform a nearest neighbor analysis to get the closest distance from the vertice to the line elements, then summarize the closest distance from the vertice to the line, and finally join the summarized results and save them as a new shapefile.",
+        "task_level": "basic",
+        "data_path": "3/6/input",
+        "edit_prompt": "True"
+    },
+    {
+        "id": 141,
+        "task": "Calculate the principal directions of polygon features in the uploaded Shapefile. For each polygon, approximate its direction using the minimum bounding rotated rectangle. The principal direction is defined as the angle (in degrees) of the longest edge of the rectangle relative to the positive x-axis, measured counterclockwise. The results should include the calculated direction for each polygon, saved as a new field in the Shapefile. Save the updated Shapefile with all original attributes and the new direction field.",
+        "old_task": "Please calculate the principal directions of rectangular polygon features in the uploaded Shapefile. The results should include the ID and direction of each rectangle and be saved as a new Shapefile.",
+        "task_level": "basic",
+        "data_path": "4/1/input",
+        "edit_prompt": "True"
+    },
+    {
+        "id": 142,
+        "task": "Please visualize the uploaded shapefile file and save the image.",
+        "task_level": "basic",
+        "data_path": "12/1/input"
+    },
+    {
+        "id": 143,
+        "task": "Please convert the coordinate system of the uploaded shapefile from EPSG:4326 to EPSG:3857 and save it as a new shapefile.",
+        "task_level": "basic",
+        "data_path": "12/2/input"
+    },
+    {
+        "id": 144,
+        "task": "Please clear the coordinate system of the uploaded shapefile and save it as a new shapefile.",
+        "task_level": "basic",
+        "data_path": "12/3/input"
+    },
+    {
+        "id": 145,
+        "task": "Please add a new Direction column for the uploaded shapefile file to indicate the direction of the matrix and save the result as a new shapefile.",
+        "task_level": "basic",
+        "data_path": "12/4/input"
+    },
+    {
+        "id": 146,
+        "task": "Please rename the fields to the corresponding Chinese in the uploaded shapefile. And save it as a new shapefile.",
+        "task_level": "basic",
+        "data_path": "12/5/input"
+    },
+    {
+        "id": 147,
+        "task": "Combine the uploaded Shapefile files and group the features by the index field, which represents the region identifier. For each region, calculate the total precipitation using the p field, which contains the precipitation values. Save the results, including the index field and the total precipitation for each region, as a new CSV file.",
+        "old_task": "Please group the uploaded Shapefile files by region and calculate the precipitation totals for each region, saving the results as a new csv file.",
+        "task_level": "basic",
+        "data_path": "12/6/input",
+        "edit_prompt": "True"
+    }
+]

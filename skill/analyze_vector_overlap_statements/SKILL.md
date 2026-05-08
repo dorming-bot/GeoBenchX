@@ -1,6 +1,6 @@
 ---
 name: analyze-vector-overlap
-description: Intersect two GeoDataFrames and store the resulting overlap layer for downstream measurements or visualization.
+description: Intersect two GeoDataFrames and store the resulting overlap layer for downstream measurements or visualization, including point-vs-line/polygon overlap, and save the overlap vector output to the project root scratch folder.
 ---
 
 # Analyze Vector Overlap Skill

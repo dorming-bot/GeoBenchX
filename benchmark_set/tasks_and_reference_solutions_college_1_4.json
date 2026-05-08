@@ -1,0 +1,303 @@
+{
+    "metadata": {
+        "author": "ZSX",
+        "notes": "Version 1.1 task definitions without solutions"
+    },
+    "tasks": [
+        {
+            "task_ID": "TASK_test381",
+            "task_text": "Analyze the elevation classification dataset of the Heilongjiang River Basin, calculating and visualizing its terrain slope and aspect to reveal the basic topographic pattern of the region.Specific steps:1)Using the 'Heilongjiang River Basin Elevation Classification Dataset',treat it as continuous elevation data to calculate the slope (in degrees) of the study area.2)Using the same elevation classification dataset, calculate the aspect (in azimuth) of the study area.3)Visualize the calculated slope and aspect maps using appropriate color schemes and classification methods to clearly illustrate the steepness and orientation of the terrain.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_test382",
+            "task_text": "As a geographic information analyst, please provide fundamental topographic insights for the 'Piura region of Peru'. Specifically, you will need to utilize the provided DEM data to calculate and visualize the slope, aspect, and profile curvature of the study area. Conduct statistical analysis of these topographic derivatives to understand the basic characteristics of the region's landforms and their potential impacts on flood disaster occurrence.Analyze the macro spatial distribution pattern of average temperature in China for January 2020. Quantify and visualize the range, mean, and spatial variability of the average temperature across mainland China in January 2020, identifying areas with concentrated low and high temperatures.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_test383",
+            "task_text": "Investigate the spatial relationship between population density and the surroundings of major urban parks in Wuhan. Using the dataset of major urban parks in Wuhan, create buffers of different radii (500 meters, 1000 meters) for each park. Then, integrate the 'China's population in 2010' dataset to calculate and compare the average population density within the two buffer zones.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_test384",
+            "task_text": "Analyze the macro distribution pattern of extreme temperatures in China's coastal provinces. Using the raster dataset of extreme temperatures in China's coastal provinces, quantify and visualize the range, mean, and spatial variability of extreme temperatures.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_test385",
+            "task_text": "Analyze the raster dataset of extreme temperatures in China's coastal provinces. Use histograms or box plots to identify and visualize areas with anomalously high or low temperatures during specific time periods (e.g., annual maximum or minimum temperatures). Submit a map indicating the distribution of extreme temperatures in China's coastal provinces, highlighting the identified global high/low temperature anomalies, along with statistical charts (such as histograms or box plots) used to identify the outliers.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_test386",
+            "task_text": "Analyze the spatial distribution characteristics and connectivity centrality of intersections in the road transportation network of Inner Mongolia. Specific steps include:1)Extract all intersections from the road network, calculate the number of connecting roads (degree) for each intersection, and create a spatial distribution map of intersection degrees.2)Identify and visualize the clustering areas of high-degree intersections (i.e., junctions where multiple roads converge), as well as the distribution patterns of these areas across the entire network.3)Quantify the proportions of intersections with different degrees (e.g., three-way intersections, four-way intersections, and above) and assess their potential impact on regional traffic flow organization and network vulnerability.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_test387",
+            "task_text": "Analyze the spatial distribution pattern of cultivated land in the source region of the Yellow River basin, quantify its concentration areas and dispersion characteristics, and provide fundamental insights for regional agricultural planning and land resource management.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_test388",
+            "task_text": "Based on the 'ASTGTM DEM data for a city in Zhejiang Province', quantify and visualize the areas within the study region that have steep slopes (e.g., greater than 20 degrees) and simultaneously face south (e.g., with aspects between 135 and 225 degrees).",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_test389",
+            "task_text": "Based on the 'ASTGTM DEM data for a city in Zhejiang Province', conduct a detailed aspect classification and quantitative analysis. First, calculate the surface aspect, then classify it into eight primary geographical directions (north, northeast, east, southeast, south, southwest, west, and northwest), and accurately count the area and percentage of each aspect category.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_test390",
+            "task_text": "Based on the 'Chengdu (vector data)' and the 'China's population in 2005'、'China's population in 2010' conduct a macro-level quantitative and visual analysis of the spatial distribution pattern of Chengdu's population between 2005 and 2010. Analyze the spatiotemporal changes in population density in Chengdu, identify areas of population growth or decline, and explore the potential correlations between these changes and socio-economic development factors such as urban expansion and functional zone adjustments.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        }
+    ]
+}

@@ -1,0 +1,303 @@
+{
+    "metadata": {
+        "author": "ZSX",
+        "notes": "Version 1.1 task definitions without solutions"
+    },
+    "tasks": [
+        {
+            "task_ID": "TASK_test371",
+            "task_text": "Based on the 'DEM data of Jalaid Banner, Xing'an League, Inner Mongolia', analyze the distribution characteristics of terrain elevation and slope in the region. Please generate elevation classification maps and slope classification maps, and quantify the area proportions of different elevation and slope intervals. This will provide a preliminary understanding of the macro-topographic pattern of the region and foundational information for potential route planning. The analysis should clearly highlight areas with dramatic elevation and slope changes as well as relatively flat areas.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_test372",
+            "task_text": "As a geographic information analyst, please provide fundamental topographic insights for the 'Piura region of Peru'. Specifically, you will need to utilize the provided DEM data to calculate and visualize the slope, aspect, and profile curvature of the study area. Conduct statistical analysis of these topographic derivatives to understand the basic characteristics of the region's landforms and their potential impacts on flood disaster occurrence.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_test373",
+            "task_text": "Analyze the DEM data of Guangming District, Shenzhen, using methods such as topographic profiling and local terrain feature extraction to identify and quantify the depth, area, and distribution density of 'pits' (depressions) within the study area, thereby forming a preliminary understanding of the micro-topographic features of the region.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_test374",
+            "task_text": "Conduct a macro-level quantitative and visual analysis of the terrain slope classification dataset in the Weihe River Basin to gain insights into the fundamental pattern of slope distribution in the region.1)Perform statistical analysis on the terrain slope classification dataset of the Weihe River Basin, calculating the area percentages for different slope categories.2)Create a histogram or pie chart of the slope categories and generate a thematic map to clearly display the spatial distribution of different slope zones.3)Write an analysis report describing the dominant slope categories in the Weihe River Basin, the proportions of flat versus steep areas, and their spatial distribution characteristics.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_test375",
+            "task_text": "Based on the 'DEM data of the Tangxun Lake Experimental Area in Hubei' and the 'China Ecological, Residential, and Industrial Land Use Spatial Dataset', comprehensively assess and identify high-priority wetland ecological restoration areas within the Tangxun Lake region to enhance ecological service functions and reduce flood risk.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_test376",
+            "task_text": "Based on the 'ASTGTM DEM data for a city in Zhejiang Province', analyze the distribution of terrain orientation (aspect) in the area. Please generate an aspect map, and quantify the area proportions and average elevations for different aspect intervals (e.g., north, northeast, east, etc., for the eight cardinal and intercardinal directions). This will help to understand the overall trend of the terrain in the region and its potential impact on route selection.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_test377",
+            "task_text": "Based on gridded population data, analyze the dynamic changes in China's population from 2005 to 2010. The analysis involves calculating and visualizing areas of population growth and decline, with a particular focus on regions exhibiting significant changes.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_test378",
+            "task_text": "Conduct a comprehensive identification and quantitative analysis of topographic depressions (including pits and closed depressions) for the DEM data of the Tangxun Lake Flood Disaster Scientific Experimental Area in Hubei. Requirements: First, extract all closed depressions within the study area and calculate their depth, area, and volume. Then, classify the depressions based on their depth and area, and visualize the spatial distribution patterns of different categories of depressions.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_test379",
+            "task_text": "Analyze the spatial distribution pattern of population density in China in 2010. Using the 'China's population in 2010' dataset, calculate and visualize the average population density within China, delineate and identify high-density and low-density areas, and describe their spatial characteristics.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_test380",
+            "task_text": "Quantify and visualize the macro distribution pattern of China's 2014 POI data. For example, count the number of different POI categories, and create spatial distribution density maps or thematic maps to reveal the agglomeration and dispersion characteristics of major urban functional zones in China. Specifically, analyze the distribution patterns of catering and educational facilities to form an understanding of the basic nationwide distribution of catering and education facilities.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        }
+    ]
+}

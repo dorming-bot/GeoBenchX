@@ -1,0 +1,303 @@
+{
+    "metadata": {
+        "author": "ZSX",
+        "notes": "Version 1.1 task definitions without solutions"
+    },
+    "tasks": [
+        {
+            "task_ID": "TASK_test351",
+            "task_text": "Based on the 'DEM data of the Tangxun Lake Experimental Area in Hubei', analyze the distribution characteristics of the Terrain Ruggedness Index (TRI) in this region. Please calculate and generate a TRI map, classify the TRI values, and quantify the area proportions of different ruggedness intervals. Through visualization and statistical analysis, identify areas with gentle and rugged terrain to provide foundational insights for assessing potential path accessibility challenges.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_test352",
+            "task_text": "Analyze the spatial distribution characteristics of traditional villages in China. Through density analysis and visualization of traditional villages, identify areas of concentration and sparsity, and form a preliminary understanding of the spatial patterns of these important cultural heritages.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_test353",
+            "task_text": "Gain insights into the fundamental patterns of population density in the Beijing-Tianjin-Hebei (Jing-Jin-Ji) region. Using the 'China's population in 2005' and 'China's population in 2010' and the 'Beijing-Tianjin-Hebei boundary', quantify and visualize the population density and its changes in the Jing-Jin-Ji region for 2005 and 2010. The objective of this task is to reveal the macro patterns and dynamic changes in population distribution in the region. During the analysis, first clip the population raster data to the administrative boundaries of the Jing-Jin-Ji region, then calculate the population density for each year (e.g., persons per square kilometer), and compute the percentage change in population density between 2005 and 2010: ((2010 density - 2005 density) / 2005 density) * 100. Finally, use appropriate cartographic symbology, such as classified color schemes, to clearly illustrate the distribution and changes in population density for each year.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_test354",
+            "task_text": "Based on the 'NanJingBoundaries', we extracted various categories of POI data for Nanjing from‘2014 China POI’. We conducted a macro-level quantification and visualization of the overall spatial distribution patterns of these POIs. Specifically, for major POI categories such as commercial, residential, and educational, we analyzed their density distribution characteristics and clustering patterns across different urban areas. ",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_test355",
+            "task_text": "Based on the 'cover data for Henan Province', we conducted descriptive statistics and spatial pattern analysis of the land cover types. This involved calculating the area proportions of different land cover categories and generating a land cover classification map. Through area statistics and frequency analysis of the major cover types, we aimed to reveal the macro-level composition and spatial distribution characteristics of land use in Henan Province.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_test356",
+            "task_text": "Based on the 'Piura region of Peru', generate and visualize hillshade maps under different solar azimuth angles (e.g., due north, due east, due south, due west). By comparing shadow and highlight areas under illumination from different directions, this analysis aims to reveal the overall terrain relief characteristics and the dominant slope aspects of the area. The deliverables include four hillshade raster maps corresponding to the different solar azimuth angles.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_test357",
+            "task_text": "Conduct directional analysis on the boundary lines of the 'Jiuzhaigou earthquake zone'. Please extract the linear boundaries of the seismic intensity contours as the analysis objects. Calculate the mean direction and circular variance of these boundary lines, and generate a directional rose diagram. This rose diagram should visualize the frequency distribution of the boundary directions of the seismic intensity contours, for example, in bins of 10-degree intervals, thereby revealing insights into the basic directional characteristics of seismic intensity expansion or geological structures.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_test358",
+            "task_text": "Explore the spatial relationships between different types of POIs within Chengdu. Using 2014 China POI data and Chengdu administrative division data, POIs for commercial service facilities (e.g., restaurants, shopping malls) and public service facilities (e.g., schools, hospitals) within the Chengdu area were screened and extracted.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_test359",
+            "task_text": "Analyze the spatial distribution characteristics of elevation in Zhejiang Province. Using the 'ASTGTM DEM data for a city in Zhejiang Province', calculate the area of different elevation intervals (e.g., 0-100 m, 101-500 m, 501-1000 m, >1000 m) through raster calculation and compute their proportions of the total area.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_test360",
+            "task_text": "Explore the macro spatial distribution patterns of walled cities in China during the late imperial period (15th–19th centuries).Using the 'City walls in Chinese cities during the late imperial period (15th–19th centuries)', visualize the center points of the walled cities on a national map, and symbolize them with uniform symbols or according to city size (if this attribute is included in the dataset).",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        }
+    ]
+}

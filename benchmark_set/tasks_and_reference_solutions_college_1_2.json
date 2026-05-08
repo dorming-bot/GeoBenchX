@@ -1,0 +1,303 @@
+{
+    "metadata": {
+        "author": "ZSX",
+        "notes": "Version 1.1 task definitions without solutions"
+    },
+    "tasks": [
+        {
+            "task_ID": "TASK_test361",
+            "task_text": "Based on the 'DEM data of Jalaid Banner, Xing'an League, Inner Mongolia', macro-classify and quantify the surface aspect of the study area. The specific tasks are: first, calculate the surface aspect; second, categorize the aspects into two major groups—'sunny slopes' (e.g., aspects roughly between southeast and southwest) and 'shady slopes' (e.g., aspects roughly between northeast and northwest)—to reflect fundamental topographic differences in solar radiation. Quantify and visualize the spatial distribution of these two slope categories.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_test362",
+            "task_text": "Excavating topographic features in Jalaid Banner, Inner Mongolia: Please apply a spatial edge detection filter to the DEM data of Jalaid Banner, Xing'an League, Inner Mongolia. The goal is to identify and quantify significant change points in the terrain, such as ridge lines, valley edges, or fault lines. Visualize the detected edges and provide a brief explanation of these geographic features.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_test363",
+            "task_text": "Analyze the DEM data of Guangming District, Shenzhen, using methods such as topographic profiling and local terrain feature extraction to identify and quantify the depth, area, and distribution density of 'pits' (depressions) within the study area, thereby forming a preliminary understanding of the micro-topographic features of the region.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_test364",
+            "task_text": "Analyze the impact of the road transportation network in Inner Mongolia on the accessibility of adjacent areas. Please create buffers around the road network at different distances (e.g., 100 meters, 500 meters, and 1000 meters), then calculate and quantify the number of POI (Point of Interest) data points in China for 2014 (such as commercial facilities, public services, etc.) within each buffer zone. Finally, use charts and maps to illustrate the spatial correlation strength between the road network and surrounding facilities.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_test365",
+            "task_text": "Analyze the overall pattern of kilometer grid population distribution in China in 2010. Use histograms or box plots to identify and visualize areas with unusually high or low population density. Submit a map showing the population density distribution in 2010, with highlighted areas of global anomalies in high/low population density.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_test366",
+            "task_text": "Conduct macro-level quantification and visualization of the spatial distribution of walled cities in late imperial China, identifying their main clusters in geographical space to form an understanding of the basic distribution pattern of historical cities. Using kernel density estimation, generate a spatial density map of China’s walled cities from the 15th to 19th centuries, visually illustrating their distribution characteristics.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_test367",
+            "task_text": "Investigate the spatial distribution characteristics of different land use types within various administrative divisions in the Beijing-Tianjin-Hebei region. Using the 'Beijing-Tianjin-Hebei boundary' and the 'China Ecological, Residential, and Industrial Land Use Spatial Dataset', quantify the area of ecological, residential, and industrial land (or other specific land use types) within each administrative division through spatial overlay analysis.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_test368",
+            "task_text": "Load the data 'HeavyRain_Region_in_China'  and xlsx file 'ShortLongDurationHeavyRainfallChina1961-2015'.Then analyze the long-term and short-term heavy rainfall characteristics dataset for China (1961-2015) to identify regions with abnormally high or low rainfall amounts under specific durations (e.g., 24-hour maximum rainfall). Submit a map that indicates the distribution of extreme rainfall across different regions of China, highlighting the identified areas with abnormally high/low rainfall. Also, include statistical charts (such as histograms or box plots) used to identify the outliers.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_test369",
+            "task_text": "For the 2014 POI data of China, quantify and visualize the macro spatial distribution patterns of different categories of Points of Interest (POI) across the country. Requirements:1)Classify the POI data (e.g., catering, shopping, education, healthcare, etc.) and count the number of POIs in each category.2)Calculate the distribution density and concentration levels of different POI categories within provincial administrative regions (or major urban clusters) in China.3)Create thematic maps to display the spatial distribution hotspots and clustering patterns of major POI categories, and provide preliminary interpretations of these patterns, thereby forming a foundational understanding of the distribution patterns of POIs in China.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_test370",
+            "task_text": "To address the issue of grassland degradation on the Tibetan Plateau, identify areas that should be prioritized for ecological restoration. First, use the 'Spatial Distribution Dataset of Grassland Degradation Types on the Tibetan Plateau' to identify areas with varying degrees of grassland degradation. Second, combine it with the 'China's Population in 2010' dataset to identify regions with relatively low population density (e.g., below a certain threshold). Finally, through raster overlay analysis, identify grassland areas that are moderately or severely degraded and simultaneously have low population density. These areas are regarded as priority zones for ecological restoration.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        }
+    ]
+}

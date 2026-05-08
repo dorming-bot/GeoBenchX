@@ -1,0 +1,218 @@
+{
+    "metadata": {
+        "author": "ZSX",
+        "notes": "Version 1.1 task definitions without solutions"
+    },
+    "tasks": [
+        {
+            "task_ID": "TASK_test282",
+            "task_text": "Load the data 'street_image' firstly.Then link the street view image location points into a path, get the shapefile of the line features. The image was obtained using a mapping vehicle. All points represent the location of a street view image. Each image has an identifier in “panoId” column; the column “link_f_pan” indicates the panoId of the neighbor image in the forward direction, the column “link_b_pan” indicates the panoId of the neighbor image in the backward direction. You can link the location points by: 1) randomly pick up a point; 2) extract its forward and backward neighbors, link them together to form a line segment; 3) find the neighbors of the two ends of the segment, and then link the neighbors to the line segment; 4) repeat step 3, until no more neighbors for the two ends, then start another new path (repeat step 1-4 until all points are processed); 5) ignore points cannot link to others. 6) Make sure that you end up with a shapefile where the line features are stored.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_test283",
+            "task_text": "Load the data 'Rolla_downtown_block_groups_2021' and load the 'Rolla_2021_population_block_group' firstly.Then join the U.S. Census block group population table to the block group boundaries. Note that you must first create the full block group FIPS for the table by merging state, county, tract, and block group short FIPSs.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_test284",
+            "task_text": "Load the data 'Rolla_building_footprints' and 'Rolla_downtown_block_groups_2019' firstly.Then distribute the population of each Census block group to the individual building footprints within it, proportionally based on building areas. For instance, if a block group has a total population of 30 residents and contains two buildings with areas of 100 square meters and 200 square meters, assign 10 residents to the first building and 20 residents to the second, according to their respective area proportions. Save the results as a Shapefile containing at least the fields block_group_id, building_area and population.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_test286",
+            "task_text": "Load the data 'Columbia_image_points' firstly.Then clip the image using the extent box of the shape file using these steps: 1) generate the extent box of the shape file; 2) clip and save the image.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_test287",
+            "task_text": "Load the data 'Outlet' and get the raster data 'n40_w078_1arc_v3' firstly.Then using the input DEM layer, generate a watershed with the outlet point specified by the 'Outlet' shapefile. Use 'pysheds' library to complete the analysis. Follow these steps to complete the analysis:  1. Apply a fill operation on the DEM to remove sinks and ensure proper flow. 2. Perform a flow direction analysis based on the filled DEM data. 3. Calculate the watershed using the flow direction output and the specified outlet point. 4. Run a flow accumulation analysis based on the flow direction output. 5. Finally, generate streamlines from the flow accumulation output, considering only areas with flow accumulation values greater than 200.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_test288",
+            "task_text": "Load the data 'Richland_downtown_street_view_image_location_EPSG6569' firstly.Then use Inverse Distance Weighted (IDW) interpolation to create a DEM using the given point data. The elevation column is “elevatio_1”. The raster resolution is 10 m. Please only use the points having the “image_date” column values in year 2013 and after. Save the result as a raster file.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_test289",
+            "task_text": "Load the data 'Street_Tree_EPSG6852_subset' and 'Roads_Potland_EPSG6852_subset' firstly.Then identify the street tree count within 20-meter buffer for each street.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        }
+    ]
+}

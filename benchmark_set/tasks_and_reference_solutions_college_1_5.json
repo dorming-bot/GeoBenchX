@@ -1,0 +1,213 @@
+{
+    "metadata": {
+        "author": "ZSX",
+        "notes": "Version 1.1 task definitions without solutions"
+    },
+    "tasks": [
+        {
+            "task_ID": "TASK_test391",
+            "task_text": "Conduct a buffer analysis on the mangrove distribution map of Southeast Asia, generating impact zones around each mangrove patch within specified distances (e.g., 100 meters and 500 meters), and visualize the results.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_test392",
+            "task_text": "Quantify and visualize the spatial distribution density of traditional villages in the source region of Yellow River Basin. Comprehensively utilize the 'Traditional Villages of China' and the 'The source region of the Yellow River' . Calculate the number of traditional villages within each predefined grid cell (e.g., 10 km × 10 km) in the Yellow River Basin, and divide it by the grid cell area to obtain the density of traditional villages.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_test393",
+            "task_text": "Analyze the potential impact of the rainstorm and flood disaster in Xinxiang City, Henan Province, in July 2021 on the surrounding population distribution. First, extract the vector boundaries of the flood-inundated areas from the 'Xinxiang City Rainstorm and Flooding Dataset'. Then, create buffers at different distances (e.g., 500 meters, 1 km, and 3 km) around these flood-inundated areas.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_test394",
+            "task_text": "Assess the potential soil erosion risk in the Jalaid Banner area of Xing'an League, Inner Mongolia. The assessment requires integrating slope information derived from elevation data and land cover types (as a proxy for soil retention capacity) to spatially model and classify soil erosion risk in the region, identifying high-risk areas. The soil erosion risk is calculated as: erosion risk = slope risk factor * 0.6 + land cover retention capacity factor * 0.4. Generate a raster map of the soil erosion risk index.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_test395",
+            "task_text": "Apply a nonlinear 'trimmed mean' to China's 2010 population distribution dataset to identify and quantify the fundamental pattern of core population distribution within the region. In a neighborhood, such as 5x5, calculate the trimmed mean by removing the highest and lowest several pixel values and then computing the average. By visualizing the processed results, analyze how this filtering effectively removes outlier noise from extremely high or low population densities, thereby revealing a more representative and stable distribution of regional population density. This provides foundational insights for macro-level population pattern analysis.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_test396",
+            "task_text": "Based on the DEM data of Jalaid Banner, Xing'an League, Inner Mongolia, and the 'Inner Mongolia roads' dataset, comprehensively evaluate the suitability for wind turbine site selection. Considering factors such as terrain slope (restricting steep areas), aspect (optimizing wind energy capture), and existing road accessibility (reducing construction costs), identify the optimal areas for wind farm construction.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_test397",
+            "task_text": "Analyze the geographic distribution pattern of China's cropland cropping system resources. Utilize the raster data of the geographic distribution of China's cropland cropping system resources to calculate and visualize the spatial distribution and area of different cropping system types across the country, identifying the cropping system characteristics of major agricultural regions.",
+            "task_labels": [
+                "Spatial operations",
+                "Task Set 03",
+                "Process, Merge, Visualize",
+                "Merge, Visualize",
+                "Heatmaps, Contour Lines"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        }
+    ]
+}
