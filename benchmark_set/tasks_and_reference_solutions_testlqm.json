@@ -5,8 +5,8 @@
     },
     "tasks": [
         {
-            "task_ID": "TASK_test391",
-            "task_text": "Load 'T_9_Ex2_Arc_Clip' and generate the corresponding DEM file based on this contour vector layer.Then load 'T_9_Ex2_Arc_Clip_urb' 、'T_9_Ex2_Arc_Clip_road' and 'T_9_Ex2_Arc_Clip_river'.Finally based on the generated DEM and the three vector datasets (roads, urban areas, and rivers), create a 3D visualization.",
+            "task_ID": "TASK_test392",
+            "task_text": "Load the data 'T_9_tutor_3danalysis_CityModel' then convert it into 3D",
             "task_labels": [
                 "Spatial operations",
                 "Task Set 03",

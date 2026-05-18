@@ -74,6 +74,76 @@ def _wrap_tool_function(func):
     return wrapper
 
 
+def _crs_to_label(crs_obj: "CRS | None") -> str:
+    if crs_obj is None:
+        return "Unknown"
+    authority = crs_obj.to_authority()
+    if authority:
+        return f"{authority[0]}:{authority[1]}"
+    return crs_obj.to_string()
+
+
+def _bounds_look_geographic(bounds) -> bool:
+    try:
+        minx, miny, maxx, maxy = map(float, bounds)
+    except Exception:
+        return False
+    return (
+        -180.0 <= minx <= 180.0
+        and -180.0 <= maxx <= 180.0
+        and -90.0 <= miny <= 90.0
+        and -90.0 <= maxy <= 90.0
+        and abs(maxx - minx) <= 360.0
+        and abs(maxy - miny) <= 180.0
+    )
+
+
+def _resolve_dem_visualization_crs(
+    src_crs,
+    bounds,
+    vector_names: list[str],
+    state: dict,
+) -> tuple["CRS", str]:
+    if src_crs is not None:
+        resolved = CRS.from_user_input(src_crs)
+        return resolved, f"Using raster CRS {_crs_to_label(resolved)}."
+
+    if _bounds_look_geographic(bounds):
+        resolved = CRS.from_epsg(4326)
+        return resolved, "Raster CRS was missing; raster bounds look geographic, so EPSG:4326 was assumed."
+
+    candidate_counts: dict[str, int] = {}
+    candidate_lookup: dict[str, CRS] = {}
+    projected_counts: dict[str, int] = {}
+
+    for vector_name in vector_names:
+        gdf = state.get("data_store", {}).get(vector_name)
+        if gdf is None or not isinstance(gdf, gpd.GeoDataFrame) or gdf.crs is None:
+            continue
+        try:
+            candidate = CRS.from_user_input(gdf.crs)
+        except Exception:
+            continue
+        key = candidate.to_string()
+        candidate_lookup[key] = candidate
+        candidate_counts[key] = candidate_counts.get(key, 0) + 1
+        if candidate.is_projected:
+            projected_counts[key] = projected_counts.get(key, 0) + 1
+
+    if projected_counts:
+        key = max(projected_counts, key=projected_counts.get)
+        resolved = candidate_lookup[key]
+        return resolved, f"Raster CRS was missing; using dominant projected vector CRS {_crs_to_label(resolved)} as the working CRS."
+
+    if candidate_counts:
+        key = max(candidate_counts, key=candidate_counts.get)
+        resolved = candidate_lookup[key]
+        return resolved, f"Raster CRS was missing; using vector CRS {_crs_to_label(resolved)} as the working CRS."
+
+    resolved = CRS.from_epsg(3857)
+    return resolved, "Raster CRS was missing and no vector CRS was available; EPSG:3857 was used as a generic metric fallback."
+
+
 from shapely.ops import nearest_points, unary_union
 from pyproj import CRS, exceptions as pyproj_exceptions
 from scipy.ndimage import distance_transform_edt
@@ -269,7 +339,8 @@ GEO_CATALOG = {
     "T_9_Ex2_Arc_Clip":"T_9_Ex2_Arc_Clip.shp",
     "T_9_Ex2_Arc_Clip_urb":"T_9_Ex2_Arc_Clip_urb.shp",
     "T_9_Ex2_Arc_Clip_road":"T_9_Ex2_Arc_Clip_road.shp",
-    "T_9_Ex2_Arc_Clip_river":"T_9_Ex2_Arc_Clip_river.shp"
+    "T_9_Ex2_Arc_Clip_river":"T_9_Ex2_Arc_Clip_river.shp",
+    "T_9_tutor_3danalysis_CityModel":"T_9_tutor_3danalysis_CityModel.shp"
 
     }
 
@@ -322,7 +393,7 @@ RASTER_CATALOG = {
     "LT05_L1TP_123042_20110928_20200820_02_T1_B4":"LT05_L1TP_123042_20110928_20200820_02_T1_B4.tif",
     "composited_rgb":"composited_rgb.tif",
     "T_9_Ex1_dem":"T_9_Ex1_dem.tif",
-    "feature2Dto3D":"feature2Dto3D.tif"
+    "T_9_tutor_feature2Dto3D":"feature2Dto3D.tif"
 }
 
 COLORMAPS = {
@@ -2473,8 +2544,7 @@ def create_3d_dem_visualization(
             width = src.width
             height = src.height
 
-        if src_crs is None:
-            return "Error: DEM raster has no CRS."
+        working_crs, crs_note = _resolve_dem_visualization_crs(src_crs, bounds, vector_names, state)
 
         valid_mask = np.isfinite(dem)
         if nodata is not None:
@@ -2542,7 +2612,7 @@ def create_3d_dem_visualization(
                 continue
             if gdf.crs is None:
                 continue
-            aligned = gdf.to_crs(src_crs)
+            aligned = gdf.to_crs(working_crs)
             aligned = aligned[aligned.geometry.notna() & (~aligned.geometry.is_empty)].copy()
             if aligned.empty:
                 continue
@@ -2658,12 +2728,14 @@ def create_3d_dem_visualization(
             "z_exaggeration": z_exaggeration,
             "elevation_min": z_min,
             "elevation_max": z_max,
-            "crs": src_crs.to_string(),
+            "crs": working_crs.to_string(),
+            "crs_note": crs_note,
             "timestamp_utc": timestamp_utc,
         }
 
         return (
             f"Created interactive 3D DEM visualization from '{Path(dem_raster_path).name}'.\n"
+            f"- CRS: {working_crs.to_string()}\n"
             f"- Output HTML: {output_path_obj.as_posix()}\n"
             f"- Display grid: {dem_small.shape[1]} x {dem_small.shape[0]} (stride {stride})\n"
             f"- Elevation range: {z_min:.3f} to {z_max:.3f}\n"
