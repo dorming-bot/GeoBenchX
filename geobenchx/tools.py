@@ -11,6 +11,7 @@ from pathlib import Path
 import ast
 import io
 import base64
+import json
 from datetime import datetime
 
 import matplotlib
@@ -35,10 +36,11 @@ import rasterio
 from rasterio.crs import CRS as RasterioCRS
 from rasterio.warp import reproject, Resampling, calculate_default_transform
 from rasterio.mask import mask
-from rasterio.transform import array_bounds
+from rasterio.transform import array_bounds, from_origin
 from rasterio.features import shapes, rasterize
 from affine import Affine
 import plotly.express as px
+import plotly.graph_objects as go
 import contextily as ctx
 from osgeo import gdal, gdal_array, ogr, osr
 from osgeo.gdalconst import *
@@ -75,6 +77,8 @@ def _wrap_tool_function(func):
 from shapely.ops import nearest_points, unary_union
 from pyproj import CRS, exceptions as pyproj_exceptions
 from scipy.ndimage import distance_transform_edt
+from scipy.interpolate import griddata
+from scipy.spatial import Voronoi
 from sklearn.neighbors import KernelDensity
 import re
 
@@ -257,7 +261,16 @@ GEO_CATALOG = {
     "NanJingBoundaries":"NanJingBoundaries.shp",
     "City walls in Chinese cities during the late imperial period (15th-19th centuries)":"MingQingCityWall.shp",
     "HeavyRain_Region_in_China":"HeavyRain_Region_in_China.shp",
-    "mangrove distribution map of Southeast Asia":"mangrove2015.shp"
+    "mangrove distribution map of Southeast Asia":"mangrove2015.shp",
+    "T_7.5_Ex1_school":"T_7.5_Ex1_school.shp",
+    "T_7.5_Ex1_network":"T_7.5_Ex1_network.shp",
+    "T_7.5_Ex1_Marketplace":"T_7.5_Ex1_Marketplace.shp",
+    "T_7.5_Ex1_famousplace":"T_7.5_Ex1_famousplace.shp",
+    "T_9_Ex2_Arc_Clip":"T_9_Ex2_Arc_Clip.shp",
+    "T_9_Ex2_Arc_Clip_urb":"T_9_Ex2_Arc_Clip_urb.shp",
+    "T_9_Ex2_Arc_Clip_road":"T_9_Ex2_Arc_Clip_road.shp",
+    "T_9_Ex2_Arc_Clip_river":"T_9_Ex2_Arc_Clip_river.shp"
+
     }
 
 RASTER_CATALOG = {
@@ -307,7 +320,9 @@ RASTER_CATALOG = {
     "LT05_L1TP_123042_20110928_20200820_02_T1_B2":"LT05_L1TP_123042_20110928_20200820_02_T1_B2.tif",
     "LT05_L1TP_123042_20110928_20200820_02_T1_B3":"LT05_L1TP_123042_20110928_20200820_02_T1_B3.tif",
     "LT05_L1TP_123042_20110928_20200820_02_T1_B4":"LT05_L1TP_123042_20110928_20200820_02_T1_B4.tif",
-    "composited_rgb":"composited_rgb.tif"
+    "composited_rgb":"composited_rgb.tif",
+    "T_9_Ex1_dem":"T_9_Ex1_dem.tif",
+    "feature2Dto3D":"feature2Dto3D.tif"
 }
 
 COLORMAPS = {
@@ -2236,6 +2251,430 @@ def generate_profile_curvature_map(
         return f"Error generating profile curvature raster: {type(e).__name__} : {str(e)}"
 
 
+def generate_plan_curvature_map(
+    dem_raster_path: Annotated[str, "Path to the DEM raster used for plan curvature calculation"],
+    output_variable_name: Annotated[str, "Name for storing plan curvature metadata in the state"],
+    state: Annotated[dict, InjectedState],
+    output_raster_path: Annotated[str | None, "Optional custom path for saving the curvature raster (defaults to SCRATCHPATH/plan_curvature_<name>.tif)"] = None,
+    overwrite_existing: Annotated[bool, "Allow overwriting if the curvature file already exists at the destination"] = True,
+    append_timestamp_to_output: Annotated[bool, "Append UTC timestamp to the curvature filename for bookkeeping"] = True,
+    plot_title: Annotated[str, "Title displayed on the curvature visualization"] = "DEM-derived Plan Curvature",
+    colormap: Annotated[str, "Matplotlib colormap name used for pseudocolor rendering"] = "RdBu"
+) -> str:
+    """
+    Generate plan curvature from a DEM using finite-difference first- and second-order derivatives.
+    Plan curvature describes curvature perpendicular to slope direction and is saved as a GeoTIFF in scratch.
+    """
+    try:
+        if "data_store" not in state:
+            state["data_store"] = {}
+        if "image_store" not in state:
+            state["image_store"] = []
+
+        if not dem_raster_path:
+            return "Error: dem_raster_path must be provided."
+        if not os.path.exists(dem_raster_path):
+            return f"Error: DEM raster '{dem_raster_path}' not found."
+
+        timestamp_utc = datetime.utcnow().strftime("%Y%m%dT%H%M%S")
+
+        if output_raster_path is None:
+            scratch_root = Path(SCRATCH_PATH) if SCRATCH_PATH else Path(__file__).resolve().parent.parent / "scratch"
+            scratch_root.mkdir(parents=True, exist_ok=True)
+            default_name = f"plan_curvature_{Path(dem_raster_path).stem}.tif"
+            output_path_obj = scratch_root / default_name
+        else:
+            output_path_obj = Path(output_raster_path)
+            output_path_obj.parent.mkdir(parents=True, exist_ok=True)
+
+        if append_timestamp_to_output:
+            suffix = output_path_obj.suffix or ".tif"
+            output_path_obj = output_path_obj.with_name(f"{output_path_obj.stem}_{timestamp_utc}{suffix}")
+
+        if output_path_obj.exists():
+            if overwrite_existing:
+                output_path_obj.unlink()
+                aux_file = output_path_obj.with_suffix(output_path_obj.suffix + ".aux.xml")
+                if aux_file.exists():
+                    aux_file.unlink()
+            else:
+                return f"Error: Output raster '{output_path_obj.as_posix()}' already exists. Enable overwrite or choose another path."
+
+        with rasterio.open(dem_raster_path) as src:
+            dem_data = src.read(1).astype("float64")
+            nodata = src.nodata
+            transform = src.transform
+            profile = src.profile
+
+        if dem_data.size == 0:
+            return "Error: DEM raster is empty."
+
+        valid_mask = np.isfinite(dem_data)
+        if nodata is not None:
+            valid_mask &= dem_data != nodata
+        dem_array = np.where(valid_mask, dem_data, np.nan)
+
+        pixel_width = abs(transform.a)
+        pixel_height = abs(transform.e)
+        if pixel_width == 0 or pixel_height == 0:
+            return "Error: DEM pixel size is zero, cannot compute curvature."
+
+        d_dy, d_dx = np.gradient(dem_array, pixel_height, pixel_width, edge_order=2)
+        p = d_dx
+        q = d_dy
+        r = np.gradient(p, pixel_width, axis=1, edge_order=2)
+        t = np.gradient(q, pixel_height, axis=0, edge_order=2)
+        s1 = np.gradient(p, pixel_height, axis=0, edge_order=2)
+        s2 = np.gradient(q, pixel_width, axis=1, edge_order=2)
+        s = 0.5 * (s1 + s2)
+
+        p2 = p ** 2
+        q2 = q ** 2
+        sum_pq = p2 + q2
+        numerator = r * q2 - 2 * s * p * q + t * p2
+        denom = np.power(sum_pq, 1.5)
+
+        curvature = np.full_like(dem_array, np.nan, dtype=np.float64)
+        np.divide(numerator, denom, out=curvature, where=denom != 0)
+
+        finite_vals = curvature[np.isfinite(curvature)]
+        if finite_vals.size > 0:
+            stats = {
+                "count": int(finite_vals.size),
+                "min": float(finite_vals.min()),
+                "max": float(finite_vals.max()),
+                "mean": float(finite_vals.mean()),
+                "std": float(finite_vals.std(ddof=1)) if finite_vals.size > 1 else 0.0
+            }
+            max_abs_value = float(np.nanmax(np.abs(finite_vals)))
+        else:
+            stats = {"count": 0, "min": None, "max": None, "mean": None, "std": None}
+            max_abs_value = None
+
+        profile.update(dtype="float32", nodata=-9999.0, count=1, compress="deflate")
+        curvature_to_write = np.where(np.isfinite(curvature), curvature, profile["nodata"]).astype("float32")
+
+        with rasterio.open(output_path_obj.as_posix(), "w", **profile) as dst:
+            dst.write(curvature_to_write, 1)
+
+        bounds = array_bounds(curvature_to_write.shape[0], curvature_to_write.shape[1], transform)
+        masked_array = np.ma.masked_where(~np.isfinite(curvature), curvature)
+        fig, ax = plt.subplots(1, 1, figsize=(10, 8))
+        img = ax.imshow(
+            masked_array,
+            cmap=plt.get_cmap(colormap),
+            extent=(bounds[0], bounds[2], bounds[1], bounds[3]),
+            origin="upper",
+            vmin=(-max_abs_value if max_abs_value is not None else None),
+            vmax=(max_abs_value if max_abs_value is not None else None)
+        )
+        ax.set_title(plot_title)
+        ax.set_axis_off()
+        cbar = plt.colorbar(img, ax=ax, fraction=0.036, pad=0.02)
+        cbar.set_label("Plan curvature (1/m)")
+        buf = io.BytesIO()
+        fig.savefig(buf, format="png", bbox_inches="tight", dpi=150)
+        buf.seek(0)
+        img_base64 = base64.b64encode(buf.read()).decode("utf-8")
+        buf.close()
+        plt.close(fig)
+
+        state["image_store"].append({
+            "type": "map",
+            "description": f"Plan curvature preview for {Path(dem_raster_path).name}",
+            "base64": img_base64
+        })
+
+        state["data_store"][output_variable_name] = {
+            "plan_curvature_raster_path": output_path_obj.as_posix(),
+            "statistics": stats,
+            "dem_raster_path": dem_raster_path,
+            "timestamp_utc": timestamp_utc,
+            "method": "finite_difference_plan_curvature"
+        }
+
+        def _fmt_stat(value: float | None) -> str:
+            return f"{value:.6f}" if value is not None else "N/A"
+
+        summary_lines = [
+            f"- Min curvature: {_fmt_stat(stats['min'])}",
+            f"- Max curvature: {_fmt_stat(stats['max'])}",
+            f"- Mean curvature: {_fmt_stat(stats['mean'])}",
+            f"- Valid pixels: {stats['count']:,}"
+        ]
+
+        summary = (
+            f"Generated plan curvature raster from DEM '{Path(dem_raster_path).name}'.\n"
+            f"Processing timestamp (UTC): {timestamp_utc}.\n"
+            f"Output saved to '{output_path_obj.as_posix()}'.\n" +
+            "\n".join(summary_lines)
+        )
+        if append_timestamp_to_output:
+            summary += "\n(Output filename includes the UTC timestamp for traceability.)"
+
+        return summary
+
+    except Exception as e:
+        return f"Error generating plan curvature raster: {type(e).__name__} : {str(e)}"
+
+
+def create_3d_dem_visualization(
+    dem_raster_path: Annotated[str, "Path to the DEM raster to visualize in 3D"],
+    output_variable_name: Annotated[str, "Name for storing 3D visualization metadata in data_store"],
+    state: Annotated[dict, InjectedState],
+    vector_geodataframe_names: Annotated[list[str] | str | None, "Optional list of vector GeoDataFrame names to overlay in 3D, or JSON-string list"] = None,
+    output_html_path: Annotated[str | None, "Optional output HTML path. Defaults to scratch/dem_3d_<name>.html"] = None,
+    band_number: Annotated[int, "1-based DEM band index"] = 1,
+    max_grid_size: Annotated[int, "Maximum DEM cells along the largest dimension after downsampling"] = 220,
+    z_exaggeration: Annotated[float, "Vertical exaggeration multiplier"] = 1.0,
+    surface_colormap: Annotated[str, "Plotly colorscale for the DEM surface"] = "Earth",
+    vector_sample_distance: Annotated[float | None, "Optional distance for sampling line/polygon vectors in raster CRS units"] = None,
+    vector_z_offset: Annotated[float, "Vertical offset added to vector overlay elevations"] = 1.0,
+    title: Annotated[str, "Title displayed in the 3D visualization"] = "3D DEM Visualization",
+    append_timestamp_to_output: Annotated[bool, "Append UTC timestamp to output HTML filename"] = True,
+    overwrite_existing: Annotated[bool, "Allow overwriting an existing HTML output"] = True,
+) -> str:
+    """Create an interactive Plotly 3D DEM surface, optionally draped with vector overlays, and save it as HTML."""
+    try:
+        if "data_store" not in state:
+            state["data_store"] = {}
+        if "html_store" not in state:
+            state["html_store"] = []
+
+        if not dem_raster_path:
+            return "Error: dem_raster_path must be provided."
+        if not dem_raster_path.startswith("zip://") and not os.path.exists(dem_raster_path):
+            return f"Error: DEM raster '{dem_raster_path}' not found."
+        if band_number < 1:
+            return "Error: band_number must be 1 or greater."
+        if max_grid_size < 20:
+            return "Error: max_grid_size must be at least 20."
+        if z_exaggeration <= 0:
+            return "Error: z_exaggeration must be positive."
+
+        if isinstance(vector_geodataframe_names, str):
+            try:
+                vector_names = ast.literal_eval(vector_geodataframe_names)
+            except Exception:
+                vector_names = [vector_geodataframe_names]
+        elif vector_geodataframe_names is None:
+            vector_names = []
+        else:
+            vector_names = list(vector_geodataframe_names)
+
+        with rasterio.open(dem_raster_path) as src:
+            if band_number > src.count:
+                return f"Error: band_number {band_number} is outside available bands (1-{src.count})."
+            dem = src.read(band_number).astype("float64")
+            transform = src.transform
+            bounds = src.bounds
+            src_crs = src.crs
+            nodata = src.nodata
+            width = src.width
+            height = src.height
+
+        if src_crs is None:
+            return "Error: DEM raster has no CRS."
+
+        valid_mask = np.isfinite(dem)
+        if nodata is not None:
+            valid_mask &= dem != nodata
+        if not valid_mask.any():
+            return "Error: DEM raster contains no valid elevation values."
+        dem = np.where(valid_mask, dem, np.nan)
+
+        stride = max(1, int(math.ceil(max(height, width) / max_grid_size)))
+        dem_small = dem[::stride, ::stride]
+        row_idx = np.arange(0, height, stride)[: dem_small.shape[0]]
+        col_idx = np.arange(0, width, stride)[: dem_small.shape[1]]
+        xs = transform.c + (col_idx + 0.5) * transform.a + (0.5) * transform.b
+        ys = transform.f + (row_idx + 0.5) * transform.e + (0.5) * transform.d
+
+        z_surface = dem_small * z_exaggeration
+        finite_vals = dem[np.isfinite(dem)]
+        z_min = float(finite_vals.min())
+        z_max = float(finite_vals.max())
+
+        fig = go.Figure()
+        fig.add_trace(
+            go.Surface(
+                x=xs,
+                y=ys,
+                z=z_surface,
+                surfacecolor=dem_small,
+                colorscale=surface_colormap,
+                colorbar={"title": "Elevation"},
+                name="DEM",
+                showscale=True,
+                hovertemplate="X: %{x:.2f}<br>Y: %{y:.2f}<br>Elevation: %{surfacecolor:.2f}<extra></extra>",
+            )
+        )
+
+        def _sample_raster_z(x_vals: np.ndarray, y_vals: np.ndarray) -> np.ndarray:
+            inv = ~transform
+            cols = []
+            rows = []
+            for x_val, y_val in zip(x_vals, y_vals):
+                col, row = inv * (float(x_val), float(y_val))
+                cols.append(int(round(col)))
+                rows.append(int(round(row)))
+            cols_arr = np.asarray(cols)
+            rows_arr = np.asarray(rows)
+            ok = (rows_arr >= 0) & (rows_arr < height) & (cols_arr >= 0) & (cols_arr < width)
+            z_vals = np.full(len(x_vals), np.nan, dtype="float64")
+            z_vals[ok] = dem[rows_arr[ok], cols_arr[ok]]
+            return (z_vals * z_exaggeration) + vector_z_offset
+
+        def _sample_line(line_geom):
+            if line_geom.length == 0:
+                coords = list(line_geom.coords)
+                return coords
+            interval = vector_sample_distance
+            if interval is None:
+                interval = max(abs(transform.a), abs(transform.e)) * stride
+            n_steps = max(int(math.ceil(line_geom.length / max(float(interval), 1e-9))), 1)
+            return [(pt.x, pt.y) for pt in (line_geom.interpolate(float(d)) for d in np.linspace(0, line_geom.length, n_steps + 1))]
+
+        overlay_count = 0
+        for vector_name in vector_names:
+            gdf = state["data_store"].get(vector_name)
+            if gdf is None or not isinstance(gdf, gpd.GeoDataFrame) or gdf.empty:
+                continue
+            if gdf.crs is None:
+                continue
+            aligned = gdf.to_crs(src_crs)
+            aligned = aligned[aligned.geometry.notna() & (~aligned.geometry.is_empty)].copy()
+            if aligned.empty:
+                continue
+
+            x_trace: list[float | None] = []
+            y_trace: list[float | None] = []
+            z_trace: list[float | None] = []
+            marker_x: list[float] = []
+            marker_y: list[float] = []
+
+            for geom in aligned.geometry:
+                geoms = list(geom.geoms) if geom.geom_type.startswith("Multi") else [geom]
+                for part in geoms:
+                    if part.geom_type == "Point":
+                        marker_x.append(part.x)
+                        marker_y.append(part.y)
+                    elif part.geom_type == "LineString":
+                        coords = _sample_line(part)
+                        if coords:
+                            xs_line = np.asarray([c[0] for c in coords], dtype="float64")
+                            ys_line = np.asarray([c[1] for c in coords], dtype="float64")
+                            zs_line = _sample_raster_z(xs_line, ys_line)
+                            x_trace.extend(xs_line.tolist() + [None])
+                            y_trace.extend(ys_line.tolist() + [None])
+                            z_trace.extend(zs_line.tolist() + [None])
+                    elif part.geom_type == "Polygon":
+                        coords = _sample_line(part.exterior)
+                        if coords:
+                            xs_line = np.asarray([c[0] for c in coords], dtype="float64")
+                            ys_line = np.asarray([c[1] for c in coords], dtype="float64")
+                            zs_line = _sample_raster_z(xs_line, ys_line)
+                            x_trace.extend(xs_line.tolist() + [None])
+                            y_trace.extend(ys_line.tolist() + [None])
+                            z_trace.extend(zs_line.tolist() + [None])
+
+            if x_trace:
+                fig.add_trace(
+                    go.Scatter3d(
+                        x=x_trace,
+                        y=y_trace,
+                        z=z_trace,
+                        mode="lines",
+                        name=vector_name,
+                        line={"width": 4},
+                    )
+                )
+                overlay_count += 1
+            if marker_x:
+                mx = np.asarray(marker_x, dtype="float64")
+                my = np.asarray(marker_y, dtype="float64")
+                mz = _sample_raster_z(mx, my)
+                fig.add_trace(
+                    go.Scatter3d(
+                        x=mx,
+                        y=my,
+                        z=mz,
+                        mode="markers",
+                        name=f"{vector_name} points",
+                        marker={"size": 4},
+                    )
+                )
+                overlay_count += 1
+
+        fig.update_layout(
+            title=title,
+            scene={
+                "xaxis_title": "X",
+                "yaxis_title": "Y",
+                "zaxis_title": "Elevation",
+                "aspectmode": "data",
+            },
+            margin={"l": 0, "r": 0, "b": 0, "t": 45},
+            height=800,
+        )
+
+        timestamp_utc = datetime.utcnow().strftime("%Y%m%dT%H%M%S")
+        scratch_root = Path(SCRATCH_PATH) if SCRATCH_PATH else Path(__file__).resolve().parent.parent / "scratch"
+        scratch_root.mkdir(parents=True, exist_ok=True)
+        if output_html_path is None:
+            output_path_obj = scratch_root / f"dem_3d_{Path(dem_raster_path).stem}.html"
+        else:
+            output_path_obj = Path(output_html_path)
+            output_path_obj.parent.mkdir(parents=True, exist_ok=True)
+        if output_path_obj.suffix.lower() != ".html":
+            output_path_obj = output_path_obj.with_suffix(".html")
+        if append_timestamp_to_output:
+            output_path_obj = output_path_obj.with_name(f"{output_path_obj.stem}_{timestamp_utc}{output_path_obj.suffix}")
+        if output_path_obj.exists():
+            if overwrite_existing:
+                output_path_obj.unlink()
+            else:
+                return f"Error: Output HTML '{output_path_obj.as_posix()}' already exists. Enable overwrite or choose another path."
+
+        html_string = fig.to_html(include_plotlyjs="cdn", full_html=True)
+        output_path_obj.write_text(html_string, encoding="utf-8")
+
+        state["html_store"].append({
+            "type": "interactive_3d_map",
+            "description": f"3D DEM visualization for {Path(dem_raster_path).name}",
+            "html": html_string,
+            "path": output_path_obj.as_posix(),
+        })
+        state["data_store"][output_variable_name] = {
+            "html_path": output_path_obj.as_posix(),
+            "dem_raster_path": dem_raster_path,
+            "vector_overlays": vector_names,
+            "overlay_trace_count": overlay_count,
+            "source_width": width,
+            "source_height": height,
+            "display_width": int(dem_small.shape[1]),
+            "display_height": int(dem_small.shape[0]),
+            "downsample_stride": stride,
+            "z_exaggeration": z_exaggeration,
+            "elevation_min": z_min,
+            "elevation_max": z_max,
+            "crs": src_crs.to_string(),
+            "timestamp_utc": timestamp_utc,
+        }
+
+        return (
+            f"Created interactive 3D DEM visualization from '{Path(dem_raster_path).name}'.\n"
+            f"- Output HTML: {output_path_obj.as_posix()}\n"
+            f"- Display grid: {dem_small.shape[1]} x {dem_small.shape[0]} (stride {stride})\n"
+            f"- Elevation range: {z_min:.3f} to {z_max:.3f}\n"
+            f"- Vector overlay traces: {overlay_count}\n"
+            f"- Metadata stored as '{output_variable_name}'."
+        )
+
+    except Exception as e:
+        return f"Error creating 3D DEM visualization: {type(e).__name__} : {str(e)}"
+
+
 def rasterize_vector_to_match_raster(
     geodataframe_name: Annotated[str, "Name of the GeoDataFrame (usually a buffer result) stored in the data_store"],
     reference_raster_path: Annotated[str, "Path to the raster whose extent, CRS, and pixel size should be matched"],
@@ -2799,6 +3238,11 @@ def create_dissolved_buffer(
     dissolve_by_attribute: Annotated[Optional[str], "Column whose categories should be dissolved independently. Leave blank to merge into a single buffer."] = None,
     output_file_path: Annotated[Optional[str], "Optional path (e.g., .shp, .gpkg, .geojson) to save the dissolved buffer"] = None,
     overwrite_existing: Annotated[bool, "Whether to overwrite an existing file at output_file_path"] = True,
+    buffer_crs: Annotated[Optional[str], "Optional CRS used for the planar buffer operation. Use this to match QGIS processing CRS exactly."] = None,
+    segments: Annotated[int, "Number of line segments per quarter circle. QGIS Buffer default is 5."] = 5,
+    cap_style: Annotated[Literal["round", "flat", "square"], "End cap style for line buffers. QGIS Buffer default is round."] = "round",
+    join_style: Annotated[Literal["round", "miter", "bevel"], "Join style for corners. QGIS Buffer default is round."] = "round",
+    mitre_limit: Annotated[float, "Miter limit used when join_style is miter. QGIS Buffer default is 2.0."] = 2.0,
     basemap_style: Annotated[Literal["OpenStreetMap", "Carto Positron", "Carto Dark"], "Basemap provider used for the preview figure"] = "Carto Positron",
     plot_title: Annotated[Optional[str], "Title shown on the preview map"] = None
 ) -> str:
@@ -2814,6 +3258,11 @@ def create_dissolved_buffer(
         dissolve_by_attribute: Optional column name for grouped dissolves; defaults to full merge
         output_file_path: Optional filepath to store the dissolved buffer (defaults to SCRATCHPATH/<output_geodataframe_name>.shp)
         overwrite_existing: Whether to overwrite an existing vector file
+        buffer_crs: Optional processing CRS. If omitted, projected meter CRS inputs are buffered in their native CRS; geographic inputs use estimated UTM.
+        segments: Number of segments per quarter circle; QGIS Buffer defaults to 5
+        cap_style: Buffer end cap style for line features
+        join_style: Buffer corner style
+        mitre_limit: Miter limit used when join_style is miter
         basemap_style: Tile provider for visualization
         plot_title: Custom title for the generated preview map
 
@@ -2834,19 +3283,51 @@ def create_dissolved_buffer(
         if geodataframe.crs is None:
             return "Error: Source GeoDataFrame has no CRS. Please assign one before buffering."
 
-        try:
-            metric_crs = geodataframe.estimate_utm_crs()
-        except pyproj_exceptions.CRSError:
-            metric_crs = None
+        if buffer_size_meters < 0:
+            return "Error: buffer_size_meters must be non-negative"
+        if segments < 1:
+            return "Error: segments must be at least 1"
+        if mitre_limit <= 0:
+            return "Error: mitre_limit must be positive"
 
-        if metric_crs is None:
-            metric_crs_code = "EPSG:3857"
+        source_crs = CRS.from_user_input(geodataframe.crs)
+        if buffer_crs:
+            metric_crs_code = CRS.from_user_input(buffer_crs).to_string()
+            crs_note = f"Used user-provided buffer CRS {metric_crs_code}."
+        elif source_crs.is_projected and any(
+            (axis.unit_name or "").lower() in {"metre", "meter", "metres", "meters"}
+            for axis in source_crs.axis_info
+        ):
+            metric_crs_code = source_crs.to_string()
+            crs_note = f"Used source projected CRS {metric_crs_code}."
         else:
-            metric_crs_code = metric_crs.to_string()
+            try:
+                metric_crs = geodataframe.estimate_utm_crs()
+            except pyproj_exceptions.CRSError:
+                metric_crs = None
+            metric_crs_code = metric_crs.to_string() if metric_crs is not None else "EPSG:3857"
+            crs_note = f"Used estimated metric CRS {metric_crs_code}."
 
         geodataframe_metric = geodataframe.to_crs(metric_crs_code)
         buffered = geodataframe_metric.copy()
-        buffered.geometry = buffered.geometry.buffer(buffer_size_meters)
+        cap_style_lookup = {"round": 1, "flat": 2, "square": 3}
+        join_style_lookup = {"round": 1, "miter": 2, "bevel": 3}
+        try:
+            buffered.geometry = buffered.geometry.buffer(
+                buffer_size_meters,
+                quad_segs=segments,
+                cap_style=cap_style_lookup[cap_style],
+                join_style=join_style_lookup[join_style],
+                mitre_limit=mitre_limit,
+            )
+        except TypeError:
+            buffered.geometry = buffered.geometry.buffer(
+                buffer_size_meters,
+                resolution=segments,
+                cap_style=cap_style_lookup[cap_style],
+                join_style=join_style_lookup[join_style],
+                mitre_limit=mitre_limit,
+            )
 
         if dissolve_by_attribute:
             if dissolve_by_attribute not in buffered.columns:
@@ -2967,6 +3448,8 @@ def create_dissolved_buffer(
             f"Created {buffer_size_meters:.0f}m buffer from '{geodataframe_name}' "
             f"and stored dissolved result as '{output_geodataframe_name}'.\n"
             f"{dissolve_note}\n"
+            f"{crs_note} Buffer parameters: segments={segments}, cap_style={cap_style}, "
+            f"join_style={join_style}, mitre_limit={mitre_limit}.\n"
             f"Input features: {len(geodataframe)}, output features: {len(dissolved_original_crs)}.\n"
             f"GeoDataFrame details:\n{info_string}\n"
             f"Vector file saved to: {saved_file_path}"
@@ -3302,6 +3785,187 @@ def convert_csv_to_shapefile(
         )
     except Exception as e:
         return f"Error converting CSV to shapefile: {type(e).__name__} : {str(e)}"
+
+
+def export_transformed_data_to_csv(
+    source_dataframe_name: Annotated[str, "Name of source DataFrame/GeoDataFrame in data_store"],
+    output_csv_name: Annotated[str, "Output CSV file name, e.g. result.csv"],
+    transformation: Annotated[
+        Literal["geometry_coordinates", "pairwise_point_distances", "point_to_line_distances", "spatial_aggregation"],
+        "Transformation type to apply before exporting CSV",
+    ],
+    state: Annotated[dict, InjectedState],
+    secondary_dataframe_name: Annotated[str | None, "Optional second GeoDataFrame name for distance/aggregation transforms"] = None,
+    value_column: Annotated[str | None, "Numeric column used in spatial_aggregation"] = None,
+    id_column: Annotated[str | None, "ID column for spatial_aggregation output; default uses source index"] = None,
+    aggregation: Annotated[Literal["sum", "mean", "min", "max", "count"], "Aggregation used in spatial_aggregation"] = "mean",
+    selected_columns: Annotated[List[str] | None, "Optional column list to keep in exported CSV (in given order)"] = None,
+    output_dataframe_name: Annotated[str | None, "Optional state key to save transformed DataFrame"] = None,
+) -> str:
+    """Transform a stored DataFrame/GeoDataFrame as requested and export the result CSV to the project scratch folder."""
+    try:
+        if "data_store" not in state:
+            state["data_store"] = {}
+
+        source = state["data_store"].get(source_dataframe_name)
+        if source is None:
+            return f"Error: '{source_dataframe_name}' not found in data_store"
+        if not isinstance(source, (pd.DataFrame, gpd.GeoDataFrame)):
+            return f"Error: '{source_dataframe_name}' is not a DataFrame/GeoDataFrame"
+        if source.empty:
+            return f"Error: '{source_dataframe_name}' is empty"
+
+        result_df: pd.DataFrame
+
+        if transformation == "geometry_coordinates":
+            if not isinstance(source, gpd.GeoDataFrame):
+                return "Error: geometry_coordinates requires a GeoDataFrame source"
+            if "geometry" not in source.columns:
+                return "Error: source GeoDataFrame has no geometry column"
+
+            rows = []
+            for idx, geom in source.geometry.items():
+                if geom is None or geom.is_empty:
+                    rows.append({"index": idx, "geometry_type": None, "coordinates": None})
+                    continue
+                rows.append(
+                    {
+                        "index": idx,
+                        "geometry_type": geom.geom_type,
+                        "coordinates": json.dumps(mapping(geom)["coordinates"], ensure_ascii=True),
+                    }
+                )
+            result_df = pd.DataFrame(rows)
+
+        elif transformation == "pairwise_point_distances":
+            if not isinstance(source, gpd.GeoDataFrame):
+                return "Error: pairwise_point_distances requires a GeoDataFrame source"
+            if source.geometry.is_empty.all():
+                return "Error: source GeoDataFrame has no valid geometries"
+            only_points = source.geometry.geom_type.isin(["Point", "MultiPoint"]).all()
+            if not only_points:
+                return "Error: pairwise_point_distances requires point geometries only"
+
+            projected = source.to_crs(source.estimate_utm_crs()) if source.crs else source.copy()
+            records = []
+            indices = list(projected.index)
+            geoms = list(projected.geometry)
+            for i, idx_i in enumerate(indices):
+                for j, idx_j in enumerate(indices):
+                    dist_m = geoms[i].distance(geoms[j])
+                    records.append(
+                        {
+                            "source_index": idx_i,
+                            "target_index": idx_j,
+                            "distance_m": float(dist_m),
+                            "distance_km": float(dist_m / 1000.0),
+                        }
+                    )
+            result_df = pd.DataFrame(records)
+
+        elif transformation == "point_to_line_distances":
+            if secondary_dataframe_name is None:
+                return "Error: point_to_line_distances requires secondary_dataframe_name"
+            secondary = state["data_store"].get(secondary_dataframe_name)
+            if secondary is None or not isinstance(secondary, gpd.GeoDataFrame):
+                return f"Error: secondary GeoDataFrame '{secondary_dataframe_name}' not found"
+            if not isinstance(source, gpd.GeoDataFrame):
+                return "Error: point_to_line_distances requires a GeoDataFrame source"
+
+            if source.crs and secondary.crs and source.crs != secondary.crs:
+                secondary = secondary.to_crs(source.crs)
+
+            projected_source = source.to_crs(source.estimate_utm_crs()) if source.crs else source.copy()
+            projected_secondary = secondary.to_crs(projected_source.crs) if projected_source.crs and secondary.crs else secondary.copy()
+
+            target_union = unary_union(projected_secondary.geometry.dropna())
+            if target_union.is_empty:
+                return f"Error: '{secondary_dataframe_name}' has no valid geometries"
+
+            rows = []
+            for idx, geom in projected_source.geometry.items():
+                if geom is None or geom.is_empty:
+                    rows.append({"index": idx, "distance_m": None, "distance_km": None})
+                    continue
+                dist_m = geom.distance(target_union)
+                rows.append({"index": idx, "distance_m": float(dist_m), "distance_km": float(dist_m / 1000.0)})
+            result_df = pd.DataFrame(rows)
+
+        else:  # spatial_aggregation
+            if value_column is None:
+                return "Error: spatial_aggregation requires value_column"
+            if not isinstance(source, gpd.GeoDataFrame):
+                return "Error: spatial_aggregation requires a GeoDataFrame source"
+            if secondary_dataframe_name is None:
+                # Support already-intersected source layers: aggregate directly on source.
+                if value_column not in source.columns:
+                    return (
+                        f"Error: value_column '{value_column}' not found in source "
+                        f"'{source_dataframe_name}'. Provide secondary_dataframe_name or a source containing this column."
+                    )
+                source_df = source.copy()
+                source_df[value_column] = pd.to_numeric(source_df[value_column], errors="coerce")
+                group_key = id_column if (id_column and id_column in source_df.columns) else "__src_idx__"
+                if group_key == "__src_idx__":
+                    source_df[group_key] = source_df.index
+                agg_df = (
+                    source_df.groupby(group_key, dropna=False)[value_column]
+                    .agg(aggregation)
+                    .reset_index()
+                )
+                agg_df.columns = ["index", value_column]
+                result_df = agg_df
+            else:
+                secondary = state["data_store"].get(secondary_dataframe_name)
+                if secondary is None or not isinstance(secondary, gpd.GeoDataFrame):
+                    return f"Error: secondary GeoDataFrame '{secondary_dataframe_name}' not found"
+                if value_column not in secondary.columns:
+                    return f"Error: value_column '{value_column}' not found in '{secondary_dataframe_name}'"
+
+                left = source.copy()
+                right = secondary.copy()
+                if left.crs and right.crs and left.crs != right.crs:
+                    right = right.to_crs(left.crs)
+
+                join_df = gpd.sjoin(left, right[[value_column, "geometry"]], how="left", predicate="intersects")
+                join_df[value_column] = pd.to_numeric(join_df[value_column], errors="coerce")
+
+                group_key = id_column if (id_column and id_column in join_df.columns) else "__src_idx__"
+                if group_key == "__src_idx__":
+                    join_df[group_key] = join_df.index
+
+                agg_df = (
+                    join_df.groupby(group_key, dropna=False)[value_column]
+                    .agg(aggregation)
+                    .reset_index()
+                )
+                agg_df.columns = ["index", value_column]
+                result_df = agg_df
+
+        if selected_columns:
+            missing_cols = [c for c in selected_columns if c not in result_df.columns]
+            if missing_cols:
+                return f"Error: selected_columns not found in result: {missing_cols}"
+            result_df = result_df[selected_columns]
+
+        scratch_root = Path(SCRATCH_PATH) if SCRATCH_PATH else Path(__file__).resolve().parent.parent / "scratch"
+        scratch_root.mkdir(parents=True, exist_ok=True)
+        normalized_name = output_csv_name if output_csv_name.lower().endswith(".csv") else f"{output_csv_name}.csv"
+        stem = Path(normalized_name).stem
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
+        out_path = scratch_root / f"{stem}_{timestamp}.csv"
+        result_df.to_csv(out_path, index=False, encoding="utf-8")
+
+        if output_dataframe_name:
+            state["data_store"][output_dataframe_name] = result_df
+
+        return (
+            f"Transformation '{transformation}' finished and CSV saved to '{out_path.as_posix()}'. "
+            f"Rows: {len(result_df)}, Columns: {list(result_df.columns)}."
+            + (f" Stored transformed DataFrame in '{output_dataframe_name}'." if output_dataframe_name else "")
+        )
+    except Exception as e:
+        return f"Error exporting transformed CSV: {type(e).__name__} : {str(e)}"
 
 # Create make_choropleth_map tool function to plot a geodataframe
 def make_choropleth_map(
@@ -3737,6 +4401,144 @@ def calculate_polygon_areas(
 
     except Exception as e:
         return f"Error: {type(e).__name__} : {str(e)}"
+
+
+def create_thiessen_polygons(
+    points_geodataframe_name: Annotated[str, "Name of point GeoDataFrame in data_store"],
+    output_geodataframe_name: Annotated[str, "Name for storing resulting Thiessen polygons GeoDataFrame"],
+    state: Annotated[dict, InjectedState],
+    clip_geodataframe_name: Annotated[str | None, "Optional GeoDataFrame name used as clip boundary"] = None,
+    output_file_name: Annotated[str | None, "Optional output filename (.shp/.gpkg/.geojson/.json). Saved under project scratch folder"] = None,
+) -> str:
+    """Create Thiessen (Voronoi) polygons from input points, optionally clip to a boundary, store result in data_store, and save to scratch."""
+    try:
+        if "data_store" not in state:
+            state["data_store"] = {}
+
+        points_gdf = state["data_store"].get(points_geodataframe_name)
+        if points_gdf is None or not isinstance(points_gdf, gpd.GeoDataFrame):
+            return f"Error: GeoDataFrame '{points_geodataframe_name}' not found"
+        if points_gdf.empty:
+            return f"Error: GeoDataFrame '{points_geodataframe_name}' has no features"
+        if points_gdf.crs is None:
+            return f"Error: GeoDataFrame '{points_geodataframe_name}' has no CRS defined"
+
+        pts = points_gdf.explode(index_parts=False).copy()
+        pts = pts[pts.geometry.notna() & (~pts.geometry.is_empty)].copy()
+        pts = pts[pts.geometry.geom_type == "Point"].copy()
+        if len(pts) < 3:
+            return "Error: At least 3 valid point geometries are required to build Thiessen polygons"
+
+        if clip_geodataframe_name:
+            clip_gdf = state["data_store"].get(clip_geodataframe_name)
+            if clip_gdf is None or not isinstance(clip_gdf, gpd.GeoDataFrame):
+                return f"Error: clip GeoDataFrame '{clip_geodataframe_name}' not found"
+            if clip_gdf.empty:
+                return f"Error: clip GeoDataFrame '{clip_geodataframe_name}' is empty"
+        else:
+            clip_gdf = None
+
+        projected = pts.to_crs(pts.estimate_utm_crs())
+        coords = np.array([(geom.x, geom.y) for geom in projected.geometry])
+        vor = Voronoi(coords)
+
+        def _voronoi_finite_polygons_2d(vor_obj, radius=None):
+            if vor_obj.points.shape[1] != 2:
+                raise ValueError("Requires 2D input")
+            new_regions = []
+            new_vertices = vor_obj.vertices.tolist()
+            center = vor_obj.points.mean(axis=0)
+            if radius is None:
+                radius = np.ptp(vor_obj.points, axis=0).max() * 2
+
+            all_ridges = {}
+            for (p1, p2), (v1, v2) in zip(vor_obj.ridge_points, vor_obj.ridge_vertices):
+                all_ridges.setdefault(p1, []).append((p2, v1, v2))
+                all_ridges.setdefault(p2, []).append((p1, v1, v2))
+
+            for p1, region_idx in enumerate(vor_obj.point_region):
+                vertices = vor_obj.regions[region_idx]
+                if all(v >= 0 for v in vertices):
+                    new_regions.append(vertices)
+                    continue
+
+                ridges = all_ridges[p1]
+                new_region = [v for v in vertices if v >= 0]
+                for p2, v1, v2 in ridges:
+                    if v2 < 0:
+                        v1, v2 = v2, v1
+                    if v1 >= 0:
+                        continue
+                    tangent = vor_obj.points[p2] - vor_obj.points[p1]
+                    tangent /= np.linalg.norm(tangent)
+                    normal = np.array([-tangent[1], tangent[0]])
+                    midpoint = vor_obj.points[[p1, p2]].mean(axis=0)
+                    direction = np.sign(np.dot(midpoint - center, normal)) * normal
+                    far_point = vor_obj.vertices[v2] + direction * radius
+                    new_vertices.append(far_point.tolist())
+                    new_region.append(len(new_vertices) - 1)
+
+                vs = np.asarray([new_vertices[v] for v in new_region])
+                c = vs.mean(axis=0)
+                angles = np.arctan2(vs[:, 1] - c[1], vs[:, 0] - c[0])
+                new_region = [v for _, v in sorted(zip(angles, new_region))]
+                new_regions.append(new_region)
+            return new_regions, np.asarray(new_vertices)
+
+        regions, vertices = _voronoi_finite_polygons_2d(vor)
+
+        polygons = []
+        src_indices = []
+        for i, region in enumerate(regions):
+            poly = Polygon(vertices[region])
+            if poly.is_valid and not poly.is_empty:
+                polygons.append(poly)
+                src_indices.append(pts.index[i])
+
+        thiessen_proj = gpd.GeoDataFrame(
+            {"source_index": src_indices},
+            geometry=polygons,
+            crs=projected.crs,
+        )
+
+        if clip_gdf is not None:
+            clip_proj = clip_gdf.to_crs(thiessen_proj.crs)
+            clip_union = unary_union(clip_proj.geometry.dropna())
+            thiessen_proj = thiessen_proj[thiessen_proj.geometry.intersects(clip_union)].copy()
+            thiessen_proj["geometry"] = thiessen_proj.geometry.intersection(clip_union)
+            thiessen_proj = thiessen_proj[thiessen_proj.geometry.notna() & (~thiessen_proj.geometry.is_empty)].copy()
+
+        thiessen_gdf = thiessen_proj.to_crs(points_gdf.crs)
+        state["data_store"][output_geodataframe_name] = thiessen_gdf
+
+        scratch_root = Path(SCRATCH_PATH) if SCRATCH_PATH else Path(__file__).resolve().parent.parent / "scratch"
+        scratch_root.mkdir(parents=True, exist_ok=True)
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
+        requested = output_file_name or f"{output_geodataframe_name}_{timestamp}.gpkg"
+        out_parent = Path(requested).parent
+        out_name = Path(requested).name
+        suffix = Path(out_name).suffix.lower()
+        if suffix not in [".shp", ".gpkg", ".geojson", ".json"]:
+            out_name = f"{Path(out_name).stem}.gpkg"
+            suffix = ".gpkg"
+        out_path = scratch_root / out_parent / out_name
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+
+        if suffix == ".shp":
+            driver = "ESRI Shapefile"
+        elif suffix == ".gpkg":
+            driver = "GPKG"
+        else:
+            driver = "GeoJSON"
+        thiessen_gdf.to_file(out_path.as_posix(), driver=driver, index=False)
+
+        return (
+            f"Created Thiessen polygons from '{points_geodataframe_name}' with {len(thiessen_gdf)} polygons, "
+            f"stored in '{output_geodataframe_name}', and saved to '{out_path.as_posix()}'."
+            + (f" Clipped by '{clip_geodataframe_name}'." if clip_geodataframe_name else "")
+        )
+    except Exception as e:
+        return f"Error creating Thiessen polygons: {type(e).__name__} : {str(e)}"
 
 def analyze_vector_overlap(
     geodataframe_a_name: Annotated[str, "Name of the first GeoDataFrame (reference)"],
@@ -5643,6 +6445,267 @@ def generate_contours_display(
     except Exception as e:
         return f"Error generating contours: {type(e).__name__} : {str(e)}" 
 
+
+def create_dem_from_contours(
+    contours_geodataframe_name: Annotated[str, "Name of contour line GeoDataFrame in data_store"],
+    elevation_column: Annotated[str, "Column containing contour elevation values"],
+    output_variable_name: Annotated[str, "Name for storing output DEM metadata in data_store"],
+    state: Annotated[dict, InjectedState],
+    output_raster_path: Annotated[str | None, "Optional output GeoTIFF path. Defaults to scratch/dem_from_contours_<name>.tif"] = None,
+    pixel_size: Annotated[float | None, "Output raster cell size in processing CRS units. If omitted, derived from data extent."] = None,
+    width: Annotated[int | None, "Optional output raster width in pixels. Used only when pixel_size is omitted."] = None,
+    height: Annotated[int | None, "Optional output raster height in pixels. Used only when pixel_size is omitted."] = None,
+    interpolation_method: Annotated[Literal["linear", "cubic", "nearest"], "Interpolation method used by scipy.interpolate.griddata"] = "linear",
+    fill_nodata_with_nearest: Annotated[bool, "Fill interpolation gaps with nearest-neighbor values"] = True,
+    sampling_interval: Annotated[float | None, "Distance between samples along contour lines in processing CRS units. Defaults to pixel_size."] = None,
+    target_crs: Annotated[str | None, "Optional processing/output CRS. If omitted, use source projected CRS or estimated UTM."] = None,
+    padding_cells: Annotated[int, "Number of output cells to pad around contour bounds"] = 2,
+    max_grid_cells: Annotated[int, "Safety limit for output raster cells"] = 4000000,
+    overwrite_existing: Annotated[bool, "Allow overwriting an existing output raster"] = True,
+    append_timestamp_to_output: Annotated[bool, "Append UTC timestamp to output filename"] = True,
+    plot_title: Annotated[str, "Title displayed on the DEM preview"] = "DEM Interpolated from Contours",
+    colormap: Annotated[str, "Matplotlib colormap name used for DEM preview"] = "terrain",
+) -> str:
+    """Create a DEM raster from contour vector lines by sampling elevations and interpolating onto a regular grid."""
+    try:
+        if "data_store" not in state:
+            state["data_store"] = {}
+        if "image_store" not in state:
+            state["image_store"] = []
+
+        contours = state["data_store"].get(contours_geodataframe_name)
+        if contours is None or not isinstance(contours, gpd.GeoDataFrame):
+            return f"Error: GeoDataFrame '{contours_geodataframe_name}' not found in data_store"
+        if contours.empty:
+            return f"Error: GeoDataFrame '{contours_geodataframe_name}' is empty"
+        if contours.crs is None:
+            return f"Error: GeoDataFrame '{contours_geodataframe_name}' has no CRS"
+        if elevation_column not in contours.columns:
+            return f"Error: elevation_column '{elevation_column}' not found in '{contours_geodataframe_name}'"
+
+        source_crs = CRS.from_user_input(contours.crs)
+        if target_crs:
+            processing_crs = CRS.from_user_input(target_crs)
+        elif source_crs.is_projected:
+            processing_crs = source_crs
+        else:
+            estimated = contours.estimate_utm_crs()
+            processing_crs = CRS.from_user_input(estimated) if estimated is not None else CRS.from_epsg(3857)
+
+        contours_proj = contours.to_crs(processing_crs.to_string())
+        contours_proj = contours_proj[contours_proj.geometry.notna() & (~contours_proj.geometry.is_empty)].copy()
+        contours_proj[elevation_column] = pd.to_numeric(contours_proj[elevation_column], errors="coerce")
+        contours_proj = contours_proj[contours_proj[elevation_column].notna()].copy()
+        if contours_proj.empty:
+            return f"Error: No valid contour geometries with numeric '{elevation_column}' values were found"
+
+        minx, miny, maxx, maxy = contours_proj.total_bounds
+        span_x = maxx - minx
+        span_y = maxy - miny
+        if span_x <= 0 or span_y <= 0:
+            return "Error: Contour extent is invalid for raster creation"
+
+        if pixel_size is not None:
+            if pixel_size <= 0:
+                return "Error: pixel_size must be positive"
+            out_width = int(math.ceil(span_x / pixel_size)) + padding_cells * 2
+            out_height = int(math.ceil(span_y / pixel_size)) + padding_cells * 2
+        else:
+            if width is None and height is None:
+                width = 500
+                height = max(1, int(round(width * span_y / span_x)))
+            elif width is None:
+                width = max(1, int(round(height * span_x / span_y)))
+            elif height is None:
+                height = max(1, int(round(width * span_y / span_x)))
+            out_width = int(width) + padding_cells * 2
+            out_height = int(height) + padding_cells * 2
+            if out_width <= padding_cells * 2 or out_height <= padding_cells * 2:
+                return "Error: width and height must be positive"
+            pixel_size = max(span_x / max(out_width - padding_cells * 2, 1), span_y / max(out_height - padding_cells * 2, 1))
+
+        total_cells = out_width * out_height
+        if total_cells > max_grid_cells:
+            return (
+                f"Error: Requested DEM grid has {total_cells:,} cells, exceeding max_grid_cells={max_grid_cells:,}. "
+                "Increase pixel_size or reduce width/height."
+            )
+
+        sampling_distance = float(sampling_interval if sampling_interval is not None else pixel_size)
+        if sampling_distance <= 0:
+            return "Error: sampling_interval must be positive"
+
+        sample_xy: list[tuple[float, float]] = []
+        sample_z: list[float] = []
+
+        def _sample_geometry(geom, elevation: float) -> None:
+            if geom is None or geom.is_empty:
+                return
+            if geom.geom_type == "LineString":
+                line = geom
+                if line.length == 0:
+                    coords = list(line.coords)
+                    if coords:
+                        sample_xy.append((coords[0][0], coords[0][1]))
+                        sample_z.append(elevation)
+                    return
+                n_steps = max(int(math.ceil(line.length / sampling_distance)), 1)
+                for dist in np.linspace(0, line.length, n_steps + 1):
+                    pt = line.interpolate(float(dist))
+                    sample_xy.append((pt.x, pt.y))
+                    sample_z.append(elevation)
+            elif geom.geom_type == "MultiLineString":
+                for part in geom.geoms:
+                    _sample_geometry(part, elevation)
+            elif geom.geom_type == "Point":
+                sample_xy.append((geom.x, geom.y))
+                sample_z.append(elevation)
+            elif geom.geom_type == "MultiPoint":
+                for part in geom.geoms:
+                    sample_xy.append((part.x, part.y))
+                    sample_z.append(elevation)
+            elif geom.geom_type in {"Polygon", "MultiPolygon"}:
+                boundary = geom.boundary
+                _sample_geometry(boundary, elevation)
+
+        for _, row in contours_proj.iterrows():
+            _sample_geometry(row.geometry, float(row[elevation_column]))
+
+        if len(sample_xy) < 3:
+            return "Error: At least three sampled contour points are required to interpolate a DEM"
+
+        points = np.asarray(sample_xy, dtype="float64")
+        values = np.asarray(sample_z, dtype="float64")
+        unique_points, unique_idx = np.unique(points, axis=0, return_index=True)
+        points = unique_points
+        values = values[unique_idx]
+        if len(points) < 3:
+            return "Error: At least three unique sampled contour points are required to interpolate a DEM"
+
+        padded_minx = minx - padding_cells * pixel_size
+        padded_maxx = maxx + padding_cells * pixel_size
+        padded_miny = miny - padding_cells * pixel_size
+        padded_maxy = maxy + padding_cells * pixel_size
+
+        x_coords = padded_minx + (np.arange(out_width) + 0.5) * pixel_size
+        y_coords = padded_maxy - (np.arange(out_height) + 0.5) * pixel_size
+        xx, yy = np.meshgrid(x_coords, y_coords)
+
+        dem_grid = griddata(points, values, (xx, yy), method=interpolation_method)
+        if fill_nodata_with_nearest and interpolation_method != "nearest":
+            nearest_grid = griddata(points, values, (xx, yy), method="nearest")
+            dem_grid = np.where(np.isfinite(dem_grid), dem_grid, nearest_grid)
+
+        finite_vals = dem_grid[np.isfinite(dem_grid)]
+        if finite_vals.size == 0:
+            return "Error: Interpolation produced no valid DEM pixels"
+
+        timestamp_utc = datetime.utcnow().strftime("%Y%m%dT%H%M%S")
+        if output_raster_path is None:
+            scratch_root = Path(SCRATCH_PATH) if SCRATCH_PATH else Path(__file__).resolve().parent.parent / "scratch"
+            scratch_root.mkdir(parents=True, exist_ok=True)
+            safe_name = re.sub(r"[^A-Za-z0-9]+", "_", contours_geodataframe_name).strip("_") or "contours"
+            output_path_obj = scratch_root / f"dem_from_contours_{safe_name}.tif"
+        else:
+            output_path_obj = Path(output_raster_path)
+            output_path_obj.parent.mkdir(parents=True, exist_ok=True)
+
+        if append_timestamp_to_output:
+            suffix = output_path_obj.suffix or ".tif"
+            output_path_obj = output_path_obj.with_name(f"{output_path_obj.stem}_{timestamp_utc}{suffix}")
+
+        if output_path_obj.exists():
+            if overwrite_existing:
+                output_path_obj.unlink()
+                aux_file = output_path_obj.with_suffix(output_path_obj.suffix + ".aux.xml")
+                if aux_file.exists():
+                    aux_file.unlink()
+            else:
+                return f"Error: Output raster '{output_path_obj.as_posix()}' already exists. Enable overwrite or choose another path."
+
+        nodata = -9999.0
+        dem_to_write = np.where(np.isfinite(dem_grid), dem_grid, nodata).astype("float32")
+        transform = from_origin(padded_minx, padded_maxy, pixel_size, pixel_size)
+        profile = {
+            "driver": "GTiff",
+            "height": out_height,
+            "width": out_width,
+            "count": 1,
+            "dtype": "float32",
+            "crs": processing_crs.to_string(),
+            "transform": transform,
+            "nodata": nodata,
+            "compress": "deflate",
+        }
+        with rasterio.open(output_path_obj.as_posix(), "w", **profile) as dst:
+            dst.write(dem_to_write, 1)
+
+        stats = {
+            "count": int(finite_vals.size),
+            "min": float(finite_vals.min()),
+            "max": float(finite_vals.max()),
+            "mean": float(finite_vals.mean()),
+            "std": float(finite_vals.std(ddof=1)) if finite_vals.size > 1 else 0.0,
+        }
+
+        fig, ax = plt.subplots(1, 1, figsize=(10, 8))
+        masked_dem = np.ma.masked_where(~np.isfinite(dem_grid), dem_grid)
+        img = ax.imshow(
+            masked_dem,
+            cmap=plt.get_cmap(colormap),
+            extent=(padded_minx, padded_maxx, padded_miny, padded_maxy),
+            origin="upper",
+        )
+        contours_proj.plot(ax=ax, color="black", linewidth=0.35, alpha=0.65)
+        ax.set_title(plot_title)
+        ax.set_axis_off()
+        cbar = plt.colorbar(img, ax=ax, fraction=0.036, pad=0.02)
+        cbar.set_label(elevation_column)
+        buf = io.BytesIO()
+        fig.savefig(buf, format="png", bbox_inches="tight", dpi=150)
+        buf.seek(0)
+        img_base64 = base64.b64encode(buf.read()).decode("utf-8")
+        buf.close()
+        plt.close(fig)
+
+        state["image_store"].append({
+            "type": "map",
+            "description": f"DEM interpolated from contours '{contours_geodataframe_name}'",
+            "base64": img_base64,
+        })
+
+        state["data_store"][output_variable_name] = {
+            "dem_raster_path": output_path_obj.as_posix(),
+            "source_contours": contours_geodataframe_name,
+            "elevation_column": elevation_column,
+            "interpolation_method": interpolation_method,
+            "fill_nodata_with_nearest": fill_nodata_with_nearest,
+            "sample_count": int(len(points)),
+            "width": out_width,
+            "height": out_height,
+            "pixel_size": float(pixel_size),
+            "crs": processing_crs.to_string(),
+            "statistics": stats,
+            "timestamp_utc": timestamp_utc,
+        }
+
+        summary = (
+            f"Created DEM raster from contour GeoDataFrame '{contours_geodataframe_name}'.\n"
+            f"- Elevation column: {elevation_column}\n"
+            f"- Interpolation: {interpolation_method}"
+            f"{' with nearest fill' if fill_nodata_with_nearest and interpolation_method != 'nearest' else ''}\n"
+            f"- Output path: {output_path_obj.as_posix()}\n"
+            f"- Raster size: {out_width} x {out_height}, pixel size: {pixel_size:.6f}\n"
+            f"- CRS: {processing_crs.to_string()}\n"
+            f"- Elevation range: {stats['min']:.3f} to {stats['max']:.3f}\n"
+            f"- Metadata stored as '{output_variable_name}'."
+        )
+        return summary
+
+    except Exception as e:
+        return f"Error creating DEM from contours: {type(e).__name__} : {str(e)}"
+
+
 # Tool function to create a bivariate choroplate map 
 def make_bivariate_map(
     dataframe_name: Annotated[str, "Name of GeoDataFrame containing map data"],
@@ -5925,6 +6988,18 @@ generate_profile_curvature_map_tool = StructuredTool.from_function(
         saves a timestamped GeoTIFF in scratch, captures a diverging preview map, and stores summary statistics.'
 )
 
+generate_plan_curvature_map_tool = StructuredTool.from_function(
+    func=_wrap_tool_function(generate_plan_curvature_map),
+    name='generate_plan_curvature_map',
+    description='Creates a plan curvature raster from a DEM, saves a timestamped GeoTIFF in the project root scratch folder, captures a diverging preview map, and stores summary statistics.'
+)
+
+create_3d_dem_visualization_tool = StructuredTool.from_function(
+    func=_wrap_tool_function(create_3d_dem_visualization),
+    name='create_3d_dem_visualization',
+    description='Create an interactive Plotly 3D DEM surface visualization, optionally overlay vector GeoDataFrames as 3D points or lines draped on the DEM, save the result as an HTML file in the project root scratch folder, and store metadata in data_store.'
+)
+
 rasterize_vector_to_match_raster_tool = StructuredTool.from_function(
     func=_wrap_tool_function(rasterize_vector_to_match_raster),
     name='rasterize_vector_to_match_raster',
@@ -5989,7 +7064,7 @@ create_buffer_tool = StructuredTool.from_function(
 create_dissolved_buffer_tool = StructuredTool.from_function(
     func=_wrap_tool_function(create_dissolved_buffer),
     name='create_dissolved_buffer',
-    description='Create metric buffers around vector features, dissolve overlaps globally or by attribute, save the result to a vector file, and capture a preview map for quick review.'
+    description='Create QGIS-style metric buffers around vector features, dissolve overlaps globally or by attribute, save the result to a vector file, and capture a preview map. Uses source projected meter CRS when available, otherwise estimates UTM; exposes QGIS-like buffer parameters segments, cap_style, join_style, and mitre_limit.'
 )
 
 make_choropleth_map_tool = StructuredTool.from_function(
@@ -6028,6 +7103,13 @@ calculate_polygon_areas_tool = StructuredTool.from_function(
     description='Calculates areas of polygon features in a GeoDataFrame in square kilometers using an appropriate UTM projection. \
         Returns total area, projected GeoDataFrame with a per-feature area column, and UTM metadata.'
 )
+
+create_thiessen_polygons_tool = StructuredTool.from_function(
+    func=_wrap_tool_function(create_thiessen_polygons),
+    name='create_thiessen_polygons',
+    description='Create Thiessen (Voronoi) polygons from a point GeoDataFrame, optionally clip by a boundary GeoDataFrame, store the result in data_store, and save vector output to the project root scratch folder.'
+)
+
 analyze_vector_overlap_tool = StructuredTool.from_function(
     func=_wrap_tool_function(analyze_vector_overlap),
     name='analyze_vector_overlap',
@@ -6094,6 +7176,12 @@ convert_csv_to_shapefile_tool = StructuredTool.from_function(
         Supports explicit or auto-detected X/Y columns and optional data_store output.'
 )
 
+export_transformed_data_to_csv_tool = StructuredTool.from_function(
+    func=_wrap_tool_function(export_transformed_data_to_csv),
+    name='export_transformed_data_to_csv',
+    description='Transform DataFrame/GeoDataFrame content according to a requested mode (geometry coordinates, pairwise point distances, point-to-line distances, or spatial aggregation) and save the transformed result as a CSV file in the project root scratch folder.'
+)
+
 perform_arithmetic_operation_tool = StructuredTool.from_function(
     func=_wrap_tool_function(perform_arithmetic_operation),
     name='perform_arithmetic_operation',
@@ -6148,6 +7236,12 @@ generate_contours_display_tool = StructuredTool.from_function(
         To get values for the function arguments, call get_raster_description_tool first.\
         Tool supports customization of contour intervals, value ranges. Note, that common nodata values could be -99999, -9999, -32768, -999, -3.4e38  and assign function arguments accordingly.\
         The tool also produces a shapefile that can be optionally saved, optionally can visualize background raster and generated contour lines and customize styling.'
+)
+
+create_dem_from_contours_tool = StructuredTool.from_function(
+    func=_wrap_tool_function(create_dem_from_contours),
+    name='create_dem_from_contours',
+    description='Create a DEM elevation raster from a contour vector GeoDataFrame by sampling contour elevations and interpolating to a regular grid. Saves a GeoTIFF to the project root scratch folder, stores metadata in data_store, and captures a preview map.'
 )
 
 make_bivariate_map_tool = StructuredTool.from_function(

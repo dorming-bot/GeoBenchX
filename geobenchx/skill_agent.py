@@ -35,12 +35,15 @@ from geobenchx.constants import (
     MODEL_SHER_LOCKER_4mini,
     MODEL_SHER_LOCKER_4o,
     MODEL_SHER_LOCKER_GEMINI_FLASH,
-    MODEL_SHER_LOCKER_GPT5.4,
+    MODEL_SHER_LOCKER_GPT5_4,
 )
 from geobenchx.dataclasses import Solution, Step
 from geobenchx.prompts import RULES_PROMPT, SYSTEM_PROMPT
 from skill.calculate_polygon_areas_statements.calculate_polygon_areas import (
     calculate_polygon_areas,
+)
+from skill.create_thiessen_polygons_statements.create_thiessen_polygons import (
+    create_thiessen_polygons,
 )
 from skill.calculate_raster_selection_area_statements.calculate_raster_selection_area import (
     calculate_raster_selection_area,
@@ -62,6 +65,12 @@ from skill.generate_aspect_map_statements.generate_aspect_map import (
 )
 from skill.generate_profile_curvature_map_statements.generate_profile_curvature_map import (
     generate_profile_curvature_map,
+)
+from skill.generate_plan_curvature_map_statements.generate_plan_curvature_map import (
+    generate_plan_curvature_map,
+)
+from skill.create_3d_dem_visualization_statements.create_3d_dem_visualization import (
+    create_3d_dem_visualization,
 )
 from skill.get_centroids_statements.get_centroids import get_centroids
 from skill.get_raster_description_statements.get_raster_description import (
@@ -89,6 +98,9 @@ from skill.reproject_vector_data_statements.reproject_vector_data import (
 )
 from skill.convert_csv_to_shapefile_statements.convert_csv_to_shapefile import (
     convert_csv_to_shapefile,
+)
+from skill.export_transformed_data_to_csv_statements.export_transformed_data_to_csv import (
+    export_transformed_data_to_csv,
 )
 from skill.calculate_line_direction_rose_statements.calculate_line_direction_rose import (
     calculate_line_direction_rose,
@@ -137,6 +149,9 @@ from skill.visualize_geographies_statements.visualize_geographies import (
 from skill.plot_contour_lines_statements.plot_contour_lines import plot_contour_lines
 from skill.generate_contours_display_statements.generate_contours_display import (
     generate_contours_display,
+)
+from skill.create_dem_from_contours_statements.create_dem_from_contours import (
+    create_dem_from_contours,
 )
 from skill.reject_task_statements.reject_task import reject_task
 
@@ -270,6 +285,16 @@ tools = [
         _SKILL_ROOT / "generate_profile_curvature_map_statements" / "SKILL.md",
     ),
     _tool_from_skill(
+        generate_plan_curvature_map,
+        "generate_plan_curvature_map",
+        _SKILL_ROOT / "generate_plan_curvature_map_statements" / "SKILL.md",
+    ),
+    _tool_from_skill(
+        create_3d_dem_visualization,
+        "create_3d_dem_visualization",
+        _SKILL_ROOT / "create_3d_dem_visualization_statements" / "SKILL.md",
+    ),
+    _tool_from_skill(
         rasterize_vector_to_match_raster,
         "rasterize_vector_to_match_raster",
         _SKILL_ROOT / "rasterize_vector_to_match_raster_statements" / "SKILL.md",
@@ -330,11 +355,6 @@ tools = [
         _SKILL_ROOT / "perform_vector_topology_operation_statements" / "SKILL.md",
     ),
     _tool_from_skill(
-        random_sample_from_layer,
-        "random_sample_from_layer",
-        _SKILL_ROOT / "random_sample_from_layer_statements" / "SKILL.md",
-    ),
-    _tool_from_skill(
         calculate_nearest_distances,
         "calculate_nearest_distances",
         _SKILL_ROOT / "calculate_nearest_distances_statements" / "SKILL.md",
@@ -375,6 +395,11 @@ tools = [
         _SKILL_ROOT / "convert_csv_to_shapefile_statements" / "SKILL.md",
     ),
     _tool_from_skill(
+        export_transformed_data_to_csv,
+        "export_transformed_data_to_csv",
+        _SKILL_ROOT / "export_transformed_data_to_csv_statements" / "SKILL.md",
+    ),
+    _tool_from_skill(
         make_heatmap,
         "make_heatmap",
         _SKILL_ROOT / "make_heatmap_statements" / "SKILL.md",
@@ -400,6 +425,11 @@ tools = [
         _SKILL_ROOT / "generate_contours_display_statements" / "SKILL.md",
     ),
     _tool_from_skill(
+        create_dem_from_contours,
+        "create_dem_from_contours",
+        _SKILL_ROOT / "create_dem_from_contours_statements" / "SKILL.md",
+    ),
+    _tool_from_skill(
         make_bivariate_map,
         "make_bivariate_map",
         _SKILL_ROOT / "make_bivariate_map_statements" / "SKILL.md",
@@ -423,6 +453,11 @@ tools = [
         calculate_polygon_areas,
         "calculate_polygon_areas",
         _SKILL_ROOT / "calculate_polygon_areas_statements" / "SKILL.md",
+    ),
+    _tool_from_skill(
+        create_thiessen_polygons,
+        "create_thiessen_polygons",
+        _SKILL_ROOT / "create_thiessen_polygons_statements" / "SKILL.md",
     ),
 ]
 
@@ -468,6 +503,7 @@ def execute_task(
         MODEL_SHER_LOCKER_4o,
         MODEL_SHER_LOCKER_GEMINI_FLASH,
         MODEL_SHER_LOCKER_4mini,
+        MODEL_SHER_LOCKER_GPT5_4,
     ]:
         if not _sher_locker_api_key:
             raise ValueError("SHER_LOCKER_API_KEY is not set in the environment.")

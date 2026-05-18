@@ -29,7 +29,8 @@ MODEL_SHER_LOCKER = 'gpt-4.1-nano'
 MODEL_SHER_LOCKER_4o = 'gpt-4o'
 MODEL_SHER_LOCKER_GEMINI_FLASH = 'gemini-2.5-flash'
 MODEL_SHER_LOCKER_4mini = 'gpt-4o-mini-2024-07-18'
-MODEL_SHER_LOCKER_GPT5.4 = 'gpt-5.4-2026-03-05'
+MODEL_SHER_LOCKER_GPT5_4 = 'gpt-5.4-2026-03-05'
+
 
 
 class ScoreValues(IntEnum):
@@ -49,6 +50,11 @@ class ScoreValues(IntEnum):
 
 class TaskLabels(str, Enum):
     """Enumeration of allowed labels."""
+    SPATIAL_DATA_TRANSFORMATION_PROCESSING = "Spatial Data Transformation and Processing"
+    VECTOR_SPATIAL_ANALYSIS = "Vector Spatial Analysis"
+    RASTER_SPATIAL_ANALYSIS = "Raster Spatial Analysis"
+    THREE_DIMENSIONAL_ANALYSIS = "Three-Dimensional Analysis"
+    SPATIAL_STATISTICAL_ANALYSIS = "Spatial Statistical Analysis"
     HEATMAPS_CONTOUR_LINES = "Heatmaps, Contour Lines"
     TASK_SET_04 = "Task Set 04"
     SPATIAL_OPERATIONS = "Spatial operations"
