@@ -5,14 +5,192 @@
     },
     "tasks": [
         {
-            "task_ID": "TASK_test392",
-            "task_text": "Load the data 'T_9_tutor_3danalysis_CityModel' then convert it into 3D",
+            "task_ID": "TASK_test398",
+            "task_text": "Get the raster data 'DEM data of the Tangxun Lake Experimental Area in Hubei' then convert it into 3D",
             "task_labels": [
-                "Spatial operations",
-                "Task Set 03",
-                "Process, Merge, Visualize",
-                "Merge, Visualize",
-                "Heatmaps, Contour Lines"
+                "Three-Dimensional Analysis"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_test399",
+            "task_text": "Get the raster data 'Piura region of Peru' then convert it into 3D",
+            "task_labels": [
+                "Three-Dimensional Analysis"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_test400",
+            "task_text": "Get the raster data 'PA DEM' then convert it into 3D",
+            "task_labels": [
+                "Three-Dimensional Analysis"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_test401",
+            "task_text": "Get the raster data 'DEM of Puerto' then convert it into 3D",
+            "task_labels": [
+                "Three-Dimensional Analysis"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_test402",
+            "task_text": "Get the raster data 'SC_DEM' then convert it into 3D",
+            "task_labels": [
+                "Three-Dimensional Analysis"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_test403",
+            "task_text": "Get the raster data 'Richland_DEM' then convert it into 3D",
+            "task_labels": [
+                "Three-Dimensional Analysis"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_test404",
+            "task_text": "Get the raster data 'ASTGTM DEM data for a city in Zhejiang Province' then convert it into 3D",
+            "task_labels": [
+                "Three-Dimensional Analysis"
+            ],
+            "reference_solution_description": null,
+            "reference_solutions": [
+                {
+                    "steps": [
+                        {
+                            "function_name": "reject_task",
+                            "arguments": {},
+                            "comment": null
+                        }
+                    ]
+                }
+            ],
+            "generated_solution": null,
+            "generated_solution_input_tokens": null,
+            "generated_solution_output_tokens": null,
+            "match_reasoning_LLM": null,
+            "match_score_LLM": null,
+            "match_reasoning_Human": null,
+            "match_score_Human": null
+        },
+        {
+            "task_ID": "TASK_test405",
+            "task_text": "Get the raster data 'DEM data of Jalaid Banner, Xing'an League, Inner Mongolia' then convert it into 3D",
+            "task_labels": [
+                "Three-Dimensional Analysis"
             ],
             "reference_solution_description": null,
             "reference_solutions": [

@@ -46,6 +46,7 @@ from osgeo import gdal, gdal_array, ogr, osr
 from osgeo.gdalconst import *
 from shapely.geometry import LineString, Point, shape, Polygon, MultiPolygon, mapping
 from shapely import affinity
+from shapely.ops import triangulate
 
 
 TOOL_CALL_DELAY_SECONDS = 20.0  # 限制任意两次工具调用之间的最小时间间隔
@@ -340,7 +341,10 @@ GEO_CATALOG = {
     "T_9_Ex2_Arc_Clip_urb":"T_9_Ex2_Arc_Clip_urb.shp",
     "T_9_Ex2_Arc_Clip_road":"T_9_Ex2_Arc_Clip_road.shp",
     "T_9_Ex2_Arc_Clip_river":"T_9_Ex2_Arc_Clip_river.shp",
-    "T_9_tutor_3danalysis_CityModel":"T_9_tutor_3danalysis_CityModel.shp"
+    "T_9_tutor_3danalysis_CityModel":"T_9_tutor_3danalysis_CityModel.shp",
+    "T_9_tutor_3danalysis_CityBuilding":"T_9_tutor_3danalysis_CityBuilding.shp",
+    "T_9_tutor_visualization_building":"T_9_tutor_visualization_building.shp",
+    "T_9_tutor_visualization_countour":"T_9_tutor_visualization_countour.shp"
 
     }
 
@@ -2745,6 +2749,295 @@ def create_3d_dem_visualization(
 
     except Exception as e:
         return f"Error creating 3D DEM visualization: {type(e).__name__} : {str(e)}"
+
+
+def create_3d_vector_visualization(
+    geodataframe_name: Annotated[str, "Name of the GeoDataFrame stored in data_store"],
+    output_variable_name: Annotated[str, "Name for storing 3D visualization metadata in data_store"],
+    state: Annotated[dict, InjectedState],
+    z_column: Annotated[str | None, "Optional numeric attribute column used as height when geometry has no Z"] = None,
+    output_html_path: Annotated[str | None, "Optional output HTML path. Defaults to scratch/vector_3d_<name>.html"] = None,
+    z_exaggeration: Annotated[float, "Vertical exaggeration multiplier"] = 1.0,
+    point_size: Annotated[float, "Marker size for point geometries"] = 4.0,
+    line_width: Annotated[float, "Line width for line/polygon geometries"] = 4.0,
+    title: Annotated[str, "Title displayed in the 3D visualization"] = "3D Vector Visualization",
+    append_timestamp_to_output: Annotated[bool, "Append UTC timestamp to output HTML filename"] = True,
+    overwrite_existing: Annotated[bool, "Allow overwriting an existing HTML output"] = True,
+) -> str:
+    """Create an interactive Plotly 3D visualization from vector geometries with Z values or an explicit height column."""
+    try:
+        if "data_store" not in state:
+            state["data_store"] = {}
+        if "html_store" not in state:
+            state["html_store"] = []
+
+        gdf = state["data_store"].get(geodataframe_name)
+        if gdf is None or not isinstance(gdf, gpd.GeoDataFrame):
+            return f"Error: GeoDataFrame '{geodataframe_name}' not found in data_store."
+        if gdf.empty:
+            return f"Error: GeoDataFrame '{geodataframe_name}' is empty."
+        if z_exaggeration <= 0:
+            return "Error: z_exaggeration must be positive."
+        if point_size <= 0 or line_width <= 0:
+            return "Error: point_size and line_width must be positive."
+
+        work = gdf[gdf.geometry.notna() & (~gdf.geometry.is_empty)].copy()
+        if work.empty:
+            return f"Error: GeoDataFrame '{geodataframe_name}' has no valid geometries."
+
+        use_z_column = z_column if (z_column and z_column in work.columns) else None
+        if z_column and use_z_column is None:
+            return f"Error: z_column '{z_column}' does not exist in '{geodataframe_name}'."
+
+        fig = go.Figure()
+        trace_count = 0
+        z_pool: list[float] = []
+        z_source = "geometry_z"
+        if use_z_column is not None:
+            z_source = f"attribute:{use_z_column}"
+
+        def _iter_xyz(geom, fallback_z: float):
+            gtype = geom.geom_type
+            if gtype == "Point":
+                if getattr(geom, "has_z", False):
+                    x, y, z = geom.coords[0][:3]
+                    yield (float(x), float(y), float(z))
+                else:
+                    yield (float(geom.x), float(geom.y), float(fallback_z))
+                return
+            if gtype == "LineString":
+                for c in geom.coords:
+                    if len(c) >= 3:
+                        yield (float(c[0]), float(c[1]), float(c[2]))
+                    else:
+                        yield (float(c[0]), float(c[1]), float(fallback_z))
+                return
+            if gtype == "Polygon":
+                for c in geom.exterior.coords:
+                    if len(c) >= 3:
+                        yield (float(c[0]), float(c[1]), float(c[2]))
+                    else:
+                        yield (float(c[0]), float(c[1]), float(fallback_z))
+                return
+            if gtype.startswith("Multi") or gtype == "GeometryCollection":
+                for part in geom.geoms:
+                    for xyz in _iter_xyz(part, fallback_z):
+                        yield xyz
+
+        def _add_extruded_polygon(poly: Polygon, top_z: float, name: str) -> int:
+            if poly.is_empty:
+                return 0
+            if len(poly.exterior.coords) < 4:
+                return 0
+
+            # Build wall mesh vertices (pair of base/top vertices per ring coordinate).
+            wall_coords = list(poly.exterior.coords)
+            if wall_coords[0] != wall_coords[-1]:
+                wall_coords.append(wall_coords[0])
+            n = len(wall_coords)
+            wall_x: list[float] = []
+            wall_y: list[float] = []
+            wall_z: list[float] = []
+            for x_val, y_val, *_ in wall_coords:
+                wall_x.extend([float(x_val), float(x_val)])
+                wall_y.extend([float(y_val), float(y_val)])
+                wall_z.extend([0.0, float(top_z)])
+            i_idx: list[int] = []
+            j_idx: list[int] = []
+            k_idx: list[int] = []
+            for i in range(n - 1):
+                b0 = 2 * i
+                t0 = 2 * i + 1
+                b1 = 2 * (i + 1)
+                t1 = 2 * (i + 1) + 1
+                i_idx.extend([b0, b0])
+                j_idx.extend([b1, t1])
+                k_idx.extend([t1, t0])
+
+            fig.add_trace(
+                go.Mesh3d(
+                    x=wall_x,
+                    y=wall_y,
+                    z=wall_z,
+                    i=i_idx,
+                    j=j_idx,
+                    k=k_idx,
+                    name=name,
+                    opacity=0.95,
+                    flatshading=True,
+                    showscale=False,
+                    showlegend=False,
+                )
+            )
+
+            # Build top cap using triangulated pieces.
+            cap_x: list[float] = []
+            cap_y: list[float] = []
+            cap_z: list[float] = []
+            cap_i: list[int] = []
+            cap_j: list[int] = []
+            cap_k: list[int] = []
+            cursor = 0
+            for tri in triangulate(poly):
+                tri_centroid = tri.representative_point()
+                if not poly.contains(tri_centroid):
+                    continue
+                tri_coords = list(tri.exterior.coords)[:3]
+                for x_val, y_val, *_ in tri_coords:
+                    cap_x.append(float(x_val))
+                    cap_y.append(float(y_val))
+                    cap_z.append(float(top_z))
+                cap_i.append(cursor)
+                cap_j.append(cursor + 1)
+                cap_k.append(cursor + 2)
+                cursor += 3
+            if cap_i:
+                fig.add_trace(
+                    go.Mesh3d(
+                        x=cap_x,
+                        y=cap_y,
+                        z=cap_z,
+                        i=cap_i,
+                        j=cap_j,
+                        k=cap_k,
+                        name=name,
+                        opacity=0.95,
+                        flatshading=True,
+                        showscale=False,
+                        showlegend=False,
+                    )
+                )
+                return 2
+            return 1
+
+        for idx, row in work.iterrows():
+            geom = row.geometry
+            fallback_z = 0.0
+            if use_z_column is not None:
+                try:
+                    fallback_z = float(row[use_z_column])
+                except Exception:
+                    fallback_z = np.nan
+            if not np.isfinite(fallback_z):
+                continue
+
+            geom_type = geom.geom_type
+            if geom_type in ("Polygon", "MultiPolygon"):
+                top_z = fallback_z * z_exaggeration
+                poly_parts = [geom] if geom_type == "Polygon" else list(geom.geoms)
+                for poly in poly_parts:
+                    added = _add_extruded_polygon(poly, top_z, f"{geodataframe_name}_{idx}")
+                    trace_count += added
+                if np.isfinite(top_z):
+                    z_pool.extend([0.0, float(top_z)])
+                continue
+
+            coords = list(_iter_xyz(geom, fallback_z))
+            if not coords:
+                continue
+            x_vals = np.asarray([c[0] for c in coords], dtype="float64")
+            y_vals = np.asarray([c[1] for c in coords], dtype="float64")
+            z_vals = np.asarray([c[2] for c in coords], dtype="float64") * z_exaggeration
+            z_pool.extend(z_vals.tolist())
+
+            if geom_type == "Point" or geom_type == "MultiPoint":
+                fig.add_trace(
+                    go.Scatter3d(
+                        x=x_vals,
+                        y=y_vals,
+                        z=z_vals,
+                        mode="markers",
+                        name=f"{geodataframe_name}_{idx}",
+                        marker={"size": point_size},
+                        showlegend=False,
+                    )
+                )
+            else:
+                fig.add_trace(
+                    go.Scatter3d(
+                        x=x_vals,
+                        y=y_vals,
+                        z=z_vals,
+                        mode="lines",
+                        name=f"{geodataframe_name}_{idx}",
+                        line={"width": line_width},
+                        showlegend=False,
+                    )
+                )
+            trace_count += 1
+
+        if trace_count == 0:
+            return (
+                f"Error: No plottable 3D geometries found in '{geodataframe_name}'. "
+                "Provide geometries with Z or a valid z_column."
+            )
+
+        fig.update_layout(
+            title=title,
+            scene={
+                "xaxis_title": "X",
+                "yaxis_title": "Y",
+                "zaxis_title": "Height",
+                "aspectmode": "data",
+            },
+            margin={"l": 0, "r": 0, "b": 0, "t": 45},
+            height=800,
+        )
+
+        timestamp_utc = datetime.utcnow().strftime("%Y%m%dT%H%M%S")
+        scratch_root = Path(SCRATCH_PATH) if SCRATCH_PATH else Path(__file__).resolve().parent.parent / "scratch"
+        scratch_root.mkdir(parents=True, exist_ok=True)
+        if output_html_path is None:
+            output_path_obj = scratch_root / f"vector_3d_{geodataframe_name}.html"
+        else:
+            output_path_obj = Path(output_html_path)
+            output_path_obj.parent.mkdir(parents=True, exist_ok=True)
+        if output_path_obj.suffix.lower() != ".html":
+            output_path_obj = output_path_obj.with_suffix(".html")
+        if append_timestamp_to_output:
+            output_path_obj = output_path_obj.with_name(f"{output_path_obj.stem}_{timestamp_utc}{output_path_obj.suffix}")
+        if output_path_obj.exists():
+            if overwrite_existing:
+                output_path_obj.unlink()
+            else:
+                return f"Error: Output HTML '{output_path_obj.as_posix()}' already exists. Enable overwrite or choose another path."
+
+        html_string = fig.to_html(include_plotlyjs="cdn", full_html=True)
+        output_path_obj.write_text(html_string, encoding="utf-8")
+
+        z_min = float(np.min(z_pool)) if z_pool else float("nan")
+        z_max = float(np.max(z_pool)) if z_pool else float("nan")
+        crs_value = work.crs.to_string() if work.crs is not None else "Unknown"
+
+        state["html_store"].append({
+            "type": "interactive_3d_map",
+            "description": f"3D vector visualization for {geodataframe_name}",
+            "html": html_string,
+            "path": output_path_obj.as_posix(),
+        })
+        state["data_store"][output_variable_name] = {
+            "html_path": output_path_obj.as_posix(),
+            "geodataframe_name": geodataframe_name,
+            "trace_count": trace_count,
+            "z_source": z_source,
+            "z_exaggeration": z_exaggeration,
+            "height_min": z_min,
+            "height_max": z_max,
+            "crs": crs_value,
+            "timestamp_utc": timestamp_utc,
+        }
+
+        return (
+            f"Created interactive 3D vector visualization from '{geodataframe_name}'.\n"
+            f"- Output HTML: {output_path_obj.as_posix()}\n"
+            f"- Height source: {z_source}\n"
+            f"- Height range (after exaggeration): {z_min:.3f} to {z_max:.3f}\n"
+            f"- Trace count: {trace_count}\n"
+            f"- Metadata stored as '{output_variable_name}'."
+        )
+
+    except Exception as e:
+        return f"Error creating 3D vector visualization: {type(e).__name__} : {str(e)}"
 
 
 def rasterize_vector_to_match_raster(
@@ -7070,6 +7363,12 @@ create_3d_dem_visualization_tool = StructuredTool.from_function(
     func=_wrap_tool_function(create_3d_dem_visualization),
     name='create_3d_dem_visualization',
     description='Create an interactive Plotly 3D DEM surface visualization, optionally overlay vector GeoDataFrames as 3D points or lines draped on the DEM, save the result as an HTML file in the project root scratch folder, and store metadata in data_store.'
+)
+
+create_3d_vector_visualization_tool = StructuredTool.from_function(
+    func=_wrap_tool_function(create_3d_vector_visualization),
+    name='create_3d_vector_visualization',
+    description='Create an interactive Plotly 3D visualization from vector geometries that contain Z coordinates or an explicit height column, save the result as an HTML file in the project root scratch folder, and store metadata in data_store.'
 )
 
 rasterize_vector_to_match_raster_tool = StructuredTool.from_function(

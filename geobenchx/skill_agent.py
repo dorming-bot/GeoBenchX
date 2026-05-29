@@ -72,6 +72,9 @@ from skill.generate_plan_curvature_map_statements.generate_plan_curvature_map im
 from skill.create_3d_dem_visualization_statements.create_3d_dem_visualization import (
     create_3d_dem_visualization,
 )
+from skill.create_3d_vector_visualization_statements.create_3d_vector_visualization import (
+    create_3d_vector_visualization,
+)
 from skill.get_centroids_statements.get_centroids import get_centroids
 from skill.get_raster_description_statements.get_raster_description import (
     get_raster_description,
@@ -293,6 +296,11 @@ tools = [
         create_3d_dem_visualization,
         "create_3d_dem_visualization",
         _SKILL_ROOT / "create_3d_dem_visualization_statements" / "SKILL.md",
+    ),
+    _tool_from_skill(
+        create_3d_vector_visualization,
+        "create_3d_vector_visualization",
+        _SKILL_ROOT / "create_3d_vector_visualization_statements" / "SKILL.md",
     ),
     _tool_from_skill(
         rasterize_vector_to_match_raster,
